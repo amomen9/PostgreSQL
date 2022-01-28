@@ -1,2 +1,2 @@
 # PostgreSQL
-PostgreSQL Maintenance Scripts
+PostgreSQL Maintenance Bash Scripts
