@@ -1,2 +1,3 @@
 # PostgreSQL
-PostgreSQL Maintenance Bash Scripts
+
+PostgreSQL Maintenance Bash Scripts, configuration files, and docs
