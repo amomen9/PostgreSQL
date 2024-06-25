@@ -1,0 +1,14 @@
+# Timer for the service
+
+[Unit]
+Description=Executes socket repair operation
+Requires=pgpool_socket_repair@9999.service
+
+[Timer]
+Unit=pgpool_socket_repair@9999.service
+OnCalendar=*:*:0/10
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+

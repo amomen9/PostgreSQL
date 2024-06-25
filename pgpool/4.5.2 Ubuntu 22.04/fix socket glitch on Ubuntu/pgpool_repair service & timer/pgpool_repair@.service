@@ -1,0 +1,32 @@
+[Unit]
+Description=pgpool socket repair service
+After=network.target
+After=multi-user.target
+After=sshd.service
+After=pgpool2.service
+Wants=pgpool_socket_repair.timer
+
+[Service]
+#Type=oneshot
+
+User=postgres
+Group=postgres
+
+
+# Where to send early-startup messages from the server
+# This is normally controlled by the global default set by systemd
+StandardOutput=syslog
+
+# Disable OOM kill on the scripts
+OOMScoreAdjust=-1000
+Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
+Environment=PGB_OOM_ADJUST_VALUE=0
+
+# create symbolic link to the socket file if not exists
+ExecStart=/bin/sh -c '/usr/bin/test -S /tmp/.s.PGSQL.9999 && /usr/bin/test ! -S /var/run/postgresql/.s.PGSQL.9999 && /usr/bin/ln -s /tmp/.s.PGSQL.9999 /var/run/postgresql/.s.PGSQL.9999 || /usr/bin/test -S /var/run/postgresql/.s.PGSQL.9999'
+# assign vip to the primary node if not already assigned
+#ExecStart=/bin/sh -c 'echo $(pcp_node_info -h localhost -U pgpool | head -`pcp_node_info -h localhost -U pgpool | awk "{print $7}" | grep -n primary | cut -d":" -f1` | tail -1 | cut -d" " -f1)'
+
+[Install]
+WantedBy=multi-user.target
+
