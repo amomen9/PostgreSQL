@@ -2,10 +2,10 @@
 
 [Unit]
 Description=Executes socket repair operation
-Requires=pgpool_socket_repair@9999.service
+Requires=pgpool_repair.service
 
 [Timer]
-Unit=pgpool_socket_repair@9999.service
+Unit=pgpool_repair.service
 OnCalendar=*:*:0/10
 AccuracySec=1s
 

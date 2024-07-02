@@ -27,19 +27,19 @@ listen_backlog_multiplier = 2
 backend_hostname0 = 'funleashpgdb01'
 backend_port0 = 5432
 backend_weight0 = 1
-backend_data_directory0 = '/data/postgresql/15/main/data'
+backend_data_directory0 = '/data/postgresql/15/main/data/'
 backend_flag0 = 'ALLOW_TO_FAILOVER'
 backend_application_name0 = 'funleashpgdb01'
 backend_hostname1 = 'funleashpgdb02'
 backend_port1 = 5432
 backend_weight1 = 1
-backend_data_directory1 = '/data/postgresql/15/main/data'
+backend_data_directory1 = '/data/postgresql/15/main/data/'
 backend_flag1 = 'ALLOW_TO_FAILOVER'
 backend_application_name1 = 'funleashpgdb02'
 backend_hostname2 = 'funleashpgdb03'
 backend_port2 = 5432
 backend_weight2 = 1
-backend_data_directory2 = '/data/postgresql/15/main/data'
+backend_data_directory2 = '/data/postgresql/15/main/data/'
 backend_flag2 = 'ALLOW_TO_FAILOVER'
 backend_application_name3 = 'funleashpgdb03'
 enable_pool_hba = on
@@ -52,23 +52,23 @@ enable_pool_hba = on
 # LOGS
 #------------------------------------------------------------------------------
 
-log_connections = off							
-log_hostname = off
-log_statement = off
-log_per_node_statement = off
+log_connections = on							
+log_hostname = on
+log_statement = on
+log_per_node_statement = on
 logging_collector = on
-log_error_verbosity = default
-log_client_messages = off
+log_error_verbosity = verbose
+log_client_messages = on
 syslog_ident = 'pgpool'
-client_min_messages = notice
-log_min_messages = warning
+client_min_messages = log
+log_min_messages = debug1
 log_truncate_on_rotation = on
 log_rotation_age = 7d
-log_rotation_size = 16MB
-log_directory = '/backup/pgpool_logs'
+log_rotation_size = 512MB
+log_directory = '/backup/pgpool_logs/'
 log_line_prefix = '%m: %a pid %p: '
 log_filename = 'pgpool-%Y-%m-%d_%H%M%S.log'
-
+log_hostname = on
 
 
 #log_connections = off							
@@ -84,7 +84,7 @@ log_filename = 'pgpool-%Y-%m-%d_%H%M%S.log'
 #log_truncate_on_rotation = on
 #log_rotation_age = 7d
 #log_rotation_size = 512MB
-#log_directory = '/tmp/pgpool_logs'
+#log_directory = '/tmp/pgpool_logs/'
 
 
 #------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ log_filename = 'pgpool-%Y-%m-%d_%H%M%S.log'
 #------------------------------------------------------------------------------
 
 
-logdir = '/backup/pgpool_logs'
+logdir = '/backup/pgpool_logs/'
 
 
 
@@ -110,12 +110,12 @@ logdir = '/backup/pgpool_logs'
 # Some parameters depend on wether the other nodes are synchronous or not
 load_balance_mode = on
 # Tell pgpool whether it should take account of SQL comments inside the incomming SQL Statements
-allow_sql_comments = off
+allow_sql_comments = on
 
 #Queries on the tables that have already been
 #modified within the current explicit transaction will
 #not be load balanced until the end of the transaction.
-disable_load_balance_on_write = 'transaction'
+disable_load_balance_on_write = 'dml_adaptive'
 
 statement_level_load_balance = off
 
@@ -123,15 +123,15 @@ statement_level_load_balance = off
 # STREAMING REPLICATION MODE
 #------------------------------------------------------------------------------
 
-sr_check_period = 10
+sr_check_period = 3
 sr_check_user = 'repl'
 sr_check_password = ''
 # Specifies the maximum tolerance level of replication delay in WAL bytes on the standby server against the primary server:
 # If the delay exceeds this configured level, Pgpool-II stops sending the SELECT queries to the standby server and starts 
 # routing everything to the primary server even if load_balance_mode is enabled, until the standby catches-up with the primary
-delay_threshold = 10000000
+delay_threshold = 1048576
 
-follow_primary_command = '/etc/pgpool2/scripts/follow_primary.sh %d %h %p %D %m %H %M %P %r %R'
+follow_primary_command = 'follow_primary.sh %d %h %p %D %m %H %M %P %r %R'
 
 
 #------------------------------------------------------------------------------
@@ -144,30 +144,22 @@ health_check_user = 'pgpool'
 health_check_password = ''
 health_check_database = 'postgres'
 health_check_max_retries = 2
-health_check_retry_delay = 1
+health_check_retry_delay = 2
 connect_timeout = 2000
 
 #------------------------------------------------------------------------------
 # HEALTH CHECK PER NODE PARAMETERS (OPTIONAL)
 #------------------------------------------------------------------------------
-#health_check_period0 = 0
-#health_check_timeout0 = 20
-#health_check_user0 = 'nobody'
-#health_check_password0 = ''
-#health_check_database0 = ''
-#health_check_max_retries0 = 0
-#health_check_retry_delay0 = 1
-#connect_timeout0 = 10000
 
 #------------------------------------------------------------------------------
 # FAILOVER AND FAILBACK
 #------------------------------------------------------------------------------
 
-failover_on_backend_shutdown = off
-failover_on_backend_error = on
-detach_false_primary = off
+failover_on_backend_shutdown = on
+failover_on_backend_error = off
+detach_false_primary = on
 
-failover_command = '/etc/pgpool2/scripts/failover.sh %d %h %p %D %m %H %M %P %r %R %N %S'
+failover_command = 'failover.sh %d %h %p %D %m %H %M %P %r %R %N %S'
 failback_command = ''
 
 #------------------------------------------------------------------------------
@@ -203,21 +195,20 @@ wd_port2= 9000
 pgpool_port2 = 9999
 
 delegate_ip = '172.23.124.74'
-if_cmd_path = '/usr/sbin'
+if_cmd_path = '/usr/sbin/ip'
 if_up_cmd = '/usr/bin/sudo /usr/sbin/ip addr add $_IP_$/24 dev ens160 label ens160:0'
 if_down_cmd = '/usr/bin/sudo /usr/sbin/ip addr del $_IP_$/24 dev ens160'
 arping_path = '/usr/bin'
-arping_cmd = '/usr/bin/sudo /usr/sbin/arping -U $_IP_$ -w 1 -I ens160'
 
-clear_memqcache_on_escalation = on
+clear_memqcache_on_escalation = off
 
 
-enable_consensus_with_half_votes = off
+enable_consensus_with_half_votes = on
 
 
 
 # - Lifecheck Setting -
-wd_monitoring_interfaces_list = ''
+wd_monitoring_interfaces_list = 'any'
 # -- heartbeat mode --
 heartbeat_hostname0 = 'funleashpgdb01'
 heartbeat_hostname1 = 'funleashpgdb02'
@@ -226,16 +217,16 @@ heartbeat_port0 = 9999
 heartbeat_port1 = 9999
 heartbeat_port2 = 9999
 
-wd_escalation_command = '/etc/pgpool2/scripts/escalation.sh'
+wd_escalation_command = 'escalation.sh'
 wd_de_escalation_command = ''
 
 #------------------------------------------------------------------------------
 # OTHERS
 #------------------------------------------------------------------------------
 
-relcache_expire = 0
+relcache_expire = 3600
 
-relcache_size = 256
+relcache_size = 512
 
 #------------------------------------------------------------------------------
 # IN MEMORY QUERY MEMORY CACHE

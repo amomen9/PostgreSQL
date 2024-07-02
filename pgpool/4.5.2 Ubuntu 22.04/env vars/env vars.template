@@ -4,3 +4,6 @@ declare -x HOME=~
 declare -x LOGNAME=$(whoami)
 declare -x PWD=~
 declare -x USER=$(whoami)
+declare -x PGCONNECT_TIMEOUT=2
+declare -x HOSTNAME_VAR=$(hostname)
+declare -x PGPOOLHOST=$(hostname)

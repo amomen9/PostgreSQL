@@ -36,7 +36,7 @@ PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
 PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 # REPL_SLOT_NAME=$(echo ${FAILED_NODE_HOST,,} | tr -- -. _)
-REPL_SLOT_RAW_NAME=$(echo ${NODE_HOST} | cut -c 2- | awk -F'db' '{print $1}')
+REPL_SLOT_RAW_NAME=$(echo ${NODE_HOST} | cut -c 2-)
 REPL_SLOT_NAME=$(echo ${REPL_SLOT_RAW_NAME,,} | tr -- -. _)
 
 POSTGRESQL_STARTUP_USER=postgres
@@ -46,6 +46,14 @@ SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.s
 
 echo failover.sh: start: failed_node_id=$FAILED_NODE_ID failed_host=$FAILED_NODE_HOST \
     old_primary_node_id=$OLD_PRIMARY_NODE_ID new_main_node_id=$NEW_MAIN_NODE_ID new_main_host=$NEW_MAIN_NODE_HOST
+
+# determine recovery conf file name
+if [ $PGVERSION -ge 12 ]; then
+    RECOVERYCONF=${NODE_PGDATA}/myrecovery.conf
+else
+    RECOVERYCONF=${NODE_PGDATA}/recovery.conf
+fi
+
 
 ## If there's no main node anymore, skip failover.
 if [ $NEW_MAIN_NODE_ID -lt 0 ]; then
@@ -81,6 +89,7 @@ echo failover.sh: primary node is down, promote new_main_node_id=$NEW_MAIN_NODE_
 
 #ssh -T ${SSH_OPTIONS} ${POSTGRESQL_STARTUP_USER}@${NEW_MAIN_NODE_HOST} ${PGHOME}/bin/pg_ctl -D ${NEW_MAIN_NODE_PGDATA} -w promote
 ssh -T ${SSH_OPTIONS} ${POSTGRESQL_STARTUP_USER}@${NEW_MAIN_NODE_HOST} ${PGHOME}/bin/pg_ctlcluster $PGMAJVER $PGCLU promote -- -w -D ${NEW_MAIN_NODE_PGDATA}
+
 
 if [ $? -ne 0 ]; then
     echo ERROR: failover.sh: promote failed

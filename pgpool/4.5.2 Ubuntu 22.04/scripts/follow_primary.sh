@@ -40,7 +40,8 @@ PCP_USER=pgpool
 #PGPOOL_PATH=/usr/bin
 PGPOOL_PATH=/usr/sbin
 PCP_PORT=9898
-REPL_SLOT_RAW_NAME=$(echo ${NODE_HOST} | cut -c 2- | awk -F'db' '{print $1}')
+REPL_SLOT_RAW_NAME=$(echo ${NODE_HOST} | cut -c 2-)
+# | awk -F'db' '{print $1}'
 #REPL_SLOT_NAME=$(echo ${NODE_HOST,,} | tr -- -. _)
 REPL_SLOT_NAME=$(echo ${REPL_SLOT_RAW_NAME,,} | tr -- -. _)
 POSTGRESQL_STARTUP_USER=postgres
