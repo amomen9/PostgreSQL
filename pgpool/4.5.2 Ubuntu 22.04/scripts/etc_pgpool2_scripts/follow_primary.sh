@@ -82,7 +82,7 @@ if [ $? -ne 0 ]; then
 	#---------------------------
 	ERROR_LEVEL="error 1"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: follow_primary.sh: node_id=${NODE_ID} is not running. skipping follow primary command"
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: follow_primary.sh: node_id=${NODE_ID} is not running. skipping follow primary command"
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -102,7 +102,7 @@ if [ $? -ne 0 ]; then
 	#---------------------------
 	ERROR_LEVEL="error 1"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: follow_main.sh: passwordless SSH to ${POSTGRESQL_STARTUP_USER}@${NEW_PRIMARY_NODE_HOST} failed. Please setup passwordless SSH."
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: follow_main.sh: passwordless SSH to ${POSTGRESQL_STARTUP_USER}@${NEW_PRIMARY_NODE_HOST} failed. Please setup passwordless SSH."
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -128,7 +128,7 @@ fi
 #---------------------------
 ERROR_LEVEL="info"
 COMMAND_PLACE_HOLDER="
-echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: follow_primary.sh: pg_rewind for node ${NODE_ID}"
+echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: follow_primary.sh: pg_rewind for node ${NODE_ID}"
 if [ $LOG_OUTPUT = "pgpool_log" ]; then
 	COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 fi 
@@ -148,7 +148,7 @@ if [ $? -ne 0 ]; then
 	#---------------------------
 	ERROR_LEVEL="info"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: follow_primary.sh: create replication slot '\"${REPL_SLOT_NAME}\"' failed. You may need to create replication slot manually."
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: follow_primary.sh: create replication slot '\"${REPL_SLOT_NAME}\"' failed. You may need to create replication slot manually."
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -194,7 +194,7 @@ if [ $? -ne 0 ]; then
 	#---------------------------
 	ERROR_LEVEL="info"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: follow_primary.sh: end: pg_rewind failed. Try pg_basebackup."
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: follow_primary.sh: end: pg_rewind failed. Try pg_basebackup."
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -244,7 +244,7 @@ EOT
 			#---------------------------
 			ERROR_LEVEL="info"
 			COMMAND_PLACE_HOLDER="
-			echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: follow_primary.sh: drop replication slot \"${REPL_SLOT_NAME}\" failed. You may need to drop replication slot manually."
+			echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: follow_primary.sh: drop replication slot \"${REPL_SLOT_NAME}\" failed. You may need to drop replication slot manually."
 			if [ $LOG_OUTPUT = "pgpool_log" ]; then
 				COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 			fi 
@@ -255,7 +255,7 @@ EOT
 		#---------------------------
 		ERROR_LEVEL="error 1"
 		COMMAND_PLACE_HOLDER="
-		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: follow_primary.sh: end: pg_basebackup failed"
+		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: follow_primary.sh: end: pg_basebackup failed"
 		if [ $LOG_OUTPUT = "pgpool_log" ]; then
 			COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 		fi 
@@ -283,7 +283,7 @@ if [ $? -eq 0 ]; then
 		#---------------------------
 		ERROR_LEVEL="error 1"
 		COMMAND_PLACE_HOLDER="
-		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: follow_primary.sh: end: pcp_attach_node failed. The old primary is not part of the pgpool cluster."
+		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: follow_primary.sh: end: pcp_attach_node failed. The old primary is not part of the pgpool cluster."
 		if [ $LOG_OUTPUT = "pgpool_log" ]; then
 			COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 		fi 
@@ -305,7 +305,7 @@ else
 		#---------------------------
 		ERROR_LEVEL="info"
 		COMMAND_PLACE_HOLDER="
-		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: follow_primary.sh: drop replication slot \"${REPL_SLOT_NAME}\" failed. You may need to drop replication slot manually."
+		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: follow_primary.sh: drop replication slot \"${REPL_SLOT_NAME}\" failed. You may need to drop replication slot manually."
 		if [ $LOG_OUTPUT = "pgpool_log" ]; then
 			COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 		fi 
@@ -317,7 +317,7 @@ else
 	#---------------------------
 	ERROR_LEVEL="error 1"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: follow_primary.sh: end: follow primary command failed. The old primary is not within reach"
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: follow_primary.sh: end: follow primary command failed. The old primary is not within reach"
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -330,7 +330,7 @@ fi
 #---------------------------
 ERROR_LEVEL="info"
 COMMAND_PLACE_HOLDER="
-echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: follow_primary.sh: end: follow primary command is completed successfully"
+echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: follow_primary.sh: end: follow primary command is completed successfully"
 if [ $LOG_OUTPUT = "pgpool_log" ]; then
 	COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 fi 

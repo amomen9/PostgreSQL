@@ -22,11 +22,6 @@ OOMScoreAdjust=-1000
 Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
 Environment=PGB_OOM_ADJUST_VALUE=0
 
-# create symbolic link to the socket file if not exists
-ExecStart=/bin/sh -c /data/postgresql/scripts/unix_domain_sockets_repair.sh
-
-SuccessExitStatus=0 1 2
-
 # assign vip to the primary node if not already assigned
 ExecStart=/bin/sh -c /data/postgresql/scripts/cluster_vip.sh
 

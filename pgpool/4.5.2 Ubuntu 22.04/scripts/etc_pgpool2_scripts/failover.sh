@@ -58,7 +58,7 @@ ERROR_LEVEL=""
 #---------------------------
 ERROR_LEVEL="info"
 COMMAND_PLACE_HOLDER="
-echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: failover.sh: start: failed_node_id=\$FAILED_NODE_ID failed_host=\$FAILED_NODE_HOST \
+echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: failover.sh: start: failed_node_id=\$FAILED_NODE_ID failed_host=\$FAILED_NODE_HOST \
 old_primary_node_id=\$OLD_PRIMARY_NODE_ID new_main_node_id=\$NEW_MAIN_NODE_ID new_main_host=\$NEW_MAIN_NODE_HOST"
 if [ $LOG_OUTPUT = "pgpool_log" ]; then
 	COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
@@ -83,7 +83,7 @@ if [ $NEW_MAIN_NODE_ID -lt 0 ]; then
 	#---------------------------
 	ERROR_LEVEL="error 2"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: failover.sh: All nodes are down. Skipping failover."
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: failover.sh: All nodes are down. Skipping failover."
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -102,7 +102,7 @@ if [ $? -ne 0 ]; then
 	#---------------------------
 	ERROR_LEVEL="error 1"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: failover.sh: passwordless SSH to ${POSTGRESQL_STARTUP_USER}@${NEW_MAIN_NODE_HOST} failed. Please setup passwordless SSH."
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: failover.sh: passwordless SSH to ${POSTGRESQL_STARTUP_USER}@${NEW_MAIN_NODE_HOST} failed. Please setup passwordless SSH."
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -126,7 +126,7 @@ if [ $OLD_PRIMARY_NODE_ID != "-1" -a $FAILED_NODE_ID != $OLD_PRIMARY_NODE_ID ]; 
 		#---------------------------
 		ERROR_LEVEL="info"
 		COMMAND_PLACE_HOLDER="
-		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: failover.sh: drop replication slot '\"${REPL_SLOT_NAME}\"' failed. You may need to drop replication slot manually."
+		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: failover.sh: drop replication slot '\"${REPL_SLOT_NAME}\"' failed. You may need to drop replication slot manually."
 		if [ $LOG_OUTPUT = "pgpool_log" ]; then
 			COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 		fi 
@@ -139,7 +139,7 @@ if [ $OLD_PRIMARY_NODE_ID != "-1" -a $FAILED_NODE_ID != $OLD_PRIMARY_NODE_ID ]; 
 	#---------------------------
 	ERROR_LEVEL="error 2"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: failover.sh: end: standby node '\"${NEW_MAIN_NODE_HOST}\"' is down. Skipping failover."
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: failover.sh: end: standby node '\"${NEW_MAIN_NODE_HOST}\"' is down. Skipping failover."
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -155,7 +155,7 @@ fi
 #---------------------------
 ERROR_LEVEL="info"
 COMMAND_PLACE_HOLDER="
-echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: failover.sh: primary node is down or a manual failover has been requsted, promote new_main_node_id=$NEW_MAIN_NODE_ID on ${NEW_MAIN_NODE_HOST}."
+echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: failover.sh: primary node is down or a manual failover has been requsted, promote new_main_node_id=$NEW_MAIN_NODE_ID on ${NEW_MAIN_NODE_HOST}."
 if [ $LOG_OUTPUT = "pgpool_log" ]; then
 	COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 fi 
@@ -172,7 +172,7 @@ if [ $? -ne 0 ]; then
 	#---------------------------
 	ERROR_LEVEL="error 1"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: failover.sh: promote '\"${NEW_MAIN_NODE_HOST}\"' failed"
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: failover.sh: promote '\"${NEW_MAIN_NODE_HOST}\"' failed"
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -188,7 +188,7 @@ else
 	#---------------------------
 	ERROR_LEVEL="error 2"
 	COMMAND_PLACE_HOLDER="
-	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: failover.sh: removing standby.signal and RECOVERYCONF files on the new primary '\"${NEW_MAIN_NODE_HOST}\"' failed. Remove them manually and restart the pg service."
+	echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: failover.sh: removing standby.signal and RECOVERYCONF files on the new primary '\"${NEW_MAIN_NODE_HOST}\"' failed. Remove them manually and restart the pg service."
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
@@ -201,7 +201,7 @@ else
 		#---------------------------
 		ERROR_LEVEL="error 1"
 		COMMAND_PLACE_HOLDER="
-		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: failover.sh: restarting pg service on the new primary '\"${NEW_MAIN_NODE_HOST}\"' failed. Critical! cluster is down"
+		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: failover.sh: restarting pg service on the new primary '\"${NEW_MAIN_NODE_HOST}\"' failed. Critical! cluster is down"
 		if [ $LOG_OUTPUT = "pgpool_log" ]; then
 			COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 		fi 
@@ -213,7 +213,7 @@ fi
 #---------------------------
 ERROR_LEVEL="info"
 COMMAND_PLACE_HOLDER="
-echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: ${ERROR_LEVEL}::: ERROR: failover.sh: end: new_main_node_id=$NEW_MAIN_NODE_ID on ${NEW_MAIN_NODE_HOST} was successfully promoted to primary"
+echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: failover.sh: end: new_main_node_id=$NEW_MAIN_NODE_ID on ${NEW_MAIN_NODE_HOST} was successfully promoted to primary"
 if [ $LOG_OUTPUT = "pgpool_log" ]; then
 	COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 fi 
