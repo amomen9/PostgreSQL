@@ -57,17 +57,13 @@ Displays a progress meter during the backup process.
 
 Both approaches create 4 files in the target backup directory:
 
-![A screenshot of a computer screen
-
-Description automatically generated](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image002.jpg)
+![1720591911543](image/README/1720591911543.png "backup directory contents")
 
 Important note!!!
 
 According to the pg_basebackup documentation, “ **As long as the client can keep up with the write-ahead log data** , using this method (stream method with -Xs flag) requires no extra write-ahead logs to be saved on the source server”. This means that the whole WAL segments might not be saved to the pg_wal.tar.gz archive. If they are actually not, the WAL files within this archive will not be enough and you will face the following error while trying to recover from the backup.
 
-![A screen shot of a computer code
-
-Description automatically generated](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image004.jpg)
+![1720591980394](image/README/1720591980394.png)
 
 Therefore, the DBA should not suffice with the WALs that are being archived inside pg_wal.tar.gz. There may be the need to use later WALs manually.
 
@@ -95,7 +91,8 @@ ls -l /data/postgresql/15/main/tablespaces
 2. We check the integrity of the backup operation with the following command. A Tar file has been created for each tablespace:
 
 tablespaces:
-`-rw------- 1 root root 1027743 Jun 23 15:22 16400.tar.gz
+
+`-rw------- 1 root root 1027743 Jun 23 15:22 16400.tar.gz`
 
 `-rw------- 1 root root 1027499 Jun 23 15:22 16409.tar.gz`
 
