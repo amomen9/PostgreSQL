@@ -47,7 +47,7 @@ if the cluster has no additional tablespaces and WAL streaming is not used.
 `•  -z: `
 Enables gzip compression for the backup.
 
-`•  -Xs (also -X strem):`
+`•  -Xs (also -X stream):`
 Includes only the required WAL files in the backup using the "stream" method.
 
 `•  -P: `
