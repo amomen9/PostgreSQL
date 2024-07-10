@@ -6,28 +6,13 @@ set -o xtrace
 
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool
-#SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
-SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
+SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
 SSH_TIMEOUT=2
 # PGPOOLS=(server1 server2 server3)
 PGPOOLS=(funleashpgdb01 funleashpgdb02 funleashpgdb03)
 
 VIP=172.23.124.74
 DEVICE=ens160
-
-
-#---------------------------
-ERROR_LEVEL="info"
-COMMAND_PLACE_HOLDER="
-echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: escalation.sh: Begin escalation op. "
-if [ $LOG_OUTPUT = "pgpool_log" ]; then
-	COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
-fi 
-set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
-echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: escalation.sh: Begin escalation op.  
-#---------------------------
-
-
 
 for pgpool in "${PGPOOLS[@]}"; do
     [ "$HOSTNAME" = "${pgpool}" ] && continue

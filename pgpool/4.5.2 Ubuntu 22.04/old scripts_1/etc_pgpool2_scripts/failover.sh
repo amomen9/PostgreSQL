@@ -42,8 +42,7 @@ REPL_SLOT_NAME=$(echo ${REPL_SLOT_RAW_NAME,,} | tr -- -. _)
 
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool
-#SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
-SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
+SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
 
 
 COMMAND_PLACE_HOLDER=""
