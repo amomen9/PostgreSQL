@@ -37,14 +37,12 @@ the port where the PostgreSQL server is listening.
 `•  -U postgres:`
 Connects to the database as the "postgres" user.
 
-`•  -D /backupdir/latest_backup:
-Defines the directory where the backup will be
-stored.`
+`•  -D /backupdir/latest_backup: Defines the directory where the backup will be stored.`
 
 `•  -Ft: `
 Indicates that the backup format should be a tar archive.
 
-`•  -Fp:` 
+`•  -Fp:`
 Use the plain format for the backup, which is suitable
 if the cluster has no additional tablespaces and WAL streaming is not used.
 
@@ -247,8 +245,7 @@ touch myrecovery.conf
 3. Inside the myrecovery.conf or postgresql.auto.conf file, the two lines below are added (the first one is mandatory. Also, have care for directive precedence and overriding in these files. To prevent that, use them mutually excluded):
 
 ```shell
-restore_command='cp /data/postgresql/15/main/data/pg_wal/%f
-%p'recovery_target_time='2024-07-10 23:30:00 UTC' #(timestamp for PITR purposes, For the latest state that can be replayed through the WAL segment files made available, simply omit this directive)recovery_target_action = ‘promote’ #(to end the recovery and make the cluster an autonomous cluster)
+restore_command='cp /data/postgresql/15/main/data/pg_wal/%f %p'recovery_target_time='2024-07-10 23:30:00 UTC' #(timestamp for PITR purposes, For the latest state that can be replayed through the WAL segment files made available, simply omit this directive)recovery_target_action = ‘promote’ #(to end the recovery and make the cluster an autonomous cluster)
 ```
 
 read more at:
@@ -283,7 +280,7 @@ psql -U postgres -h localhost -p 5432 -f all_databases.sql #On the target server
 1. First, the latest backup is taken, and the restore process is performed according to step 3. (The three steps of the third stage should be done in the given order.) For that matter, first we take a dump of the database requested by the customer. For example, testdb:
 
 ```shell
-Pg_dump –U postgres –d testdb > testdb.sql	#(-t for a specific table)
+pg_dump –U postgres –d testdb > testdb.sql	#(-t for a specific table)
 ```
 
 Then we log in to the desired server machine and perform the following steps:
