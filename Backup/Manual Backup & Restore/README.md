@@ -15,15 +15,13 @@ Note:
 1. Tar and Compressed Format
 
 ```shell
-$ pg_basebackup -h localhost -p 5432 -U postgres -D
-/backupdir/latest_backup -Ft -z -Xs -P
+$ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Ft -z -Xs -P
 ```
 
 3. Plain Format
 
 ```shell
-$ pg_basebackup -h localhost -p 5432 -U postgres -D
-/backupdir/latest_backup -Fp -Xs -P
+$ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Fp -Xs -P
 ```
 
 Here's a breakdown of the options used in your command:
@@ -63,15 +61,14 @@ Important note!!!
 
 According to the pg_basebackup documentation, “ **As long as the client can keep up with the write-ahead log data** , using this method (stream method with -Xs flag) requires no extra write-ahead logs to be saved on the source server”. This means that the whole WAL segments might not be saved to the pg_wal.tar.gz archive. If they are actually not, the WAL files within this archive will not be enough and you will face the following error while trying to recover from the backup.
 
-![1720591980394](image/README/1720591980394.png)
+![1720591980394](image/README/1720591980394.png "insuffiicient WAL files error")
 
 Therefore, the DBA should not suffice with the WALs that are being archived inside pg_wal.tar.gz. There may be the need to use later WALs manually.
 
 •  Backup using the following command for all databases and objects in tar format (production environments):
 
 ```shell
-pg_basebackup -h localhost -p 5432 -U postgres -D
-/backup/test1 -Ft -z -Xs -P
+pg_basebackup -h localhost -p 5432 -U postgres -D /backup/test1 -Ft -z -Xs -P
 ```
 
 Note: This type of backup includes all database objects including tablespaces.
