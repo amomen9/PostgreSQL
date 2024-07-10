@@ -1,5 +1,5 @@
 # Backup
 
-### [•  Manual Backup and Restore](asdad)
+### [•  Manual Backup and Restore](./Manual Backup & Restore/README.md)
 
-### [•  systemd Backup Automation](dsfdfs)
+### [•  systemd Backup Automation](./systemd Backup Plan/README.md)
