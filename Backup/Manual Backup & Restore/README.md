@@ -239,7 +239,7 @@ touch myrecovery.conf
 3. Inside the myrecovery.conf or postgresql.auto.conf file, the two lines below are added (the first one is mandatory. Also, have care for directive precedence and overriding in these files. To prevent that, use them mutually excluded):
 
 ```shell
-restore_command='cp /data/postgresql/15/main/data/pg_wal/%f %p'recovery_target_time='2024-07-10 23:30:00 UTC' #(timestamp for PITR purposes, For the latest state that can be replayed through the WAL segment files made available, simply omit this directive)recovery_target_action = ‘promote’ #(to end the recovery and make the cluster an autonomous cluster)
+restore_command='cp /data/postgresql/15/main/data/pg_wal/%f %p'recovery_target_time='2024-07-10 23:30:00 UTC' #(timestamp for PITR purposes, For the latest state that can be replayed through the WAL segment files made available, simply omit this directive)recovery_target_action = 'promote' #(to end the recovery and make the cluster an autonomous cluster)
 ```
 
 read more at:
