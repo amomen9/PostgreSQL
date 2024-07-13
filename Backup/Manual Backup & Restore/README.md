@@ -37,20 +37,20 @@ Connects to the database as the "postgres" user.
 
 `•  -D /backupdir/latest_backup: Defines the directory where the backup will be stored.`
 
-`•  -Ft: `
+`•  -Ft (also -F tar): `
 Indicates that the backup format should be a tar archive.
 
-`•  -Fp:`
+`•  -Fp (also -F plain):`
 Use the plain format for the backup, which is suitable
 if the cluster has no additional tablespaces and WAL streaming is not used.
 
-`•  -z: `
+`•  -z (also --gzip): `
 Enables gzip compression for the backup.
 
 `•  -Xs (also -X stream):`
 Includes only the required WAL files in the backup using the "stream" method.
 
-`•  -P: `
+`•  -P (also --progress): `
 Displays a progress meter during the backup process.
 
 Both approaches create 4 files in the target backup directory:
