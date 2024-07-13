@@ -1,6 +1,6 @@
 # Backup
 
-### [•  Manual Backup and Restore](./Manual%20Backup%20and%20Restore/README.md)
+### [•  Manual Backup and Restore](./Manual%20Backup%20&%20Restore/README.md)
 
 ---
 
