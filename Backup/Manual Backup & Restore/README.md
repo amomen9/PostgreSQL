@@ -246,7 +246,7 @@ read more at:
 
 [https://www.postgresql.org/docs/current/runtime-config-wal.html](https://www.postgresql.org/docs/current/runtime-config-wal.html)
 
-The more WAL files are given to the cluster, the further they will be replayed the more the cluster will move forward in time.
+The more WAL files are given to the cluster, the further they will be replayed, and thus the more the cluster will move forward in time.
 
 recovery.signal file is an indicator that we are in the recovery state of the database cluster.
 
