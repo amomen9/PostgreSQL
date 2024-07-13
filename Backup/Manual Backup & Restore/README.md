@@ -310,6 +310,7 @@ psql\l+   # show databases with tablespaces
 
 ### Verify the integrity of the full backups
 
+The built-in tool to verify the integrity of the backups for PostgreSQL is pg_verifybackup. An example is below:
 
 ```
 $ pg_basebackup -h mydbserver -D /usr/local/pgsql/data
