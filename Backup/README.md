@@ -1,12 +1,9 @@
 # Backup
 
-[Manual Backup and Restore](./Manual Backup & Restore/README.md)
+### [•  Manual Backup and Restore](./Manual%20Backup%20and%20Restore/README.md)
 
 ---
 
-
-
-[systemd Backup Automation](./systemd Backup Plan/README.md)
-
+### [•  systemd Backup Automation](./systemd%20Backup%20Plan/README.md)
 
 ---
