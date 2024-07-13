@@ -306,3 +306,16 @@ psql\l+   # show databases with tablespaces
 \dt # show tables or relations
 \dn # show schema
 ```
+
+
+### Verify the integrity of the full backups
+
+
+```
+$ pg_basebackup -h mydbserver -D /usr/local/pgsql/data
+$ pg_verifybackup /usr/local/pgsql/data
+```
+
+Read more at:
+
+[https://www.postgresql.org/docs/current/app-pgverifybackup.html](https://www.postgresql.org/docs/current/app-pgverifybackup.html)
