@@ -21,7 +21,7 @@ $ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Ft
 3. Plain Format
 
 ```shell
-$ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Fp -Xs -P
+$ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Fp -T olddir=newdir -Xs -P
 ```
 
 Here's a breakdown of the options used in your command:
@@ -44,6 +44,10 @@ Indicates that the backup format should be a tar archive.
 Use the plain format for the backup, which is suitable
 if the cluster has no additional tablespaces and WAL streaming is not used.
 
+`•  -T tbs1_olddir=tbs1_newdir -T tbs2_olddir=tbs2_olddir ...:`
+
+Defines the tablespace mapping from the source cluster's path to the new cluster's path.
+
 `•  -z (also --gzip): `
 Enables gzip compression for the backup.
 
@@ -53,11 +57,17 @@ Includes only the required WAL files in the backup using the "stream" method.
 `•  -P (also --progress): `
 Displays a progress meter during the backup process.
 
-Both approaches create 4 files in the target backup directory:
+Approach 1 creates 3 + # of tablespaces files in the target backup directory:
 
 ![1720591911543](image/README/1720591911543.png "backup directory contents")
 
-Important note!!!
+Approach 2, because of its plain format, creates 1 + # of tablespaces directories for the pg data directory and tablespaces respectively. Note that all the noted directories must be empty in advance and do not need to be created. If they do not exist, pg_basebackup creates them automatically. Multiple tablespaces must be handled with multiple -T flags. Example:
+
+![1720885245545](image/README/1720885245545.png)
+
+
+
+**Important note!!!**
 
 According to the pg_basebackup documentation, “ **As long as the client can keep up with the write-ahead log data** , using this method (stream method with -Xs flag) requires no extra write-ahead logs to be saved on the source server”. This means that the whole WAL segments might not be saved to the pg_wal.tar.gz archive. If they are actually not, the WAL files within this archive will not be enough and you will face the following error while trying to recover from the backup.
 
