@@ -57,6 +57,8 @@ Includes only the required WAL files in the backup using the "stream" method.
 `•  -P (also --progress): `
 Displays a progress meter during the backup process.
 
+---
+
 Approach 1 creates 3 + # of tablespaces files in the target backup directory:
 
 ![1720591911543](image/README/1720591911543.png "backup directory contents")
