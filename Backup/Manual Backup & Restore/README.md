@@ -330,11 +330,11 @@ If pg_verfiybackup is not in the path, this is usually the location that it can 
 
 * on Ubuntu:
 
-/usr/lib/postgresql/`<pg maj version>`/bin/pg_verifybackup
+/usr/lib/postgresql/<pg maj version>/bin/pg_verifybackup
 
 * on RHEL:
 
-/usr/pgsql-`<pg maj version>`/bin/pg_verifybackup
+/usr/pgsql-<pg maj version>/bin/pg_verifybackup
 
 
 
