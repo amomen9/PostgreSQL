@@ -4,6 +4,7 @@ The systemd backup automation plan is a simple plan composed of a service templa
 
 1. [X] **Scripts**
 
+	* **Note**: The scripts will be placed under /data/postgresql/scripts/ directory.
     1. WAL Backup & Purge Script (archive_wal.sh)
 
 ```shell
@@ -110,13 +111,6 @@ The following is the PostgreSQL@.service service template which is used to execu
 
 ```shell
 # /etc/systemd/system/pgbt.service
-# It's not recommended to modify this file in-place, It is recommended to use systemd
-# "dropin" feature;  i.e. create file with suffix .conf under
-# /etc/systemd/system/pgb.service.d directory overriding the
-# unit's defaults. You can also use "systemctl edit pgb"
-# Look at systemd.unit(5) manual page for more info.
-
-
 
 [Unit]
 Description=PG maintenace task service triggered by timer
@@ -134,6 +128,7 @@ User=postgres
 Group=postgres
 
 Environment=PGDATA=/data/postgresql/15/main/data/
+# pg data dir as an env variable for the service execution
 Environment=SCHOME=/data/postgresql/scripts/
 WorkingDirectory=/data/postgresql/scripts/
 
@@ -141,10 +136,11 @@ WorkingDirectory=/data/postgresql/scripts/
 # This is normally controlled by the global default set by systemd
 # StandardOutput=syslog
 
-# Disable OOM kill on the scripts
+
 OOMScoreAdjust=-1000
 Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
 Environment=PGB_OOM_ADJUST_VALUE=0
+# Disable OOM kill on the service to increase its resilience.
 
 
 ExecStart=/bin/nohup ./%I.sh
@@ -154,3 +150,67 @@ ExecStart=/bin/nohup ./%I.sh
 WantedBy=multi-user.target
 
 ```
+
+* [X] Timers
+
+1. Timer to trigger WAL backup (archive_wal.timer)
+
+```shell
+
+# This timer unit is for backing up WAL segments
+#
+
+[Unit]
+Description=timer unit is for backing up WAL segments
+Requires=PostgreSQL@archive_wal.service
+
+[Timer]
+Unit=PostgreSQL@archive_wal.service
+OnCalendar=*-*-* *:00:00
+# Every hour
+
+
+[Install]
+WantedBy=timers.target
+
+```
+
+2. Timer to trigger full backup (postgres_backup.timer)
+
+```shell
+# This timer unit is for PostgreSQL base backup 
+#
+
+[Unit]
+Description=This timer unit is for PostgreSQL base backup
+Requires=PostgreSQL@postgres_backup.service
+
+[Timer]
+Unit=PostgreSQL@postgres_backup.service
+OnCalendar=*-*-* 19:30:00
+# Evert day at 19:30:00
+
+
+[Install]
+WantedBy=timers.target
+
+```
+
+* [X] Activation
+1. Place the service and timer files in the following directory using root privileges:
+/lib/systemd/system/
+
+2. enable services
+```shell
+sudo systemctl enable PostgreSQL@archive_wal.service
+sudo systemctl enable PostgreSQL@postgres_backup.service
+```
+
+3. enable timers
+```shell
+sudo systemctl enable archive_wal.timer
+sudo systemctl enable postgres_backup.timer
+```
+
+
+Finish ■
