@@ -334,7 +334,7 @@ If pg_verfiybackup is not in the path, this is usually the location that it can 
 
 * on RHEL:
 
-/usr/pgsql-<pg maj version>/bin/pg_verifybackup
+/usr/pgsql-&lt;pg maj version&gt;/bin/pg_verifybackup
 
 
 
