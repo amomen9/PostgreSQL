@@ -46,7 +46,7 @@ if the cluster has no additional tablespaces and WAL streaming is not used.
 
 `•  -T tbs1_olddir=tbs1_newdir -T tbs2_olddir=tbs2_olddir ...:`
 
-Defines the tablespace mapping from the source cluster's path to the new cluster's path.
+Defines the tablespace mapping from the source cluster's path to the new cluster's path. (only applicable to plain backup format, has no effect on the tar format)
 
 `•  -z (also --gzip): `
 Enables gzip compression for the backup.
