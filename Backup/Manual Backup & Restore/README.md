@@ -65,8 +65,6 @@ Approach 2, because of its plain format, creates 1 + # of tablespaces directorie
 
 ![1720885245545](image/README/1720885245545.png)
 
-
-
 **Important note!!!**
 
 According to the pg_basebackup documentation, “ **As long as the client can keep up with the write-ahead log data** , using this method (stream method with -Xs flag) requires no extra write-ahead logs to be saved on the source server”. This means that the whole WAL segments might not be saved to the pg_wal.tar.gz archive. If they are actually not, the WAL files within this archive will not be enough and you will face the following error while trying to recover from the backup.
@@ -317,10 +315,9 @@ psql\l+   # show databases with tablespaces
 \dn # show schema
 ```
 
-
 ### Verify the integrity of the full backups
 
-The built-in tool to verify the integrity of the backups for PostgreSQL is pg_verifybackup. An example is below:
+The built-in tool to verify the integrity of the backups for PostgreSQL is pg_verifybackup. pg_verifybackup is only intended for plain backup format. For the archive format, you can extract the contents first and then pass them to pg_verifybackup. An example is below:
 
 ```
 $ pg_basebackup -h mydbserver -D /usr/local/pgsql/data
