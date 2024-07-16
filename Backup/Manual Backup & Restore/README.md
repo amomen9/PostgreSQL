@@ -324,11 +324,11 @@ If pg_verfiybackup is not in the path, this is usually the location where it can
 
 * on Ubuntu:
 
-`/usr/lib/postgresql/&lt;pg maj version&gt;/bin/pg_verifybackup`
+/usr/lib/postgresql/&lt;pg maj version&gt;/bin/pg_verifybackup
 
 * on RHEL:
 
-`/usr/pgsql-&lt;pg maj version&gt;/bin/pg_verifybackup`
+/usr/pgsql-&lt;pg maj version&gt;/bin/pg_verifybackup
 
 
 An example is below:
