@@ -56,3 +56,7 @@ The document below provides interesting information.
 The document below is the main documentation on the pgpool website, which naturally has more content and is for in-depth and topical study.
 
 [https://www.pgpool.net/docs/latest/en/html/]()
+
+pgpool GitHub repository:
+
+[pgpool/pgpool2: the official mirror of git://git.postgresql.org/git/pgpool2.git.](https://github.com/pgpool/pgpool2)
