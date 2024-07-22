@@ -19,7 +19,7 @@ For more, follow [this link](./pgpool%20references.md).
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 
-<div style="width:300px;height:200px;>
+<div style="width:300px;height:200px;">
 ![1721627485581](image/README/1721627485581.png)
 </div>
 
