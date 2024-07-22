@@ -19,8 +19,8 @@ For more, follow [this link](./pgpool%20references.md).
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 
-<div style="width:450px; text-align:center;">
-<img align="center" src="image/README/1721627485581.png" alt="1721627485581"/>
+<div style="text-align:center;">
+<img align="center" src="image/README/1721627485581.png" alt="1721627485581" style="width:450px;"/>
 </div>
 
 The replication topology is composed of:
