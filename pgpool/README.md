@@ -24,6 +24,7 @@ For more, follow [this link](./pgpool%20references.md).
 <br/>
 </div>
 
+<br/>
 The replication topology is composed of:
 
 | row | Node hostname | IP Add        | Description            |
