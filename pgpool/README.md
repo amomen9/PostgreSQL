@@ -1219,8 +1219,10 @@ Note: requires iputils-arping to be installed on Ubuntu
 
 # list of tables that their records frequently change.
 
-```
 </div>
 
 1. **Create Replication, Health Check, and Recovery users with required privileges on every node.**
+
+```
+
 ```
