@@ -1542,6 +1542,16 @@ Then add the required env variables:
 vi ~postgres/.bashrc
 ```
 
-The env entries:
+The env entries. Add them to the end of .bashrc. The `| cut -d '.' -f1` part is to remove the FQDN part, if any:
 ```shell
+declare -x PGDATA=/data/postgresql/15/main/data
+declare -x HOSTNAME=$(hostname | cut -d '.' -f1)
+declare -x HOME=~
+declare -x LOGNAME=$(whoami)
+declare -x PWD=~
+declare -x USER=$(whoami)
+declare -x PGCONNECT_TIMEOUT=1
+declare -x HOSTNAME_VAR=$(hostname)
+declare -x PGPOOLHOST=$(hostname)
+declare -x PGPASSFILE="$(echo ~postgres)/.pgpass"
 ```
