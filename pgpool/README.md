@@ -28,12 +28,12 @@ For more, follow [this link](./pgpool%20references.md).
 The replication topology is composed of:
 <br/>
 
-| row | Node hostname | IP Add        | Description            |
-| --- | :------------: | ------------- | ---------------------- |
-| 1   | funleashpgdb01 | 172.23.124.71 | Node 1 (synchronous)   |
-| 2   | funleashpgdb02 | 172.23.124.72 | Node 2 (synchronous)  |
-| 3   | funleashpgdb03 | 172.23.124.73 | Node 3 (asynchronous) |
-| 4   |      vip      | 172.23.124.74 | floating virtual IP    |
+| row |   Node hostname   | IP Add        | Description            |
+| --- | :---------------: | ------------- | ---------------------- |
+| 1   |  funleashpgdb01  | 172.23.124.71 | Node 1 (synchronous)   |
+| 2   |  funleashpgdb02  | 172.23.124.72 | Node 2 (synchronous)  |
+| 3   |  funleashpgdb03  | 172.23.124.73 | Node 3 (asynchronous) |
+| 4   | vip (delegate_ip) | 172.23.124.74 | floating virtual IP    |
 
 ### Installation:
 
@@ -72,11 +72,64 @@ EOT
 It will be explained later.
 
 ```
+mkdir -p /var/log/pgpool
 touch /var/log/pgpool/pgpool_status		# Backend status file
 chown -R postgres /var/log/pgpool		# Log location
 ```
 
-1. **pgpool configuration files:** pgpool.conf
+
+1. **Create Replication, Health Check, and Recovery users with required privileges on every node.**
+
+```pgsql
+-- inside pg engine, create pg users and assign a password to the postgres user both in the database cluster engine and linux, and set up pg_hba.conf file accordingly. A sample of the pg_hba.conf file was given. We take all the passwords to be the same for simplicity.
+CREATE USER repl REPLICATION PASSWORD 'Pa$svvord';
+
+-- If you want to show "replication_state" and "replication_sync_state" column in SHOW POOL NODES command result,
+-- role pgpool needs to be PostgreSQL super user or in pg_monitor group. This also applies to detach_false_primary feature
+-- you can run the following to grant pg_monitor
+-- GRANT pg_monitor TO pgpool;
+CREATE USER pgpool SUPERUSER PASSWORD 'Pa$svvord';
+
+-- inside psql:
+SET password_encryption = 'scram-sha-256';
+
+\password pgpool
+\password repl
+\password postgres
+```
+
+
+1. **postgresql configuration files: pg_hba.conf**
+
+replication must be enabled for streaming replication and also pg_basebackup to work.
+
+pg_hba.conf sample for every node:
+
+```
+local   all             postgres                                peer
+local   all             test                                	scram-sha-256
+local   all             postgres                                scram-sha-256
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   replication     all                                     scram-sha-256
+local   all             all                                     scram-sha-256
+
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            scram-sha-256
+host    replication     all             172.23.124.0/24         scram-sha-256
+host    all             all             0.0.0.0/0             	scram-sha-256
+host    replication     all             0.0.0.0/0             	scram-sha-256
+host    all             all             172.23.124.0/24         scram-sha-256
+host    all             all             127.0.0.1/32            scram-sha-256
+
+# IPv6 local connections:
+host    all             all             ::1/128                 scram-sha-256
+```
+
+
+1. **pgpool configuration files: pgpool.conf**
 
 The major configuration file for pgpool is pgpool.conf. Now we dive into this file. This is the default configuration file of pgpool 4.5.2. The parts that are commented out show the default value in effect for that directive. We have added some extra explainations for some parts. Furthermore, the only default directive that is not commented out by default is the following:
 
@@ -87,6 +140,7 @@ The complete default pgpool.conf file that I have added additional explanations 
 
 <details>
 <summary>The complete default pgpool.conf file with added explanations (click to expand)</summary>
+
 
 ```conf
 # ----------------------------
@@ -539,6 +593,7 @@ backend_clustering_mode = 'streaming_replication'
 # LOAD BALANCING MODE
 
 #------------------------------------------------------------------------------
+# Some parameters depend on wether the other nodes are synchronous or not
 
 #load_balance_mode = on
                                    # Activate load balancing mode
@@ -584,6 +639,7 @@ backend_clustering_mode = 'streaming_replication'
                                    # query cache is possible.
                                    # If off, SQL comments effectively prevent the judgment
                                    # (pre 3.4 behavior).
+# Tell pgpool whether it should take account of SQL comments inside the incomming SQL Statements
 
 #disable_load_balance_on_write = 'transaction'
                                    # Load balance behavior when write query is issued
@@ -612,6 +668,9 @@ backend_clustering_mode = 'streaming_replication'
                                    #
                                    # Note that any query not in an explicit transaction
                                    # is not affected by the parameter except 'always'.
+#Queries on the tables that have already been
+#modified within the current explicit transaction will
+#not be load balanced until the end of the transaction.
 
 #dml_adaptive_object_relationship_list= ''
                                    # comma separated list of object pairs
@@ -653,6 +712,10 @@ backend_clustering_mode = 'streaming_replication'
                                    # Threshold before not dispatching query to standby node
                                    # Unit is in bytes
                                    # Disabled (0) by default
+# Specifies the maximum tolerance level of replication delay in WAL bytes on the standby server against the primary server
+# If the delay exceeds this configured level, Pgpool-II stops sending the SELECT queries to the standby server and starts 
+# routing everything to the primary server even if load_balance_mode is enabled, until the standby catches-up with the primary
+
 #delay_threshold_by_time = 0
                                    # Threshold before not dispatching query to standby node
                                    # The default unit is in millisecond(s)
@@ -936,7 +999,7 @@ backend_clustering_mode = 'streaming_replication'
                                     # arping command path
                                     # If arping_cmd starts with "/", if_cmd_path will be ignored.
                                     # (change requires restart)
-Note: requires iputils-arping to be installed on Ubuntu
+# Note: requires iputils-arping to be installed on Ubuntu
 
 #arping_cmd = '/usr/bin/sudo /usr/sbin/arping -U $_IP_$ -w 1 -I eth0'
                                     # arping command
@@ -1221,6 +1284,240 @@ Note: requires iputils-arping to be installed on Ubuntu
 # list of tables that their records frequently change.
 ```
 
-</details>
+* **Note:**
 
-1. **Create Replication, Health Check, and Recovery users with required privileges on every node.**
+When password directives are left empty, pgpool will first examine the pool_passwd file, then try to use empty password.
+
+* Now, this is the pgpool.conf file summarized for our production env specific needs. Some directives are picked, the others are not included to be left with their default values. Some values are default, but they are included anyway for future manipulation and attention. The ckeck parameters are specified with the assumption that all our nodes are on the same fast and stably connected network. Though for a disaster node which is in a far location and on a relatively slowly connected network, different "PER NODE PARAMETERS" options should be specified. We use the pgpool's pool_hba, CONNECTION POOLING, LOAD BALANCING, FAILOVER AND FAILBACK, ONLINE RECOVERY, WATCHDOG, RELCACHE, and IN MEMORY QUERY MEMORY CACHE features:
+
+```
+######################### Optimized for Production ############################
+
+#------------------------------------------------------------------------------
+# BACKEND CLUSTERING MODE
+#------------------------------------------------------------------------------
+backend_clustering_mode = 'streaming_replication'
+
+#------------------------------------------------------------------------------
+# CONNECTIONS
+#------------------------------------------------------------------------------
+
+listen_addresses = '*'
+port = 9999
+socket_dir = '/var/run/postgresql'
+#socket_dir = '/tmp'
+
+
+pcp_listen_addresses = '*'
+pcp_port = 9898
+pcp_socket_dir = '/var/run/postgresql'
+#pcp_socket_dir = '/tmp'
+
+listen_backlog_multiplier = 2
+
+# Replica Configurations
+				
+enable_pool_hba = on
+
+#------------------------------------------------------------------------------
+# POOLS
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# LOGS
+#------------------------------------------------------------------------------
+
+log_connections = on					
+log_hostname = on
+log_statement = off
+log_per_node_statement = off
+logging_collector = on
+log_error_verbosity = default
+log_client_messages = off
+syslog_ident = 'pgpool'
+client_min_messages = notice
+log_min_messages = warning
+log_truncate_on_rotation = on
+log_rotation_age = 7d
+log_rotation_size = 512MB
+log_directory = '/tmp/pgpool_logs'
+
+#------------------------------------------------------------------------------
+# FILE LOCATIONS
+#------------------------------------------------------------------------------
+
+# pgpool_status file location
+logdir = '/var/log/pgpool/'
+
+#------------------------------------------------------------------------------
+# CONNECTION POOLING
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# REPLICATION MODE
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# LOAD BALANCING MODE
+#------------------------------------------------------------------------------
+# Some parameters depend on wether the other nodes are synchronous or not
+
+load_balance_mode = on
+allow_sql_comments = on
+disable_load_balance_on_write = 'transaction'
+statement_level_load_balance = off
+
+#------------------------------------------------------------------------------
+# STREAMING REPLICATION MODE
+#------------------------------------------------------------------------------
+
+sr_check_period = 10
+sr_check_user = 'repl'
+sr_check_password = ''
+delay_threshold = 10001
+follow_primary_command = '/etc/pgpool2/scripts/follow_primary.sh %d %h %p %D %m %H %M %P %r %R'
+
+#------------------------------------------------------------------------------
+# HEALTH CHECK GLOBAL PARAMETERS
+#------------------------------------------------------------------------------
+
+health_check_period = 5
+health_check_timeout = 2
+health_check_user = 'pgpool'
+health_check_password = ''
+health_check_database = 'postgres'
+health_check_max_retries = 1
+health_check_retry_delay = 1
+connect_timeout = 2000
+
+#------------------------------------------------------------------------------
+# HEALTH CHECK PER NODE PARAMETERS (OPTIONAL)
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# FAILOVER AND FAILBACK
+#------------------------------------------------------------------------------
+
+failover_on_backend_shutdown = on
+failover_on_backend_error = on
+detach_false_primary = on
+failover_command = '/etc/pgpool2/scripts/failover.sh %d %h %p %D %m %H %M %P %r %R %N %S'
+failback_command = ''
+
+#------------------------------------------------------------------------------
+# ONLINE RECOVERY
+#------------------------------------------------------------------------------
+
+recovery_user = 'postgres'
+recovery_password = ''
+recovery_1st_stage_command = '/etc/pgpool2/scripts/recovery_1st_stage'
+recovery_2nd_stage_command = ''
+
+#------------------------------------------------------------------------------
+# WATCHDOG
+#------------------------------------------------------------------------------
+
+
+use_watchdog = on
+
+# -Connection to upstream servers -
+trusted_servers = 'funleashpgdb01,funleashpgdb02,funleashpgdb03'
+trusted_server_command = 'ping -q -c3 %h'
+
+# - Watchdog communication Settings -
+hostname0 = 'funleashpgdb01'
+wd_port0 = 9000
+pgpool_port0 = 9999
+hostname1 = 'funleashpgdb02'
+wd_port1 = 9000
+pgpool_port1 = 9999
+hostname2 = 'funleashpgdb03'
+wd_port2 = 9000
+pgpool_port2 = 9999
+wd_ipc_socket_dir = '/var/run/postgresql'
+
+# - Virtual IP control Setting -
+ping_path = '/usr/bin'
+delegate_ip = '172.23.124.74'
+if_cmd_path = '/usr/sbin'
+if_up_cmd = '/usr/bin/sudo /usr/sbin/ip addr add $_IP_$/24 dev ens160 label ens160:0'
+if_down_cmd = '/usr/bin/sudo /usr/sbin/ip addr del $_IP_$/24 dev ens160'
+arping_path = '/usr/bin'
+arping_cmd = '/usr/bin/sudo /usr/sbin/arping -U $_IP_$ -w 1 -I ens160'
+
+# - Behaivor on escalation Setting -
+clear_memqcache_on_escalation = off
+wd_escalation_command = '/etc/pgpool2/scripts/escalation.sh'
+enable_consensus_with_half_votes = off
+wd_de_escalation_command = ''
+
+# - Watchdog consensus settings for failover -
+failover_when_quorum_exists = on
+failover_require_consensus = on
+
+# - Watchdog cluster membership settings for quorum computation -
+wd_remove_shutdown_nodes = off
+
+# - Lifecheck Setting -
+wd_lifecheck_method = 'heartbeat'
+wd_interval = 3
+
+# -- heartbeat mode --
+heartbeat_hostname0 = 'funleashpgdb01'
+heartbeat_port0 = 9999
+heartbeat_device0 = ''
+heartbeat_hostname1 = 'funleashpgdb02'
+heartbeat_port1 = 9999
+heartbeat_device1 = ''
+heartbeat_hostname2 = 'funleashpgdb03'
+heartbeat_port2 = 9999
+heartbeat_device2 = ''
+wd_heartbeat_keepalive = 2
+wd_heartbeat_deadtime = 3
+
+backend_hostname0 = 'funleashpgdb01'
+backend_port0 = 5432
+backend_weight0 = 1
+backend_data_directory0 = '/data/postgresql/15/main/data'
+backend_flag0 = 'ALLOW_TO_FAILOVER'
+backend_application_name0 = 'funleashpgdb01'
+
+backend_hostname1 = 'funleashpgdb02'
+backend_port1 = 5432
+backend_weight1 = 1
+backend_data_directory1 = '/data/postgresql/15/main/data'
+backend_flag1 = 'ALLOW_TO_FAILOVER'
+backend_application_name1 = 'funleashpgdb02'
+
+backend_hostname2 = 'funleashpgdb03'
+backend_port2 = 5432
+backend_weight2 = 1
+backend_data_directory2 = '/data/postgresql/15/main/data'
+backend_flag2 = 'ALLOW_TO_FAILOVER'
+backend_application_name2 = 'funleashpgdb03'
+
+
+#------------------------------------------------------------------------------
+# OTHERS
+#------------------------------------------------------------------------------
+
+relcache_expire = 0
+relcache_size = 256
+relcache_query_target = load_balance_node
+
+#------------------------------------------------------------------------------
+# IN MEMORY QUERY MEMORY CACHE
+#------------------------------------------------------------------------------
+# https://www.pgpool.net/docs/latest/en/html/runtime-in-memory-query-cache.html
+
+memory_cache_enabled = on
+memqcache_total_size = 256MB
+memqcache_max_num_cache = 2796202
+memqcache_cache_block_size = 2638400
+memqcache_maxcache = 1638400
+memqcache_oiddir = '/var/log/pgpool/oiddir'
+memqcache_auto_cache_invalidation = on
+
+```
+
+</details>

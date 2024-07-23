@@ -803,7 +803,7 @@ backend_clustering_mode = 'streaming_replication'
                                     # arping command path
                                     # If arping_cmd starts with "/", if_cmd_path will be ignored.
                                     # (change requires restart)
-Note: requires iputils-arping to be installed on Ubuntu
+# Note: requires iputils-arping to be installed on Ubuntu
 
 
 #arping_cmd = '/usr/bin/sudo /usr/sbin/arping -U $_IP_$ -w 1 -I eth0'
@@ -1018,6 +1018,8 @@ Note: requires iputils-arping to be installed on Ubuntu
 #------------------------------------------------------------------------------
 # IN MEMORY QUERY MEMORY CACHE
 #------------------------------------------------------------------------------
+# https://www.pgpool.net/docs/latest/en/html/runtime-in-memory-query-cache.html
+
 #memory_cache_enabled = off
                                    # If on, use the memory cache functionality, off by default
                                    # (change requires restart)
