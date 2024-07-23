@@ -86,10 +86,9 @@ The major configuration file for pgpool is pgpool.conf. Now we dive into this fi
 
 The complete default pgpool.conf file that I have added additional explainations for some directives of it is as follows:
 
-```html
+
 <details>
 <summary>Click to expand</summary>
-```
 
 ```conf
 # ----------------------------
