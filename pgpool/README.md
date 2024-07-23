@@ -143,7 +143,7 @@ The major configuration file for pgpool is pgpool.conf. Now we dive into this fi
 The complete default pgpool.conf file that I have added additional explanations for some directives of it is as follows:
 
 <details>
-<summary>(click to expand) The complete default **pgpool.conf** file with added explanations:</summary>
+<summary>(click to expand) The complete default pgpool.conf file with added explanations:</summary>
 
 ```conf
 # ----------------------------
@@ -1296,7 +1296,7 @@ When password directives are left empty, pgpool will first examine the pool_pass
 * Now, this is the pgpool.conf file summarized for our production env specific needs. Some directives are picked, the others are not included to be left with their default values. Some values are default, but they are included anyway for future manipulation and attention. The ckeck parameters are specified with the assumption that all our nodes are on the same fast and stably connected network. Though for a disaster node which is in a far location and on a relatively slowly connected network, different "PER NODE PARAMETERS" options should be specified. We use the pgpool's pool_hba, CONNECTION POOLING, LOAD BALANCING, FAILOVER AND FAILBACK, ONLINE RECOVERY, WATCHDOG, RELCACHE, and IN MEMORY QUERY MEMORY CACHE features:
 
 <details>
-<summary>(click to expand) **pgpool.conf** summary:</summary>
+<summary>(click to expand) pgpool.conf summary:</summary>
 
 ```conf
 ######################### Optimized for our case-specific Production ############################
