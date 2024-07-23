@@ -77,11 +77,16 @@ touch /var/log/pgpool/pgpool_status		# Backend status file
 chown -R postgres /var/log/pgpool		# Log location
 ```
 
+1. **Assign a password to the user postgres in Linux**
+
+```shell
+sudo passwd postgres
+```
 
 1. **Create Replication, Health Check, and Recovery users with required privileges on every node.**
 
 ```pgsql
--- inside pg engine, create pg users and assign a password to the postgres user both in the database cluster engine and linux, and set up pg_hba.conf file accordingly. A sample of the pg_hba.conf file was given. We take all the passwords to be the same for simplicity.
+-- inside pg engine, create pg users and assign a password to the postgres user in the database cluster engine too, and set up pg_hba.conf file accordingly. A sample of the pg_hba.conf file was given. We take all the passwords to be the same for simplicity.
 CREATE USER repl REPLICATION PASSWORD 'Pa$svvord';
 
 -- If you want to show "replication_state" and "replication_sync_state" column in SHOW POOL NODES command result,
@@ -97,7 +102,6 @@ SET password_encryption = 'scram-sha-256';
 \password repl
 \password postgres
 ```
-
 
 1. **postgresql configuration files: pg_hba.conf**
 
@@ -128,7 +132,6 @@ host    all             all             127.0.0.1/32            scram-sha-256
 host    all             all             ::1/128                 scram-sha-256
 ```
 
-
 1. **pgpool configuration files: pgpool.conf**
 
 The major configuration file for pgpool is pgpool.conf. Now we dive into this file. This is the default configuration file of pgpool 4.5.2. The parts that are commented out show the default value in effect for that directive. We have added some extra explainations for some parts. Furthermore, the only default directive that is not commented out by default is the following:
@@ -140,7 +143,6 @@ The complete default pgpool.conf file that I have added additional explanations 
 
 <details>
 <summary>(click to expand) The complete default pgpool.conf file with added explanations:</summary>
-
 
 ```conf
 # ----------------------------
@@ -1283,6 +1285,7 @@ backend_clustering_mode = 'streaming_replication'
 
 # list of tables that their records frequently change.
 ```
+
 </details>
 
 * **Note:**
@@ -1295,7 +1298,7 @@ When password directives are left empty, pgpool will first examine the pool_pass
 <summary>(click to expand) pgpool.conf summary:</summary>
 
 ```conf
-######################### Optimized for Production ############################
+######################### Optimized for our case-specific Production ############################
 
 #------------------------------------------------------------------------------
 # BACKEND CLUSTERING MODE
@@ -1320,7 +1323,7 @@ pcp_socket_dir = '/var/run/postgresql'
 listen_backlog_multiplier = 2
 
 # Replica Configurations
-				
+	
 enable_pool_hba = on
 
 #------------------------------------------------------------------------------
@@ -1331,7 +1334,7 @@ enable_pool_hba = on
 # LOGS
 #------------------------------------------------------------------------------
 
-log_connections = on					
+log_connections = on		
 log_hostname = on
 log_statement = off
 log_per_node_statement = off
@@ -1525,3 +1528,20 @@ memqcache_auto_cache_invalidation = on
 ```
 
 </details>
+
+On Ubuntu, pg environment variables are missing which are needed by scripts execution. They are available in RHEL distributions. So we create them on Ubuntu. For that matter, we add them to postgres' .bashrc file. The .bashrc and .profile files do not exist, so we do the following:
+
+```shell
+sudo cp /etc/skel/{.bashrc,.bash_logout,.profile}
+sudo chown -R postgres:postgres ~postgres
+```
+
+Then add the required env variables:
+
+```shell
+vi ~postgres/.bashrc
+```
+
+The env entries:
+```shell
+```
