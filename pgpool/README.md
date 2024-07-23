@@ -2,7 +2,7 @@
 
 ### References
 
-pgpool explaination and sample setup:
+pgpool explanation and sample setup:
 
 [https://www.pgpool.net/docs/latest/en/html/example-cluster.html](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)
 
@@ -14,8 +14,9 @@ For more, follow [this link](./pgpool%20references.md).
 
 1. PostgreSQL major version specified here is 15. However, this manual also complies with most of the pg versions in use, including 13, 14, 15, and 16.
 2. pgpool version is 4.5.2
-3. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available server, even a separate one. Here we setup the watchdog on all the nodes.
-4. The following are the node details used in this documentation:
+3. There are some glitches for pgpool on Ubuntu, which do not exist on the RHEL. That is because EnterpriseDB is rather Redhat oriented than other Linux distros. I have tried to make up for them and included the solutions in this document. The tests have shown a satisfactory result for myself but the solutions are offered **without a guarantee**.
+4. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available server, even a separate one. Here we setup the watchdog on all the nodes.
+5. The following are the node details used in this documentation:
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 
@@ -39,7 +40,7 @@ The replication topology is composed of:
 
 Add the pg official repository and install PostgreSQL on all the nodes. After adding the PostgreSQL's official repository, you can find pgpool and its related packages in that repository.
 
-1. **Install required packages:**
+#### 1. **Install required packages:**
 
 ```shell
 sudo apt-get update
@@ -48,7 +49,7 @@ sudo apt-get install pgpool2 libpgpool2 postgresql-15-pgpool2
 
 postgresql-15-pgpool2 contains extensions for pgpool and is mandatory too. They will be mentioned later. Choose the version of this package which corresponds with your pg major version.
 
-1. **Copy template files:**
+#### 1. **Copy template files:**
 
 copy template script files from the following directory to a specific directory, rename and remove .sample from the end of the files.
 
@@ -56,7 +57,7 @@ copy template script files from the following directory to a specific directory,
 cp /usr/share/doc/pgpool2/examples/scripts/* /data/postgresql/15/main/
 ```
 
-1. **Create pgpool_node_id file**
+#### 1. **Create pgpool_node_id file**
 
 create the pgpool_node_id file with the node id (ex 0) below on every node:
 Write the following inside shell. The node id starts from 0 for Node 1, 1 for Node 2, and so on.
@@ -67,7 +68,7 @@ cat << /etc/pgpool2/pgpool_node_id >> EOT
 EOT
 ```
 
-2. **Create the backend status file.**
+#### 2. **Create the backend status file.**
 
 It will be explained later.
 
@@ -77,13 +78,13 @@ touch /var/log/pgpool/pgpool_status		# Backend status file
 chown -R postgres /var/log/pgpool		# Log location
 ```
 
-1. **Assign a password to the user postgres in Linux**
+#### 1. **Assign a password to the user postgres in Linux**
 
 ```shell
 sudo passwd postgres
 ```
 
-1. **Create Replication, Health Check, and Recovery users with required privileges on every node.**
+#### 1. **Create Replication, Health Check, and Recovery users with required privileges on every node.**
 
 ```pgsql
 -- inside pg engine, create pg users and assign a password to the postgres user in the database cluster engine too, and set up pg_hba.conf file accordingly. A sample of the pg_hba.conf file was given. We take all the passwords to be the same for simplicity.
@@ -103,7 +104,7 @@ SET password_encryption = 'scram-sha-256';
 \password postgres
 ```
 
-1. **postgresql configuration files: pg_hba.conf**
+#### 1. **postgresql configuration files: pg_hba.conf**
 
 replication must be enabled for streaming replication and also pg_basebackup to work.
 
@@ -132,7 +133,7 @@ host    all             all             127.0.0.1/32            scram-sha-256
 host    all             all             ::1/128                 scram-sha-256
 ```
 
-1. **pgpool configuration files: pgpool.conf**
+#### 1. **pgpool configuration files: pgpool.conf**
 
 The major configuration file for pgpool is pgpool.conf. Now we dive into this file. This is the default configuration file of pgpool 4.5.2. The parts that are commented out show the default value in effect for that directive. We have added some extra explainations for some parts. Furthermore, the only default directive that is not commented out by default is the following:
 
@@ -1323,7 +1324,7 @@ pcp_socket_dir = '/var/run/postgresql'
 listen_backlog_multiplier = 2
 
 # Replica Configurations
-	
+
 enable_pool_hba = on
 
 #------------------------------------------------------------------------------
@@ -1334,7 +1335,7 @@ enable_pool_hba = on
 # LOGS
 #------------------------------------------------------------------------------
 
-log_connections = on		
+log_connections = on
 log_hostname = on
 log_statement = off
 log_per_node_statement = off
@@ -1529,7 +1530,10 @@ memqcache_auto_cache_invalidation = on
 
 </details>
 
-On Ubuntu, pg environment variables are missing which are needed by scripts execution. They are available in RHEL distributions. So we create them on Ubuntu. For that matter, we add them to postgres' .bashrc file. The .bashrc and .profile files do not exist, so we do the following:
+On Ubuntu, heartbeat port appears to be glitchy and sometimes will not open. In such case, pgpool will send the signal to 9999 port instead automatically, that's why I have directly assigned the 9999 port to heartbeat instead of 9694.
+
+#### 1. Correct environment variables for Ubuntu
+On Ubuntu, pg environment variables are missing which are needed by scripts execution. They are available in RHEL distributions. So we create them on Ubuntu. For that matter, we add them to the postgres' .bashrc file. The .bashrc and .profile files do not exist, so we do the following:
 
 ```shell
 sudo cp /etc/skel/{.bashrc,.bash_logout,.profile}
@@ -1542,7 +1546,8 @@ Then add the required env variables:
 vi ~postgres/.bashrc
 ```
 
-The env entries. Add them to the end of .bashrc. The `| cut -d '.' -f1` part is to remove the FQDN part, if any:
+These are the env entries. Add them to the end of .bashrc file. The `| cut -d '.' -f1` part is to remove the FQDN part from the hostname command output, if any:
+
 ```shell
 declare -x PGDATA=/data/postgresql/15/main/data
 declare -x HOSTNAME=$(hostname | cut -d '.' -f1)
@@ -1555,3 +1560,8 @@ declare -x HOSTNAME_VAR=$(hostname)
 declare -x PGPOOLHOST=$(hostname)
 declare -x PGPASSFILE="$(echo ~postgres)/.pgpass"
 ```
+
+#### 1. Customizing the bash script files (Ubuntu):
+Now we customize the bash script files that we have copied to the /etc/pgpool2/scripts directory. On RHEL, they do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows. I also have added logging of the echo commands' output to the pgpool log files themselves.
+
+#### *. failover.sh
