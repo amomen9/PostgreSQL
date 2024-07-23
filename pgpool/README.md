@@ -87,7 +87,7 @@ The major configuration file for pgpool is pgpool.conf. Now we dive into this fi
 The complete default pgpool.conf file that I have added additional explainations for some directives of it is as follows:
 
 
-<table style="max-height: 1000px; overflow-y: auto;">
+<table style="height: 200px; overflow-y: auto;">
 <tr><td>
 
 ```conf
