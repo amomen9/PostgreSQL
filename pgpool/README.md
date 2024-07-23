@@ -1564,4 +1564,4 @@ declare -x PGPASSFILE="$(echo ~postgres)/.pgpass"
 #### 1. Customizing the bash script files (Ubuntu):
 Now we customize the bash script files that we have copied to the /etc/pgpool2/scripts directory. On RHEL, they do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows. I also have added logging of the echo commands' output to the pgpool log files themselves.
 
-#### *. failover.sh
+#### * failover.sh
