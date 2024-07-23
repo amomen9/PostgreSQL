@@ -88,7 +88,7 @@ The complete default pgpool.conf file that I have added additional explainations
 
 
 <details>
-<summary>Click to expand</summary>
+<summary>complete default pgpool.conf file with added explainations (click to expand)</summary>
 
 ```conf
 # ----------------------------
