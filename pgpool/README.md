@@ -87,7 +87,8 @@ The major configuration file for pgpool is pgpool.conf. Now we dive into this fi
 The complete default pgpool.conf file that I have added additional explainations for some directives of it is as follows:
 
 
-<div style="max-height: 1000px; overflow-y: auto;">
+<table style="max-height: 1000px; overflow-y: auto;">
+<tr><td>
 
 ```conf
 # ----------------------------
@@ -1222,7 +1223,8 @@ Note: requires iputils-arping to be installed on Ubuntu
 # list of tables that their records frequently change.
 ```
 
-</div>
+</td></tr>
+</table>
 
 1. **Create Replication, Health Check, and Recovery users with required privileges on every node.**
 
