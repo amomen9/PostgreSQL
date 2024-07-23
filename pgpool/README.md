@@ -80,9 +80,9 @@ chown -R postgres /var/log/pgpool		# Log location
 
 The major configuration file for pgpool is pgpool.conf. Now we dive into this file. This is the default configuration file of pgpool 4.5.2. The parts that are commented out show the default value in effect for that directive. We have added some extra explainations for some parts. Furthermore, the only default directive that is not commented out by default is the following:
 
-```
-backend_clustering_mode = 'streaming_replication'
-```
+
+| backend_clustering_mode = 'streaming_replication' |
+| :------------------------------------------------ |
 
 The complete default pgpool.conf file that I have added additional explainations for some directives of it is as follows:
 
