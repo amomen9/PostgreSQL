@@ -143,7 +143,7 @@ The major configuration file for pgpool is pgpool.conf. Now we dive into this fi
 The complete default pgpool.conf file that I have added additional explanations for some directives of it is as follows:
 
 <details>
-<summary style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">(click to expand) The complete default <b>pgpool.conf</b> file with added explanations:</summary>
+<summary><u>(click to expand) The complete default <b>pgpool.conf</b> file with added explanations:</u><summary>
 
 ```conf
 # ----------------------------
@@ -1296,7 +1296,7 @@ When password directives are left empty, pgpool will first examine the pool_pass
 * Now, this is the pgpool.conf file summarized for our production env specific needs. Some directives are picked, the others are not included to be left with their default values. Some values are default, but they are included anyway for future manipulation and attention. The ckeck parameters are specified with the assumption that all our nodes are on the same fast and stably connected network. Though for a disaster node which is in a far location and on a relatively slowly connected network, different "PER NODE PARAMETERS" options should be specified. We use the pgpool's pool_hba, CONNECTION POOLING, LOAD BALANCING, FAILOVER AND FAILBACK, ONLINE RECOVERY, WATCHDOG, RELCACHE, and IN MEMORY QUERY MEMORY CACHE features:
 
 <details>
-<summary style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">(click to expand) pgpool.conf summary:</summary>
+<summary><u>(click to expand) pgpool.conf summary:</u><summary>
 
 ```conf
 ######################### Optimized for our case-specific Production ############################
@@ -1603,7 +1603,7 @@ log_destination='pgpool_log'
 This script is executed right after a failover occurs first. Then in the event of a manual failover, the follow_primary.sh script will also be executed.
 
 <details>
-<summary style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">(click to expand) failover.sh </summary>
+<summary><u>(click to expand) failover.sh </u><summary>
 
 ```shell
 #!/bin/bash
@@ -1843,7 +1843,7 @@ exit 0
 Just like we said in failover.sh, in the event of a manual failover, the follow_primary.sh script will also be executed subsequently:
 
 <details>
-<summary style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">(click to expand) follow_primary.sh </summary>
+<summary><u>(click to expand) follow_primary.sh </u><summary>
 
 ```shell
 #!/bin/bash
@@ -2196,7 +2196,7 @@ exit 0
 This file is executed in the event that the VIP is changed from one node to another. In such event, the IP must be removed from the old replica and assigned to the interface of the new replica which is to host the virtual IP. This script is executed on the new host to remove VIP from the other nodes using ssh command.
 
 <details>
-<summary style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">(click to expand) escalation.sh </summary>
+<summary><u>(click to expand) escalation.sh </u><summary>
 
 ```shell
 #!/bin/bash
