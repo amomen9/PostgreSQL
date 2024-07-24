@@ -143,7 +143,7 @@ The major configuration file for pgpool is pgpool.conf. Now we dive into this fi
 The complete default pgpool.conf file that I have added additional explanations for some directives of it is as follows:
 
 <details>
-<summary>(click to expand) The complete default <b style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">pgpool.conf</b> file with added explanations:</summary>
+<summary>(click to expand) The complete default <b>pgpool.conf</b> file with added explanations:</summary>
 
 ```conf
 # ----------------------------
@@ -1578,7 +1578,7 @@ ssh-keygen
 #### 1. Customizing the bash script files (Ubuntu):
 Now we customize the bash script files that we have copied to the /etc/pgpool2/scripts directory. On RHEL, they do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows. I also have added logging of the echo commands' output to the pgpool log files themselves. You can compare the following scripts with the original ones:
 
-##### -script.conf
+##### <ul><li>script.conf</li></ul>
 I have added a script.conf file to define some parameters such as log_level and log_destination for the script files
 
 ```conf
