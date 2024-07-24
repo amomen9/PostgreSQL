@@ -1598,7 +1598,7 @@ log_destination='pgpool_log'
 
 ```
 
-##### -failover.sh:
+##### <ul><li>failover.sh:</ul></li>
 
 This script is executed right after a failover occurs first. Then in the event of a manual failover, the follow_primary.sh script will also be executed.
 
@@ -1839,7 +1839,7 @@ exit 0
 </details>
 
 
-##### -follow_primary.sh
+##### <ul><li>follow_primary.sh</ul></li>
 Just like we said in failover.sh, in the event of a manual failover, the follow_primary.sh script will also be executed subsequently:
 
 <details>
@@ -2192,7 +2192,7 @@ exit 0
 
 </details>
 
-##### -escalation.sh
+##### <ul><li>escalation.sh</ul></li>
 This file is executed in the event that the VIP is changed from one node to another. In such event, the IP must be removed from the old replica and assigned to the interface of the new replica which is to host the virtual IP. This script is executed on the new host to remove VIP from the other nodes using ssh command.
 
 <details>
