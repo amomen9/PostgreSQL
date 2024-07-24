@@ -1578,7 +1578,7 @@ ssh-keygen
 #### 1. Customizing the bash script files (Ubuntu):
 Now we customize the bash script files that we have copied to the /etc/pgpool2/scripts directory. On RHEL, they do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows. I also have added logging of the echo commands' output to the pgpool log files themselves. You can compare the following scripts with the original ones:
 
-##### • script.conf
+##### 		• script.conf
 I have added a script.conf file to define some parameters such as log_level and log_destination for the script files
 
 ```conf
