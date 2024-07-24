@@ -143,7 +143,7 @@ The major configuration file for pgpool is pgpool.conf. Now we dive into this fi
 The complete default pgpool.conf file that I have added additional explanations for some directives of it is as follows:
 
 <details>
-<summary><span style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">(click to expand) The complete default <b>pgpool.conf</b> file with added explanations:</span></summary>
+<summary><span style="text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: blue; text-decoration-thickness: 2px;">(click to expand) The complete default <b>pgpool.conf</b> file with added explanations:</span>a</summary>
 
 ```conf
 # ----------------------------
