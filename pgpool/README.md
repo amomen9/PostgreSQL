@@ -10,14 +10,14 @@ For more, follow [this link](./pgpool%20references.md).
 
 ---
 
-### [•  pgpool Doc Part I ](./Part I.md)
+### [•  pgpool Doc Part I ](./Part%20I.md)
 
 ---
 
-### [•  pgpool Doc Part II ](./Part II.md)
+### [•  pgpool Doc Part II ](./Part%20II.md)
 
 ---
 
-### [•  pgpool Doc Part III ](./Part III.md)
+### [•  pgpool Doc Part III ](./Part%20III.md)
 
 ---
