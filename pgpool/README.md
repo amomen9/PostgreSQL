@@ -1576,7 +1576,7 @@ ssh-keygen
 
 
 #### 1. Customizing the bash script files (Ubuntu):
-Now we customize the bash script files that we have copied to the /etc/pgpool2/scripts directory. On RHEL, they do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows. I also have added logging of the echo commands' output to the pgpool log files themselves.
+Now we customize the bash script files that we have copied to the /etc/pgpool2/scripts directory. On RHEL, they do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows. I also have added logging of the echo commands' output to the pgpool log files themselves. You can compare the following scripts with the original ones:
 
 ##### -script.conf
 I have added a script.conf file to define some parameters such as log_level and log_destination for the script files
@@ -1601,6 +1601,10 @@ log_destination='pgpool_log'
 ##### -failover.sh:
 
 This script is executed right after a failover occurs first. Then in the event of a manual failover, the follow_primary.sh script will also be executed.
+
+<details>
+<summary>(click to expand) failover.sh </summary>
+
 ```shell
 #!/bin/bash
 # This script is run by failover_command.
@@ -1832,8 +1836,14 @@ exit 0
 
 ```
 
+</details>
+
+
 ##### -follow_primary.sh
 Just like we said in failover.sh, in the event of a manual failover, the follow_primary.sh script will also be executed subsequently:
+
+<details>
+<summary>(click to expand) follow_primary.sh </summary>
 
 ```shell
 #!/bin/bash
@@ -2180,8 +2190,14 @@ exit 0
 
 ```
 
+</details>
+
 ##### -escalation.sh
 This file is executed in the event that the VIP is changed from one node to another. In such event, the IP must be removed from the old replica and assigned to the interface of the new replica which is to host the virtual IP. This script is executed on the new host to remove VIP from the other nodes using ssh command.
+
+<details>
+<summary>(click to expand) escalation.sh </summary>
+
 ```shell
 #!/bin/bash
 # This script is run by wd_escalation_command to bring down the virtual IP on other pgpool nodes
@@ -2223,3 +2239,6 @@ done
 exit 0
 
 ```
+
+</details>
+
