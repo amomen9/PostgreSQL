@@ -6,7 +6,7 @@ set -o xtrace
 
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool
-SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/${SSH_KEY_FILE}"
+SSH_OPTIONS="-o StrictHostKeyChecking=no -i ~/.ssh/${SSH_KEY_FILE}"
 SSH_TIMEOUT=5
 # PGPOOLS=(server1 server2 server3)
 PGPOOLS=(funleashpgdb01 funleashpgdb02 funleashpgdb03)

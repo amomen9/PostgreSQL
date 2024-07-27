@@ -34,7 +34,7 @@ NEW_PRIMARY_NODE_PGDATA="${10}"
 PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
 PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
 PGCLU=main
-ARCHIVEDIR=/backup/wal
+ARCHIVEDIR=/var/postgresql/pg-wal-archive
 REPLUSER=repl
 PCP_USER=pgpool
 #PGPOOL_PATH=/usr/bin
@@ -45,7 +45,7 @@ REPL_SLOT_RAW_NAME=$(echo ${NODE_HOST} | cut -c 2- | awk -F'db' '{print $1}')
 REPL_SLOT_NAME=$(echo ${REPL_SLOT_RAW_NAME,,} | tr -- -. _)
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool
-SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/${SSH_KEY_FILE}"
+SSH_OPTIONS="-o StrictHostKeyChecking=no -i ~/.ssh/${SSH_KEY_FILE}"
 
 TBSP_DIR=/data/postgresql/$PGMAJVER/main/tablespaces
 PGCONFDIR=/etc/postgresql/$PGMAJVER/$PGCLU
@@ -121,7 +121,7 @@ EOT
     fi
 
     #${PGHOME}/bin/pg_ctl -l /dev/null -w -D ${NODE_PGDATA} start
-    ${PGHOME}/bin/pg_ctlcluster $PGMAJVER $PGCLU start -- -l /dev/null -w -D ${NODE_PGDATA}
+    ${PGHOME}/bin/pg_ctlcluster $PGMAJVER $PGCLU start
 
 "
 
@@ -174,7 +174,7 @@ EOT
 
     # start Standby node on ${NODE_HOST}
     #ssh -T ${SSH_OPTIONS} ${POSTGRESQL_STARTUP_USER}@${NODE_HOST} $PGHOME/bin/pg_ctl -l /dev/null -w -D ${NODE_PGDATA} start
-    ssh -T ${SSH_OPTIONS} ${POSTGRESQL_STARTUP_USER}@${NODE_HOST} $PGHOME/bin/pg_ctlcluster $PGMAJVER $PGCLU start -- -l /dev/null -w -D ${NODE_PGDATA}
+    ssh -T ${SSH_OPTIONS} ${POSTGRESQL_STARTUP_USER}@${NODE_HOST} $PGHOME/bin/pg_ctlcluster $PGMAJVER $PGCLU start
 
 fi
 

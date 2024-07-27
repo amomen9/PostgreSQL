@@ -12,23 +12,29 @@ In any document, if you see commands such as below (or the document explicitly s
 
 •  etc.
 
+#### • Our main reference:
+
 This document is our main reference for installing and configuring the Pgpool-II + Watchdog Setup Example. It is lengthy, but all parts are essential.
 
 [https://www.pgpool.net/docs/latest/en/html/example-cluster.html](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)
 
 ---
 
-* EDB:
+#### • EDB:
 
 [https://www.enterprisedb.com/docs/pgpool/latest/](https://www.enterprisedb.com/docs/pgpool/latest/)
 
 ---
 
-* This document provides good explanations and screem clips for pgpoolAdmin.
+#### • pgPoolAdmin
+
+This document provides good explanations and screen clips for pgpoolAdmin.
 
 [https://www.pgpool.net/docs/pgpoolAdmin/index_en.html](https://www.pgpool.net/docs/pgpoolAdmin/index_en.html)
 
 ---
+
+#### • Mere installation
 
 * This method is for creating a repo and installing pgpool specifically for Ubuntu.
 
@@ -36,14 +42,20 @@ This document is our main reference for installing and configuring the Pgpool-II
 
 ---
 
+#### • Mere installation and basic configuration
+
 * This document only explains the installation and configuration of pgpool & pgAdmin. You can just pay attention to the commands.
 
 [https://www.heatware.net/postgresql/postgres-pgpool-ubuntu-setup-install/#:~:text=To%20install%20Pgpool-II%20on%20Ubuntu%2C%20follow%20these%20steps%3A,install%20the%20Pgpool-II%20package%20along%20with%20its%20dependencies](https://www.heatware.net/postgresql/postgres-pgpool-ubuntu-setup-install/#:~:text=To%20install%20Pgpool-II%20on%20Ubuntu%2C%20follow%20these%20steps%3A,install%20the%20Pgpool-II%20package%20along%20with%20its%20dependencies)
 
 ---
 
-###########
-These are supplementary documents.
+#### • Supplementary Documents.
+
+
+* pgPool release notes:
+ 
+[https://www.pgpool.net/docs/latest/en/html/release.html]()
 
 * The document below specifically provides information about Parallel Query but is a bit outdated.
 
