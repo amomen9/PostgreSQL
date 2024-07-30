@@ -1,10 +1,10 @@
 &nbsp;Doc parts:
 
-<ul>
-<li>[Part I: Install and Configure PostgreSQL for pgPool](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)</li>
-<li>[Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)</li>
-<li>[Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)</li>
-</ul>
+
+* [Part I: Install and Configure PostgreSQL for pgPool](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
+* [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
+* [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
+
 
 # PGPOOL (Ubuntu) Part I
 
