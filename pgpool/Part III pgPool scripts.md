@@ -3,30 +3,56 @@
 * [Part I: Install and Configure PostgreSQL for pgPool](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
 * [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
+* [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
+* [Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+* [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
 
 
 # PGPOOL (Ubuntu) Part III
 **pgPool scripts**
 
-Modify the scripts like below. Logging to pgPool log files has also been added.
+#### 3. Copy template files (Every Node):
 
-### Customizing the shell script files (with .sh extension) (Ubuntu) (Every Node):
+Copy template shell script files from the following directory to a specific directory of your choice, rename and remove .sample from the end of the files. Two such specific directories are suggested here. You have to keep in mind to define the path for these scripts in the `*_command` directives accordingly in the pgpool.conf file, though.
 
-* **Location:** `/etc/pgpool2/scripts`
+The first group of shell script files are the ones with .sh extension and the second ones are the ones without extension.
 
+```shell
+sudo -u postgres mkdir -p /etc/pgpool2/scripts && sudo -u postgres cp /usr/share/doc/pgpool2/examples/*.sh* /etc/pgpool2/scripts
 
-First of all, make sure that the scripts are executable
 ```
-chmod +x <all scripts>
+
+here is the result:
+
+![1721809387449](image/PartI/1721809387449.png)
+
+The files with aws at the beginning are for the Amazon Web Services which are irrelevant for us.
+
+```shell
+sudo -u postgres rm -f /etc/pgpool2/scripts/aws*
 ```
 
-We copied the script files with .sh extension to the /etc/pgpool2/scripts directory. Now we customize the shell script files that we have copied. As it was mentioned earlier, on RHEL, the script files in general do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows.
+Now remove .sample from the end of the file names.
 
-I have also added logging of the echo commands' output to the pgpool log files themselves manually. You can compare the following scripts with the original ones:
+Next, we copy the shell scripts which have no extension to the $PGDATA directory.
 
-#### 17. script.conf (Every Node)
+```shell
+sudo -u postgres cp /usr/share/doc/pgpool2/examples/{replication_mode_recovery_2nd_stage.sample,replication_mode_recovery_1st_stage.sample,recovery_1st_stage.sample,pgpool_remote_start.sample} \
+$PGDATA/
+```
 
-I have added a script.conf file to define some parameters such as log_level and log_destination for the script files
+Remove .sample from the end of these file names too. Later we modify these files to work in our environment. On RHEL, the script files in general do not need much modification, but on Ubuntu, there is more work to do.
+
+Finally, the scripts **must** be made **executable** for the user that runs pgpool scripts (postgres in our case, which also owns the scripts).
+
+```
+sudo chmod -R 750 $PGDATA
+sudo chmod -R 750 /etc/pgpool2/scripts
+```
+
+#### 17. Create script.conf (Every Node)
+
+I have added a script.conf file. This file helps with logging the script execution messages by defining some parameters such as log_level and log_destination for the script files
 
 ```conf
 # manually created script configuration amomen
@@ -44,6 +70,25 @@ log_destination='pgpool_log'
 				# journal
 
 ```
+
+---
+
+* Now, modify the scripts like below. Logging to pgPool log files has also been added.
+
+### Customizing the shell script files (with .sh extension) (Ubuntu) (Every Node):
+
+* **Location:** `/etc/pgpool2/scripts`
+
+
+First of all, make sure that the scripts are executable
+```
+chmod +x <all scripts>
+```
+
+We copied the script files with .sh extension to the /etc/pgpool2/scripts directory. Now we customize the shell script files that we have copied. As it was mentioned earlier, on RHEL, the script files in general do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows.
+
+I have also added logging of the echo commands' output to the pgpool log files themselves manually. You can compare the following scripts with the original ones:
+
 
 #### 18. failover.sh (Every Node):
 
@@ -659,6 +704,8 @@ exit 0
 
 This file is executed in the event that the VIP is changed from one node to another. In such event, the IP must be removed from the old replica and assigned to the interface of the new replica which is to host the virtual IP. This script is executed on the new host to remove VIP from the other nodes using ssh command.
 
+* Change the variable DEVICE value to your interface name.
+
 <details>
 <summary>(click to expand) escalation.sh </summary>
 
@@ -909,3 +956,7 @@ exit 0
 ```
 
 </details>
+
+
+
+### [Next: Part IV, fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)

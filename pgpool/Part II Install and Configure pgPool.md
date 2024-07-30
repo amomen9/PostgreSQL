@@ -3,6 +3,9 @@
 * [Part I: Install and Configure PostgreSQL for pgPool](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
 * [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
+* [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
+* [Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+* [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
 
 
 # PGPOOL (Ubuntu) Part II
@@ -31,46 +34,6 @@ sudo chown -R postgres:postgres /etc/pgpool2
 
 Note that the packages pgpool2, libpgpool2, and their dependents, do not rely on the PostgreSQL major version, however, the pgpool extensions (postgresql-15-pgpool2) for PostgreSQL database cluster engine do rely on the PostgreSQL's major version and must be chosen accordingly.
 postgresql-15-pgpool2 contains extensions for pgpool and is mandatory too. They will be mentioned later. Choose the version of this package which corresponds with your pg major version.
-
-
-#### 3. Copy template files (Every Node):
-
-Copy template shell script files from the following directory to a specific directory of your choice, rename and remove .sample from the end of the files. Two such specific directories are suggested here. You have to keep in mind to define the path for these scripts in the `*_command` directives accordingly in the pgpool.conf file, though.
-
-The first group of shell script files are the ones with .sh extension and the second ones are the ones without extension.
-
-```shell
-sudo -u postgres mkdir -p /etc/pgpool2/scripts && sudo -u postgres cp /usr/share/doc/pgpool2/examples/*.sh* /etc/pgpool2/scripts
-
-```
-
-here is the result:
-
-![1721809387449](image/PartI/1721809387449.png)
-
-The files with aws at the beginning are for the Amazon Web Services which are irrelevant for us.
-
-```shell
-sudo -u postgres rm -f /etc/pgpool2/scripts/aws*
-```
-
-Now remove .sample from the end of the file names.
-
-Next, we copy the shell scripts which have no extension to the $PGDATA directory.
-
-```shell
-sudo -u postgres cp /usr/share/doc/pgpool2/examples/{replication_mode_recovery_2nd_stage.sample,replication_mode_recovery_1st_stage.sample,recovery_1st_stage.sample,pgpool_remote_start.sample} \
-$PGDATA/
-```
-
-Remove .sample from the end of these file names too. Later we modify these files to work in our environment. On RHEL, the script files in general do not need much modification, but on Ubuntu, there is more work to do.
-
-Finally, the scripts **must** be made **executable** for the user that runs pgpool scripts (postgres in our case, which also owns the scripts).
-
-```
-sudo chmod -R 750 $PGDATA
-sudo chmod -R 750 /etc/pgpool2/scripts
-```
 
 #### 4. Create pgpool_node_id file (Every Node, but with different content)
 
@@ -1413,7 +1376,17 @@ backend_clustering_mode = 'streaming_replication'
 When password directives are left empty, pgpool will first examine the pool_passwd file, then try to use empty password.
 
 * Now, this is the pgpool.conf file summarized for our production env specific needs. Some directives are picked, the others are not included to be left with their default values. Some values are default, but they are included anyway for future manipulation and attention. 
-* The ckeck (healthcheck, heartbeat signal, and sr check) parameters are specified with the assumption that all our nodes are on the same fast and stably connected network. Though for a disaster node which is in a far location and on a relatively slowly connected network, different "PER NODE PARAMETERS" options should be specified. 
+* The check (healthcheck, heartbeat signal, and sr check) parameters are specified with the assumption that all our nodes are on the same fast and stably connected network. Though for a disaster node which is in a far location and on a relatively slowly connected network, different "PER NODE PARAMETERS" options should be specified. 
+* Note that if_up_cmd/if_down_cmd directives must be modified to have your correct interface name. For example, if you interface name is ens160, they would be the following:
+		
+```conf
+if_up_cmd = '/usr/bin/sudo /usr/sbin/ip addr add $_IP_$/24 dev ens160 label ens160:0'
+```
+		
+```conf
+if_down_cmd = '/usr/bin/sudo /usr/sbin/ip addr del $_IP_$/24 dev ens160'
+```
+
 * We use the pgpool's pool_hba, CONNECTION POOLING, LOAD BALANCING, FAILOVER AND FAILBACK, ONLINE RECOVERY, WATCHDOG, RELCACHE, and IN MEMORY QUERY MEMORY CACHE features:
 
 ```shell
@@ -1798,6 +1771,79 @@ sudo -u postgres sh -c 'ssh -i ~postgres/.ssh/id_rsa_pgpool funleashpgdb02'
 ```
 
 Do this for all the nodes, i.e. every node must be able to connect to any node (including itself) using ssh (postgres ----> postgres user). 
+
+#### Create extension on the primary server's template1 database
+You must install and create the extensions in each database where you plan to use pgPool-II.
+To ensure all extensions are available for future databases, you can add the extension to the
+template1 database.
+
+```pgsql
+\c postgres
+CREATE EXTENSION pgpool_recovery;
+CREATE EXTENSION pgpool_adm;
+
+\c template1
+CREATE EXTENSION pgpool_recovery;
+CREATE EXTENSION pgpool_adm;
+```
+
+#### Modifying the serivce file for pgPool (Not recommended for production)
+The following service modification to pgpool is for development and test purposes and
+ is not recommended for a production environment. Yet, some may choose to do so.
+
+The pgpool_status file plays a crucial role in Pgpool-II's operation as it records 
+the status of backend PostgreSQL servers.
+
+Problems that might occur in the abscence of the pgpool_status file:
+ 
+1. data inconsistency and discrepancy especially in scenarios where a backend might stop unexpectedly and Pgpool executes a failover procedure
+2. It says wether the node is up or down, and is retained across Pgpool-II restarts
+3. issues like a split-brain condition, where multiple primary servers exist.
+
+The OPTS="-D -n" configuration is used to configure environment variables and startup options for Pgpool-II.
+ Placing a line in this file sets a specific behavior for the Pgpool-II service when it starts.
+ The -D option is for testing purpose only for developers and you should not use it
+ for other purposes. If pgpool_status is accidentally removed, Pgpool-II may go into
+ split-brain (there are multiple primary servers exist).
+ The line OPTS="-D" to /etc/sysconfig/pgpool (RHEL) or pgpool.conf or service file on
+ Ubuntu, tells Pgpool-II to ignore the pgpool_status file at startup,
+ which normally contains the backend status (up/down). This option can be useful when
+ you don't want Pgpool-II to resume the previous state
+ of the backend nodes. The -n option instructs Pgpool-II to not run as a daemon
+ system file which is present in the systemd service file by default and is mandatory there.
+ 
+The alternatives are either user Environment directive or ExecStart:
+
+```shell
+sudo systemctl edit pgpool2
+```
+
+The following are alternatives for the pgPool's service file's override:
+
+1. Alternative 1:
+
+```shell
+[Service]
+ExecStart=		# This line makes the main service file's ExecStart directive ineffective. This is mandatory
+				# because for this Type of service, multiple ExecStart tags are not permitted.
+
+ExecStart=/usr/sbin/pgpool -D -n
+```
+
+2. Alternative 2:
+
+```shell
+[Service]
+Environment="PGPOOL_OPTS=-D -n"
+
+```
+
+Next:
+
+```shell
+sudo systemctl daemon-reload
+sudo systemctl restart pgpool2
+```
 
 
 # [Next: Part III, pgPool scripts](./Part%20III%20pgPool%20scripts.md)

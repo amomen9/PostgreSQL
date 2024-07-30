@@ -4,6 +4,9 @@
 * [Part I: Install and Configure PostgreSQL for pgPool](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
 * [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
+* [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
+* [Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+* [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
 
 
 # PGPOOL (Ubuntu) Part I
@@ -228,6 +231,14 @@ According to our backup conventions, we choose the WAL archive location to be th
 The PGDATA (pg data directory) has also been changed, thus we have to specify this in postgresql.conf file too in the following directive.
 
 `data_directory = '/data/postgresql/15/main/data'`
+
+Before modifying this file, we create our custom directory for the full backups and WAL archive destination
+ for archive and restore commands (These are my choices for these destinations and can be chosen to be somewhere else):
+
+```shell
+sudo mkdir -p /var/postgresql/{pg-wal-archive,pg-local-full-backup}
+sudo chown -R postgres:postgres /var/postgresql
+```
 
 postgresql.conf sample for every node:
 
