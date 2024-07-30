@@ -11,7 +11,13 @@
 
 ### Customizing the shell script files (with .sh extension) (Ubuntu) (Every Node):
 
-Location: `/etc/pgpool2/scripts`
+* **Location:** `/etc/pgpool2/scripts`
+
+
+First of all, make sure that the scripts are executable
+```
+chmod +x <all scripts>
+```
 
 We copied the script files with .sh extension to the /etc/pgpool2/scripts directory. Now we customize the shell script files that we have copied. As it was mentioned earlier, on RHEL, the script files in general do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows.
 
@@ -705,7 +711,13 @@ exit 0
 
 ### Customizing the shell script files (without extension) (Ubuntu):
 
-Location: `$PGDATA`
+* **Location:** `$PGDATA`
+
+
+First of all, make sure that the scripts are executable
+```
+chmod +x <all scripts>
+```
 
 #### 21. recovery_1st_stage
 

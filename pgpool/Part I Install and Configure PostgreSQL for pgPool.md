@@ -38,34 +38,44 @@ The replication topology is composed of:
 
 #### 1. Install PostgreSQL (every node):
 
-Add the pg official repository and install PostgreSQL on all the nodes. You can see how to install PostgreSQL [here](../PostgreSQL%20in%20General%20%28Single%20Node%20or%20Cluster%29/README.md). 
-Do the necessary configurations for PostgreSQL. Make sure that the postgres service is up on the 1st node. The following steps demonstrate how to do that. 
+Add the pg official repository and install PostgreSQL on all the nodes. You can see how to install PostgreSQL [here](../PostgreSQL%20in%20General%20%28Single%20Node%20or%20Cluster%29/README.md).
+Do the necessary configurations for PostgreSQL. Make sure that the postgres service is up on the 1st node. The following steps demonstrate how to do that.
 
 **Very important note!**
 
 In this document, these are the major directories paths. If you need to make alterations, you must change the directories used in this document eveywhere:
 
-**$PGDATA:<br/>**
+**$PGDATA:`<br/>`**
 `/data/postgresql/15/main/data`
 
-**Tablespaces Root Directory:<br/>**
+**Tablespaces Root Directory:`<br/>`**
 `/data/postgresql/15/main/tablespaces`
 
-**WAL Archive Directory:<br/>**
+**WAL Archive Directory:`<br/>`**
 `/var/postgresql/pg-wal-archive/`
 
-**pgpool .sh script files:<br/>**
+**pgpool .sh script files:`<br/>`**
 `/etc/pgpool2/scripts`
 
-**pgpool script files without extension:<br/>**
+**pgpool script files without extension:`<br/>`**
 `/data/postgresql/15/main/data`
 
 #### 1. Correct the environment variables for Ubuntu (every node):
 
-On Ubuntu, pg environment variables are missing which are needed by scripts execution. They are available in RHEL distributions. So we create them on Ubuntu. For that matter, we add them to the postgres' .bashrc file. The .bashrc and .profile files do not exist, so we do the following:
+* For a comprehensive list of pg environment variables, refer to the following reference:
+
+[https://www.postgresql.org/docs/current/libpq-envars.html](https://www.postgresql.org/docs/current/libpq-envars.html)
+
+On Ubuntu, there is a shortcoming in which the pg environment variables are missing by default that are needed by the scripts execution (either automatically or using PCP commands). They are available in RHEL distributions. So we create them on Ubuntu. For that matter, we add them to the postgres' .bashrc file. The .bashrc and .profile files do not exist, so we do the following:
+
+* **Steps:**
+
+1. create a file containing env variables definition
+
+We use .bashrc file.
 
 ```shell
-sudo cp /etc/skel/{.bashrc,.bash_logout,.profile} ~postgres/
+sudo touch ~postgres/.bashrc
 sudo chown -R postgres:postgres ~postgres
 ```
 
@@ -88,14 +98,64 @@ declare -x PGCONNECT_TIMEOUT=1
 declare -x HOSTNAME_VAR=$(hostname)
 declare -x PGPOOLHOST=$(hostname)
 declare -x PGPASSFILE="$(echo ~postgres)/.pgpass"
-declare -x PCPPASSFILE="$(echo ~postgres)/.pgpass"
+declare -x PCPPASSFILE="$(echo ~postgres)/.pcppass"
 ```
 
-After saving the .bashrc file, execute the following to take the modification into effect:
+After saving the .bashrc file, execute the following using the postgres user for the modification to take effect.
+
+If you are in postgres user shell:
 
 ```shell
 source ~postgres/.bashrc
 ```
+
+If you are in another user's shell:
+
+```shell
+sudo -u postgres sh -c 'source ~postgres/.bashrc'
+```
+
+**However**, this only makes the modifications available when you log in to the postgres user in the interactive shell.
+If we are not using the postgres user's interactive shell to execute the PCP commands, or do not log in to
+the postgres user after the OS has booted, which is usually the normal case, the .bashrc file will not execute and thus
+the env variables will not exist. For that matter, I do the several things below. In this case, executing the 'source'
+command manually is not needed.
+
+2. Make env vars available through pg systemd service.
+   This will not work if we start pg with bypassing systemd. We will take care of that in the next step. But now:
+
+```shell
+sudo systemctl edit postgresql@15-main.service
+```
+
+add the following line in the space demonstrated by the figure:
+
+```shell
+ExecStartPre=/bin/sh -c 'source /var/lib/Postgresql/.bashrc'
+```
+
+![1722241910486](image/PartIInstallandConfigurePostgreSQLforpgPool/1722241910486.png)
+
+3. Fill the variables inside the file below like it is shown. This also works when pg is not brought up by systemd (by using pg_ctl, pg_ctlcluster, etc.)
+
+`/etc/postgresql/<version>/<cluster>/environment`
+
+```conf
+PGDATA=/data/postgresql/15/main/data
+HOSTNAME=funleashpgdb01
+HOME=/var/lib/postgresql
+LOGNAME=postgres
+PWD=/var/lib/postgresql
+USER=Postgres
+PGCONNECT_TIMEOUT=1
+HOSTNAME_VAR=funleashpgdb01
+PGPOOLHOST=funleashpgdb01
+PGPASSFILE=/var/lib/postgresql/.pgpass
+PCPPASSFILE=/var/lib/postgresql/.pcppass
+```
+
+4. 
+
 #### 6. Assign a password to the user postgres in Linux (Every Node)
 
 ```shell
@@ -211,7 +271,6 @@ promote_trigger_file = 'standalone.signal'
 hot_standby = on
 ```
 
-
 #### 2.  Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only):
 
 **Important Note!**
@@ -224,7 +283,5 @@ systemctl stop postgresql@15-main.service	# for pg version '15', and cluster nam
 
 rm -rf $PGDATA/*
 ```
-
-
 
 # [Next: Part II, Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)

@@ -10,13 +10,13 @@ For more, follow [this link](./pgpool%20references.md).
 
 ---
 
-### [•  pgpool Doc Part I ](./Part%20I.md)
+### [•  pgpool Doc Part I: Install and Configure PostgreSQL for pgPool.md ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
 
 ---
 
-### [•  pgpool Doc Part II ](./Part%20II.md)
+### [•  pgpool Doc Part II: Install and Configure pgPool.md ](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 
 ---
 
-### [•  pgpool Doc Part III ](./Part%20III.md)
+### [•  pgpool Doc Part III: pgPool scripts.md ](./Part%20III%20pgPool%20scripts.md)
 

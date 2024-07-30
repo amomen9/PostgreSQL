@@ -61,7 +61,7 @@ Next, we copy the shell scripts which have no extension to the $PGDATA directory
 
 ```shell
 cp /usr/share/doc/pgpool2/examples/{replication_mode_recovery_2nd_stage.sample,replication_mode_recovery_1st_stage.sample,recovery_1st_stage.sample,pgpool_remote_start.sample} \
-$PGDATA
+$PGDATA/
 ```
 
 Remove .sample from the end of these file names too. Later we modify these files to work in our environment. On RHEL, the script files in general do not need much modification, but on Ubuntu, there is more work to do.
