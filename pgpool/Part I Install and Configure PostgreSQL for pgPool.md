@@ -7,6 +7,7 @@
 
 
 # PGPOOL (Ubuntu) Part I
+**Install and Configure PostgreSQL for pgPool**
 
 **Note:**
 
@@ -14,7 +15,10 @@
 2. pgpool version is 4.5.2
 3. There are some glitches for pgpool on Ubuntu, which do not exist on the RHEL. That is because EnterpriseDB is rather Redhat oriented than other Linux distros. I have tried to make up for them and included the solutions in this document. The tests have shown a satisfactory result for myself but the solutions are offered **without a guarantee**.
 4. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available server, even a separate one. Here we setup the watchdog on all the nodes.
-5. The following are the node details used in this documentation:
+5. Note that many of the commands that have "sudo" at their beginning in this document do not have to have this command if they are run under postgres user. However, I have assumed that
+ these commands are being executed under another sudoer user.
+6. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
+7. The following are the node details used in this documentation:
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 
@@ -34,7 +38,16 @@ The replication topology is composed of:
 | 3   |  funleashpgdb03  | 172.23.124.73 | Node 3 (asynchronous) |
 | 4   | vip (delegate_ip) | 172.23.124.74 | floating Virtual IP    |
 
-### Installation and Configuration of Postgres (Preparing Postgres for pgPool):
+1. set hostnames and IP adresses if necessary (every node):
+
+* set hostnames:
+```shell
+sudo hostnamectl set-hostname <hostname>
+```
+
+* set static IP addresses either using DHCP or directly giving the machines static IP addresses.
+
+### Installation and Configuration of PostgreSQL (Preparing PostgreSQL for pgPool):
 
 #### 1. Install PostgreSQL (every node):
 
@@ -45,49 +58,60 @@ Do the necessary configurations for PostgreSQL. Make sure that the postgres serv
 
 In this document, these are the major directories paths. If you need to make alterations, you must change the directories used in this document eveywhere:
 
-**$PGDATA:`<br/>`**
+**$PGDATA:**
+
+
 `/data/postgresql/15/main/data`
 
-**Tablespaces Root Directory:`<br/>`**
+**Tablespaces Root Directory:**
+
 `/data/postgresql/15/main/tablespaces`
 
-**WAL Archive Directory:`<br/>`**
+**WAL Archive Directory:**
+
 `/var/postgresql/pg-wal-archive/`
 
-**pgpool .sh script files:`<br/>`**
+**pgpool .sh script files:**
+
 `/etc/pgpool2/scripts`
 
-**pgpool script files without extension:`<br/>`**
+**pgpool script files without extension:**
+
 `/data/postgresql/15/main/data`
 
-#### 1. Correct the environment variables for Ubuntu (every node):
+#### 1. Correct the environment variables for Ubuntu (Skip for Red Hat) (every node):
 
 * For a comprehensive list of pg environment variables, refer to the following reference:
 
 [https://www.postgresql.org/docs/current/libpq-envars.html](https://www.postgresql.org/docs/current/libpq-envars.html)
 
-On Ubuntu, there is a shortcoming in which the pg environment variables are missing by default that are needed by the scripts execution (either automatically or using PCP commands). They are available in RHEL distributions. So we create them on Ubuntu. For that matter, we add them to the postgres' .bashrc file. The .bashrc and .profile files do not exist, so we do the following:
+On Ubuntu, there is a shortcoming in which the pg environment variables are missing by default
+ that are needed by the scripts execution (either automatically or using PCP commands). They are
+ available in RHEL distributions. So we create them on Ubuntu manually. There might be several ways
+ available. But we do one of the most convenient below:
 
 * **Steps:**
 
-1. create a file containing env variables definition
+We add them to the global bashrc file `/etc/bash.bashrc` to make the env variables available for every shell.
+ We do the following:
 
-We use .bashrc file.
+1. edit the file:
 
 ```shell
-sudo touch ~postgres/.bashrc
-sudo chown -R postgres:postgres ~postgres
+sudo vi /etc/bash.bashrc
 ```
 
-Then add the required env variables:
+Then add the required env variables.
+
+These are a sample of the env entries for this file. Add them to the end of bash.bashrc file.
+ The `| cut -d '.' -f1` part is to remove the FQDN part from the hostname command output,
+ if any. Note that we have altered the pg data directory to /data/postgresql/15/main/data.
+ This is not mandatory and depends on your preferences. If the matter is to put pg data
+ on another storage, you can do that using a mount point on both /data/postgresql/15/main/data
+ and the default ~postgres/15/main directory:
 
 ```shell
-vi ~postgres/.bashrc
-```
-
-These are the env entries. Add them to the end of .bashrc file. The `| cut -d '.' -f1` part is to remove the FQDN part from the hostname command output, if any. Note that we have altered the pg data directory to /data/postgresql/15/main/data. This is not mandatory and depends on your preferences:
-
-```shell
+# env vars:
 declare -x PGDATA=/data/postgresql/15/main/data
 declare -x HOSTNAME=$(hostname | cut -d '.' -f1)
 declare -x HOME=~
@@ -101,63 +125,22 @@ declare -x PGPASSFILE="$(echo ~postgres)/.pgpass"
 declare -x PCPPASSFILE="$(echo ~postgres)/.pcppass"
 ```
 
-After saving the .bashrc file, execute the following using the postgres user for the modification to take effect.
-
-If you are in postgres user shell:
-
-```shell
-source ~postgres/.bashrc
-```
-
-If you are in another user's shell:
+2. After saving the file, the new shells that are instantiated will have the environment variables. **However**,
+ the already instantiated shells will not have them. For the modification to take effect for all the shells,
+ a reboot is required.
 
 ```shell
-sudo -u postgres sh -c 'source ~postgres/.bashrc'
+sudo reboot -i
 ```
 
-**However**, this only makes the modifications available when you log in to the postgres user in the interactive shell.
-If we are not using the postgres user's interactive shell to execute the PCP commands, or do not log in to
-the postgres user after the OS has booted, which is usually the normal case, the .bashrc file will not execute and thus
-the env variables will not exist. For that matter, I do the several things below. In this case, executing the 'source'
-command manually is not needed.
+* For the record, you could follow some other approaches, For example, creating a ".sh" file and executing it in the service
+ file using ExecStartPre, populating the /etc/postgresql/<pg maj version>/<pg cluster name>/environment with static entries,'
+ using EnvironmentFile directive in systemd service, etc.
 
-2. Make env vars available through pg systemd service.
-   This will not work if we start pg with bypassing systemd. We will take care of that in the next step. But now:
-
-```shell
-sudo systemctl edit postgresql@15-main.service
-```
-
-add the following line in the space demonstrated by the figure:
-
-```shell
-ExecStartPre=/bin/sh -c 'source /var/lib/Postgresql/.bashrc'
-```
-
-![1722241910486](image/PartIInstallandConfigurePostgreSQLforpgPool/1722241910486.png)
-
-3. Fill the variables inside the file below like it is shown. This also works when pg is not brought up by systemd (by using pg_ctl, pg_ctlcluster, etc.)
-
-`/etc/postgresql/<version>/<cluster>/environment`
-
-```conf
-PGDATA=/data/postgresql/15/main/data
-HOSTNAME=funleashpgdb01
-HOME=/var/lib/postgresql
-LOGNAME=postgres
-PWD=/var/lib/postgresql
-USER=Postgres
-PGCONNECT_TIMEOUT=1
-HOSTNAME_VAR=funleashpgdb01
-PGPOOLHOST=funleashpgdb01
-PGPASSFILE=/var/lib/postgresql/.pgpass
-PCPPASSFILE=/var/lib/postgresql/.pcppass
-```
-
-4. 
 
 #### 6. Assign a password to the user postgres in Linux (Every Node)
 
+Let the password for postgres user be the same on all the nodes for simplicity.
 ```shell
 sudo passwd postgres
 ```
@@ -184,9 +167,16 @@ SET password_encryption = 'scram-sha-256';
 
 #### 8. Create pg password file (.pgpass) (Every Node)
 
-It is used to connect to the database cluster without providing a password from the machine on which we create this file. In fact, the password is taken from this file instead of directly entering it by the user when connecting to the database cluster. We place it under `~postgres`. It shall have the following format:
+It is used to connect to the database cluster without providing a password from the machine
+ on which we create this file. In fact, the password is taken from this file instead of
+ directly entering it by the user when connecting to the database cluster. We place it under
+ `~postgres`. We also use plain passwords. It shall have the following format:
 `hostname:port:database:username:password`
 It also accepts * as wildcard. Here is what we fill inside this file:
+
+```shell
+sudo -u postgres vi ~postgres/.pgpass
+```
 
 ```conf
 *:*:*:postgres:Pa$svvord

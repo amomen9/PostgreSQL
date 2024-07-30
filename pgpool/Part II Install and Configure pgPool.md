@@ -6,26 +6,27 @@
 
 
 # PGPOOL (Ubuntu) Part II
+**Install and Configure pgPool**
 
 ### Installation and Configuration of pgPool:
 
 #### 2. Install pgpool (every node):
 After adding the PostgreSQL's official repository, you can find pgpool and its related packages in that repository.
 
-For pg version 15 (Ubuntu), you can execute the following:
+For pg version **15** (Ubuntu), you can execute the following:
 
 ```shell
 sudo apt-get update
 sudo apt-get install pgpool2 libpgpool2 postgresql-15-pgpool2
-
+sudo chown -R postgres:postgres /etc/pgpool2
 ```
 
-For pg version 16 (Ubuntu), you can execute the following:
+For pg version **16** (Ubuntu), you can execute the following:
 
 ```shell
 sudo apt-get update
 sudo apt-get install pgpool2 libpgpool2 postgresql-16-pgpool2
-
+sudo chown -R postgres:postgres /etc/pgpool2
 ```
 
 Note that the packages pgpool2, libpgpool2, and their dependents, do not rely on the PostgreSQL major version, however, the pgpool extensions (postgresql-15-pgpool2) for PostgreSQL database cluster engine do rely on the PostgreSQL's major version and must be chosen accordingly.
@@ -39,7 +40,7 @@ Copy template shell script files from the following directory to a specific dire
 The first group of shell script files are the ones with .sh extension and the second ones are the ones without extension.
 
 ```shell
-mkdir -p /etc/pgpool2/scripts && cp /usr/share/doc/pgpool2/examples/*.sh* /etc/pgpool2/scripts
+sudo -u postgres mkdir -p /etc/pgpool2/scripts && sudo -u postgres cp /usr/share/doc/pgpool2/examples/*.sh* /etc/pgpool2/scripts
 
 ```
 
@@ -50,7 +51,7 @@ here is the result:
 The files with aws at the beginning are for the Amazon Web Services which are irrelevant for us.
 
 ```shell
-rm -f /etc/pgpool2/scripts/aws*
+sudo -u postgres rm -f /etc/pgpool2/scripts/aws*
 ```
 
 Now remove .sample from the end of the file names.
@@ -58,7 +59,7 @@ Now remove .sample from the end of the file names.
 Next, we copy the shell scripts which have no extension to the $PGDATA directory.
 
 ```shell
-cp /usr/share/doc/pgpool2/examples/{replication_mode_recovery_2nd_stage.sample,replication_mode_recovery_1st_stage.sample,recovery_1st_stage.sample,pgpool_remote_start.sample} \
+sudo -u postgres cp /usr/share/doc/pgpool2/examples/{replication_mode_recovery_2nd_stage.sample,replication_mode_recovery_1st_stage.sample,recovery_1st_stage.sample,pgpool_remote_start.sample} \
 $PGDATA/
 ```
 
@@ -67,8 +68,8 @@ Remove .sample from the end of these file names too. Later we modify these files
 Finally, the scripts **must** be made **executable** for the user that runs pgpool scripts (postgres in our case, which also owns the scripts).
 
 ```
-chmod -R 750 $PGDATA
-chmod -R 750 /etc/pgpool2/scripts
+sudo chmod -R 750 $PGDATA
+sudo chmod -R 750 /etc/pgpool2/scripts
 ```
 
 #### 4. Create pgpool_node_id file (Every Node, but with different content)
@@ -77,19 +78,19 @@ create the pgpool_node_id file with the node id (ex 0) below on every node:
 Write the following inside shell. The node id starts from 0 for Node 1, 1 for Node 2, and so on.
 
 ```shell
-cat > /etc/pgpool2/pgpool_node_id << EOT
+sudo -u postgres cat > /etc/pgpool2/pgpool_node_id << EOT
 0
 EOT
 ```
 
 #### 5. Create the backend status file (Every Node)
 
-It will be explained later.
-
+It will be explained later. With the following commands, the `logdir` directive of pgpool.conf **must**
+ be set to `'/var/log/pgpool'`.
 ```shell
-mkdir -p /var/log/pgpool
-touch /var/log/pgpool/pgpool_status		# Backend status file
-chown -R postgres /var/log/pgpool		# Log location
+sudo mkdir -p /var/log/pgpool
+sudo touch /var/log/pgpool/pgpool_status		# Backend status file
+sudo chown -R postgres:postgres /var/log/pgpool		# Log location
 ```
 
 
@@ -105,6 +106,9 @@ We obtain the hashed password by executing the following command:
 pg_md5 <password>
 ```
 
+![Screenshot_40](image/PartIInstallandConfigurePostgreSQLforpgPool/Screenshot_40.png)
+
+
 Or if we want to enter the password in a more safe manner, we enter the following then type in the password:
 
 ```shell
@@ -114,7 +118,9 @@ pg_md5 -p
 The mode for pcp.conf file should be 0755.
 
 ```shell
-chmod 0755 ~postgres/.pcppass
+sudo chmod 0755 /etc/pgpool2/pcp.conf
+
+sudo chown postgre:postgres /etc/pgpool2/pcp.conf
 ```
 
 #### 10. Create pgpool pcp password file (.pcppass) (Every Node)
@@ -123,15 +129,26 @@ It is used to authenticate to the pcp commands without providing a password from
 
 In fact, the password is taken from this file instead of directly entering it by the user when executing the pcp commands. The passwords that the pcp commands accept is recorded within pcp.conf file which we just explained. We place the .pcppass file under `~postgres`.
 
+```shell
+sudo vi ~postgres/.pcppass
+```
+
 It shall have the following format:
   
 `hostname:port:username:password`
 
-It also accepts * as wildcard. Here is what we fill inside this file:
+It also accepts * as wildcard. Here is what we fill inside this file. Again, the password is plain:
 
 ```conf
-*:9898:pgpool:1
+*:9898:pgpool:Pa$svvord
 ```
+
+Save and close.
+
+```shell
+sudo chown -R postgres:postgres ~postgres
+```
+
 
 The .pcppass file must only be accessible by the owner. They must have 0600 mode. Note that we have defined the PCPPASSFILE env variable before too to point to the location that I mentioned. But even if we did not, the default location would be ~postgres/.pcppass
 
@@ -140,6 +157,11 @@ chmod 0600 ~postgres/.pcppass
 ```
 
 #### 11. Create pgpool pool_passwd file (Every Node)
+
+* Note!
+
+You can only use one of MD5 and AES encryption algorithms for the users in this file.
+
 
 It is used to connect to the pgpool proxy (which then redirects the user's query to one of the backends. The backend that it chooses depends on many factors. For example, node balancing measures, connecting to primary or secondary measures, etc.) on the pgpool port (9999 by default) without providing a password from the machine on which we create this file. 
 
@@ -155,7 +177,7 @@ It shall have the following format:
 First run the following:
 
 ```shell
-touch /etc/pgpool2/pool_passwd
+sudo touch /etc/pgpool2/pool_passwd
 ```
 
 Unlike the previous files, it must not be filled manually, but by using one of the pg_md5 or pg_enc commands which are part of the pgpool2 package.
@@ -171,8 +193,11 @@ Encrypting using MD5 encryption:
 ![1721846962078](image/PartI/1721846962078.png)
 
 ```shell
-pg_md5 -m -f /etc/pgpool2/pgpool.conf -u <username> -p
+sudo pg_md5 -m -f /etc/pgpool2/pgpool.conf -K ~postgres/.pgpoolkey -u <username> -p
 ```
+
+Repeat this for all the users that you want to create an entry for in this file using this encryption algorithm.
+ Here we create and entry for postgres, pgpool, and repl users.
 
 Some command-line arguments can be not provided if their values are the default ones. For example, the pgpool.conf file path (default is /etc/pgpool2/pgpool.conf).
 
@@ -186,27 +211,42 @@ pg_enc needs one extra necessity, which is the pgpool key. It can either be prov
 We use the .pgpoolkey file method. An encryption key must be manually provided here by the user:
 
 ```shell
-cat > ~postgres/.pgpoolkey << EOT
+sudo cat > ~postgres/.pgpoolkey << EOT
 <Encryption Key>
 EOT
 
-chmod 0600 ~postgres/.pgpoolkey
+sudo chmod 0600 ~postgres/.pgpoolkey
 ```
 
 While .pgpoolkey is in the default location (~postgres/.pgpoolkey), it does not need to be provided for pg_enc as a command-line argument.
 
 ```shell
-pg_enc -m -f /etc/pgpool2/pgpool.conf -u <username> -p
+sudo pg_enc -m -f /etc/pgpool2/pgpool.conf -K ~postgres/.pgpoolkey -u <username> -p
 ```
+Repeat this for all the users that you want to create an entry for in this file using this encryption algorithm.
+ Here we create and entry for postgres, pgpool, and repl users.
 
-Some command-line arguments can be not provided if their values are the default ones. For example, the pgpool.conf file path (default is /etc/pgpool2/pgpool.conf).
+Some command-line arguments can be not provided if their values are the default ones. For example, the pgpool.conf file path (default is /etc/pgpool2/pgpool.conf),
+ the .pgpoolkey file path is ~/.pgpoolkey
 
 You will be prompted to enter the user's password. -m flag will make the pg_md5 command to update the pool_passwd file automatically.
+
+then
+
+```
+sudo chown -R postgres:postgres /etc/pgpool2
+```
 
 Finally, the pool_passwd file must only be accessible by the owner. They must have 0600 mode.
 
 ```shell
-chmod 0600 /etc/pgpool2/pool_passwd
+sudo chmod 0600 /etc/pgpool2/pool_passwd
+```
+
+Run this to check the contents of this file. It will also confirm if the postgres user have read access to this file:
+
+```shell
+sudo -u postgres cat /etc/pgpool2/pool_passwd
 ```
 
 
@@ -1376,6 +1416,14 @@ When password directives are left empty, pgpool will first examine the pool_pass
 * The ckeck (healthcheck, heartbeat signal, and sr check) parameters are specified with the assumption that all our nodes are on the same fast and stably connected network. Though for a disaster node which is in a far location and on a relatively slowly connected network, different "PER NODE PARAMETERS" options should be specified. 
 * We use the pgpool's pool_hba, CONNECTION POOLING, LOAD BALANCING, FAILOVER AND FAILBACK, ONLINE RECOVERY, WATCHDOG, RELCACHE, and IN MEMORY QUERY MEMORY CACHE features:
 
+```shell
+sudo -u postgres truncate -s 0 /etc/pgpool2/pgpool.conf
+sudo -u postgres vi /etc/pgpool2/pgpool.conf
+```
+
+Copy the contents of the following file inside vim. Perform the modifications of your choice if you
+ deem necessary:
+
 <details>
 <summary>(click to expand) pgpool.conf summary:</summary>
 
@@ -1618,7 +1666,16 @@ memqcache_auto_cache_invalidation = on
 
 There is a directive in the pgpool.conf file for pool_hba.conf. It is "enable_pool_hba" which is off by default. We need this feature and want to use it. Thus, we have switched it to on in the pgpool.conf file. It has a similar functionality to pg_hba.conf for pgpool proxy.
 
-The following is a sample of this file:
+The following is a sample of this file.
+
+```shell
+sudo -u postgres truncate -s 0 /etc/pgpool2/pool_hba.conf
+sudo -u postgres vi /etc/pgpool2/pool_hba.conf
+```
+
+Copy the contents of the following file inside vim. Perform the modifications of your choice if you
+ deem necessary:
+
 
 ```conf
 # pgpool Client Authentication Configuration File
@@ -1691,11 +1748,12 @@ The following is a sample of this file:
 # "local" is for Unix domain socket connections only
 local   all         all                               scram-sha-256
 # IPv4 local connections:
-host    all         all         172.23.124.0/24       scram-sha-256
-host    all         all         127.0.0.1/32          trust
-host    all         all         ::1/128               trust
+host    all             all             172.23.124.0/24         scram-sha-256
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
 
-host	all	all		0.0.0.0/0		md5
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               md5
 
 
 ```
@@ -1712,26 +1770,32 @@ We must know that the private key and authorized_keys files **must** be exclusiv
 They are also placed under .ssh directory in the user's home directory. If .ssh does not exist, we have to create it first:
 
 ```shell
-mkdir -p ~postgres/.ssh
+sudo -u postgres mkdir -p ~postgres/.ssh
 ```
 
 The file name for private and public key files conventionally includes id_rsa_pgpool. We do that using `ssh-keygen` command:
 
 ```shell
-ssh-keygen -f ~postgres/.ssh/id_rsa_pgpool -t rsa
+sudo -u postgres ssh-keygen -f ~postgres/.ssh/id_rsa_pgpool -t rsa
 ```
 
-We choose no passphrase.
+We choose no passphrase. Than means we press enter twice without entering any password.
 
 ![1721821699123](image/PartII/1721821699123.png)
 
 The public and private key files are created. Next, copy the public key to the remote server:
 
-```
-ssh-copy-id -i ~postgres/.ssh/id_rsa_pgpool.pub funleashpgdb02
+The following must run with a postgres' user subshell. Thus we use "sh -c"
+
+```shell
+sudo -u postgres sh -c 'ssh-copy-id -i ~postgres/.ssh/id_rsa_pgpool.pub funleashpgdb02'
 ```
 
 Finally, test if an ssh connection can be estabilished with funleashpgdb02 without entering a password.
+
+```shell
+sudo -u postgres sh -c 'ssh -i ~postgres/.ssh/id_rsa_pgpool funleashpgdb02'
+```
 
 Do this for all the nodes, i.e. every node must be able to connect to any node (including itself) using ssh (postgres ----> postgres user). 
 

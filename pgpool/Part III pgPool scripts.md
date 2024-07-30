@@ -6,6 +6,9 @@
 
 
 # PGPOOL (Ubuntu) Part III
+**pgPool scripts**
+
+Modify the scripts like below. Logging to pgPool log files has also been added.
 
 ### Customizing the shell script files (with .sh extension) (Ubuntu) (Every Node):
 
