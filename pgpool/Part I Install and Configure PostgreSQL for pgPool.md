@@ -5,7 +5,7 @@
 * [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
 * [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
-* [Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+* [Part V: pgpool command, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
 * [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
 
 
@@ -52,6 +52,17 @@ sudo hostnamectl set-hostname <hostname>
 
 * set static IP addresses either using DHCP or directly giving the machines static IP addresses.
 
+* Add hostnames and IPs to the `/etc/hosts` file for local hostname resolution (Every Node):
+
+```hosts
+172.23.124.71 funleashpgdb01
+172.23.124.72 funleashpgdb02
+172.23.124.73 funleashpgdb03
+172.23.124.74 vip
+
+```
+
+
 ### Installation and Configuration of PostgreSQL (Preparing PostgreSQL for pgPool):
 
 #### 1. Install PostgreSQL (Every Node):
@@ -61,10 +72,11 @@ Do the necessary configurations for PostgreSQL. Make sure that the postgres serv
 
 **Very important note!**
 
-In this document, these are the major directories paths. If you need to make alterations, you must change the directories used in this document eveywhere:
+In this document, these are the major directories paths.
+ All these directories must exist and the postgres user must have full access to them.
+ If you need to make alterations, you must change the directories used in this document eveywhere:
 
 **$PGDATA:**
-
 
 `/data/postgresql/15/main/data`
 

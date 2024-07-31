@@ -4,7 +4,7 @@
 * [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
 * [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
-* [Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+* [Part V: pgpool command, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
 * [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
 
 
@@ -116,7 +116,7 @@ sudo chown -R postgres:postgres ~postgres
 The .pcppass file must only be accessible by the owner. They must have 0600 mode. Note that we have defined the PCPPASSFILE env variable before too to point to the location that I mentioned. But even if we did not, the default location would be ~postgres/.pcppass
 
 ```shell
-chmod 0600 ~postgres/.pcppass
+sudo -u postgres chmod 0600 ~postgres/.pcppass
 ```
 
 #### 11. Create pgpool pool_passwd file (Every Node)
@@ -140,7 +140,7 @@ It shall have the following format:
 First run the following:
 
 ```shell
-sudo touch /etc/pgpool2/pool_passwd
+sudo -u postgres touch /etc/pgpool2/pool_passwd
 ```
 
 Unlike the previous files, it must not be filled manually, but by using one of the pg_md5 or pg_enc commands which are part of the pgpool2 package.
@@ -156,7 +156,7 @@ Encrypting using MD5 encryption:
 ![1721846962078](image/PartI/1721846962078.png)
 
 ```shell
-sudo pg_md5 -m -f /etc/pgpool2/pgpool.conf -K ~postgres/.pgpoolkey -u <username> -p
+sudo -u postgres pg_md5 -m -f /etc/pgpool2/pgpool.conf -K ~postgres/.pgpoolkey -u <username> -p
 ```
 
 Repeat this for all the users that you want to create an entry for in this file using this encryption algorithm.
@@ -174,17 +174,17 @@ pg_enc needs one extra necessity, which is the pgpool key. It can either be prov
 We use the .pgpoolkey file method. An encryption key must be manually provided here by the user:
 
 ```shell
-sudo cat > ~postgres/.pgpoolkey << EOT
+sudo -u postgres cat > ~postgres/.pgpoolkey << EOT
 <Encryption Key>
 EOT
 
-sudo chmod 0600 ~postgres/.pgpoolkey
+sudo -u postgres chmod 0600 ~postgres/.pgpoolkey
 ```
 
 While .pgpoolkey is in the default location (~postgres/.pgpoolkey), it does not need to be provided for pg_enc as a command-line argument.
 
 ```shell
-sudo pg_enc -m -f /etc/pgpool2/pgpool.conf -K ~postgres/.pgpoolkey -u <username> -p
+sudo -u postgres pg_enc -m -f /etc/pgpool2/pgpool.conf -K ~postgres/.pgpoolkey -u <username> -p
 ```
 Repeat this for all the users that you want to create an entry for in this file using this encryption algorithm.
  Here we create and entry for postgres, pgpool, and repl users.
@@ -203,7 +203,7 @@ sudo chown -R postgres:postgres /etc/pgpool2
 Finally, the pool_passwd file must only be accessible by the owner. They must have 0600 mode.
 
 ```shell
-sudo chmod 0600 /etc/pgpool2/pool_passwd
+sudo -u postgres chmod 0600 /etc/pgpool2/pool_passwd
 ```
 
 Run this to check the contents of this file. It will also confirm if the postgres user have read access to this file:
@@ -1380,11 +1380,11 @@ When password directives are left empty, pgpool will first examine the pool_pass
 * Note that if_up_cmd/if_down_cmd directives must be modified to have your correct interface name. For example, if you interface name is ens160, they would be the following:
 		
 ```conf
-if_up_cmd = '/usr/bin/sudo /usr/sbin/ip addr add $_IP_$/24 dev ens160 label ens160:0'
+if_up_cmd = '/usr/bin/sudo /usr/sbin/ip addr add $_IP_$/24 dev ens160 label ens160:0'		# If the interface name is ens160
 ```
 		
 ```conf
-if_down_cmd = '/usr/bin/sudo /usr/sbin/ip addr del $_IP_$/24 dev ens160'
+if_down_cmd = '/usr/bin/sudo /usr/sbin/ip addr del $_IP_$/24 dev ens160'		# If the interface name is ens160
 ```
 
 * We use the pgpool's pool_hba, CONNECTION POOLING, LOAD BALANCING, FAILOVER AND FAILBACK, ONLINE RECOVERY, WATCHDOG, RELCACHE, and IN MEMORY QUERY MEMORY CACHE features:
@@ -1772,10 +1772,14 @@ sudo -u postgres sh -c 'ssh -i ~postgres/.ssh/id_rsa_pgpool funleashpgdb02'
 
 Do this for all the nodes, i.e. Every Node must be able to connect to any node (including itself) using ssh (postgres ----> postgres user). 
 
-#### Create extension on the primary server's template1 database
+#### Create extension on the primary server's (1st node) template1 and postgres databases
 You must install and create the extensions in each database where you plan to use pgPool-II.
-To ensure all extensions are available for future databases, you can add the extension to the
-template1 database.
+ This shall be done on the 1st node which we set it as our primary server at the initial Installation
+ and configuration. When recovering the other nodes from the 1st node, all primary node's data including 
+ these extensions will be transferred to the other nodes. 
+ 
+To ensure that all extensions are available for future databases, you can add the extensions to the
+ template1 database.
 
 ```pgsql
 \c postgres
@@ -1787,7 +1791,7 @@ CREATE EXTENSION pgpool_recovery;
 CREATE EXTENSION pgpool_adm;
 ```
 
-#### Modifying the serivce file for pgPool (Not recommended for production)
+#### Modifying the serivce file for pgPool (Not recommended for production) (Every Node)
 The following service modification to pgpool is for development and test purposes and
  is not recommended for a production environment. Yet, some may choose to do so.
 

@@ -4,14 +4,14 @@
 * [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
 * [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
-* [Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+* [Part V: pgpool command, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
 * [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
 
 
 # PGPOOL (Ubuntu) Part III
 **pgPool scripts**
 
-* A support for tablespaces is added to the original script files.
+* A support for tablespaces is added to the original script files in the pg_basebackup command.
 
 #### 3. Copy template files (Every Node):
 
@@ -48,8 +48,8 @@ Remove .sample from the end of these file names too. Later we modify these files
 Finally, the scripts **must** be made **executable** for the user that runs pgpool scripts (postgres in our case, which also owns the scripts).
 
 ```
-sudo chmod -R 750 $PGDATA
-sudo chmod -R 750 /etc/pgpool2/scripts
+sudo -u postgres chmod -R 750 $PGDATA
+sudo -u chmod -R 750 /etc/pgpool2/scripts
 ```
 
 #### 17. Create script.conf (Every Node)
@@ -84,7 +84,7 @@ log_destination='pgpool_log'
 
 First of all, make sure that the scripts are executable
 ```
-chmod +x <all scripts>
+sudo -u postgres chmod +x <all scripts>
 ```
 
 We copied the script files with .sh extension to the /etc/pgpool2/scripts directory. Now we customize the shell script files that we have copied. As it was mentioned earlier, on RHEL, the script files in general do not need much modification, but on Ubuntu, because pg_ctlcluster is used instead of pg_ctl and some other factors, we modify these files as follows.
@@ -96,10 +96,10 @@ I have also added logging of the echo commands' output to the pgpool log files t
 
 This script is executed right after a failover occurs first. Then in the event of a manual failover, the follow_primary.sh script will also be executed.
 
-After preparing, editing, and carrying out the necessary modifications on this script, you can run the following to test its functionality:
+After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:
 
 ```shell
-/etc/pgpool2/scripts/failover.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA funleashpgdb01 5432
+sudo -iu postgres sh -c '/etc/pgpool2/scripts/failover.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA funleashpgdb01 5432'
 ```
 
 <details>
@@ -350,15 +350,15 @@ One of the commands that is used in this script is `pg_rewind` which has a diffe
  The path that this script uses for pg_rewind is "${PGHOME}/bin/pg_rewind". the place of this binary on Ubuntu is 
  "/usr/lib/postgresql/<pg major version>/bin/pg_rewind". So, we create a symbolic link to fix that:
  
- ```shell
- ln -s /usr/lib/postgresql/<pg major version>/bin/pg_rewind /usr/bin/pg_rewind
- ```
+```shell
+sudo ln -s /usr/lib/postgresql/<pg major version>/bin/pg_rewind /usr/bin/pg_rewind
+```
 
 
-After preparing, editing, and carrying out all the other necessary modifications on this script, as well, you can run the following line to test its functionality:
+After preparing, editing, and carrying out all the other necessary modifications on this script, as well, you can run the following line **to test its functionality**:
 
 ```shell
-/etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA
+sudo -iu postgres sh -c '/etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA'
 ```
 
 
@@ -771,24 +771,24 @@ exit 0
 
 
 
-### Customizing the shell script files (without extension) (Ubuntu):
+### Customizing the shell script files (without extension) (Ubuntu) (Every Node):
 
 * **Location:** `$PGDATA`
 
 
 First of all, make sure that the scripts are executable
 ```
-chmod +x <all scripts>
+sudo -u postgres chmod +x <all scripts>
 ```
 
-#### 21. recovery_1st_stage
+#### 21. recovery_1st_stage (Every Node)
 
 This script is executed upon execution of the `pcp_recovery_node` command to restore the pg data directory of a node from another node (usually the primary node). The <b>pcp commands</b> will be explained later. After this script, the `pcp_recovery_node` command will trigger the `pgpool_remote_start` script to start the recovered node remotely.
 
-After preparing, editing, and carrying out the necessary modifications on this script, you can run the following to test its functionality:
+After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:
 
 ```shell
-$PGDATA/recovery_1st_stage $PGDATA funleashpgdb02 $PGDATA 5432 1 5432 $HOSTNAME
+sudo -iu postgres sh -c '$PGDATA/recovery_1st_stage $PGDATA funleashpgdb02 $PGDATA 5432 1 5432 $HOSTNAME'
 ```
 
 <details>
@@ -907,13 +907,13 @@ exit 0
 
 </details>
 
-#### 22. pgpool_remote_start
+#### 22. pgpool_remote_start (Every Node)
 Like what was said for the recovery_1st_stage script, subsequently, the `pcp_recovery_node` command will trigger the `pgpool_remote_start` script to start the recovered node remotely. Note that inside the following script the pg_ctlcluster command is used to start the remote pg database cluster. It bypasses systemd mechanism to start the pg service. That is why although the pg service is functional, the `systemctl status postgresql@15-main.service` shows the pg service status as failed but all is well.
 
-After preparing, editing, and carrying out the necessary modifications on this script, you can run the following to test its functionality:
+After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:
 
 ```shell
-$PGDATA/pgpool_remote_start funleashpgdb02 $PGDATA
+sudo -iu postgres sh -c '$PGDATA/pgpool_remote_start funleashpgdb02 $PGDATA'
 ```
 
 <details>

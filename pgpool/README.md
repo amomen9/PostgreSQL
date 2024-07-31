@@ -26,7 +26,7 @@ For more, follow [this link](./pgpool%20references.md).
 
 ---
 
-### [•  Part V: pgpool, pcp, pgpool admin commands ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+### [•  Part V: pgpool command, pcp, pgpool admin commands ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
 
 --- 
 

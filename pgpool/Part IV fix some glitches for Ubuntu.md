@@ -4,7 +4,7 @@
 * [Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
 * [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
-* [Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+* [Part V: pgpool command, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
 * [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
 
 
@@ -14,7 +14,7 @@
  
 #### Change heartbeat port (Every Node)
 
-As I stated before, we changed the heartbeat port to 9999 (or proxy default port) instead of 9694 because this port will
+As I stated before, we changed the heartbeat port to **9999** (or proxy default port) instead of 9694 because this port will
  sometimes not come up. This is done in the pgpool.conf file.
 
 
@@ -77,26 +77,30 @@ ExecStartPre=/bin/sh -c /data/postgresql/scripts/remove_socket_symlinks.sh
 # This line is optional. -D discard pgpool2 nodes previuos status. -n skips running pgpool in systemd mode. For more info, refer to
 # the official documentation.
 ExecStart=
-ExecStart=/usr/sbin/pgpool -D -n
+ExecStart=/usr/sbin/pgpool -D -n	
+# -D discards pgpool_status file and is for development and test purposes. It is not recommended for the production environments.
 
 ```
 
-![Screenshot_40](image/Part IV/Screenshot_40.png)
+![Screenshot_40](image/Part%20IV/Screenshot_40.png)
 
 ```shell
 sudo systemctl daemon-reload
 sudo systemctl restart pgpool2
 ```
 
-#### Periodically check for the VIP (Every Node)
 
 #### Periodically check for unix domain socket files' symbolic links (Every Node)
+
+#### Periodically check for the VIP (Every Node)
+
+#### Periodically fix the mode for PGDATA directory (Every Node)
 
 For these two above, we create a service to be periodically triggered by a timer.
  The service executes two scripts. 
  
 1. Sometimes, the unix domain socket file is misplaced in another location.
- This causes for example the `psql -p 9999` command (or any other client) for the pgpool proxy to fail. 
+ This causes for example the `psql -p 9999` command (or any other client) for connecting to the pgpool proxy to fail. 
  Thats's why we create a symbolic link for the socket file in a place that this command thinks it should
  look for. The name of the script for this is `unix_domain_sockets_repair.sh`.
 
@@ -170,12 +174,12 @@ This script is as follows:
 /usr/bin/chmod -R 0750 /data/postgresql
 ```
 
-####  Create the service file and the timer
+####  Create the service file and the timer (Every Node)
 
 Now create a service file and timer for these scripts. The name of the service file is `pgpool_repair.service`:
 
 ```shell
-sudo vi /var/lib/systemd/system/pgpool_repair.service
+sudo vi /lib/systemd/system/pgpool_repair.service
 ```
 
 Write the following inside:
@@ -228,7 +232,7 @@ WantedBy=multi-user.target
 Now the timer file for the service. The name of the timer file is `pgpool_repair.timer`:
 
 ```shell
-sudo vi /var/lib/systemd/system/pgpool_repair.timer
+sudo vi /lib/systemd/system/pgpool_repair.timer
 ```
 
 Write the following inside:
@@ -266,5 +270,5 @@ The service will run every 10 seconds`
 
 
 
-# [Next: Part V: pgpool, pcp, pgpool admin commands ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+# [Next: Part V: pgpool, pcp, pgpool admin commands ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
 
