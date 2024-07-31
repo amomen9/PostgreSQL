@@ -1,3 +1,3 @@
 #!/bin/bash
 
-chmod -R 750 /data/postgresql
+/usr/bin/chmod -R 0750 /data/postgresql

@@ -10,15 +10,15 @@ For more, follow [this link](./pgpool%20references.md).
 
 ---
 
-### [•  Part I: Install and Configure PostgreSQL for pgPool.md ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
+### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
 
 ---
 
-### [•  Part II: Install and Configure pgPool.md ](./Part%20II%20Install%20and%20Configure%20pgPool.md)
+### [•  Part II: Install and Configure pgPool ](./Part%20II%20Install%20and%20Configure%20pgPool.md)
 
 ---
 
-### [•  Part III: pgPool scripts.md ](./Part%20III%20pgPool%20scripts.md)
+### [•  Part III: pgPool scripts ](./Part%20III%20pgPool%20scripts.md)
 
 ---
 
@@ -26,8 +26,8 @@ For more, follow [this link](./pgpool%20references.md).
 
 ---
 
-### [•  Part V: pgpool, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
+### [•  Part V: pgpool, pcp, pgpool admin commands ](./Part%20V%20pgpool%2C%20pcp%2C%20pgpool%20admin%20commands.md)
 
 --- 
 
-### [•  Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
+### [•  Part VI: Simulations, tests, notes ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)

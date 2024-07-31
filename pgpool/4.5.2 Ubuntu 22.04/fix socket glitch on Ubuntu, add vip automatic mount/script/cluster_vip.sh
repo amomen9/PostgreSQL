@@ -15,9 +15,9 @@ eval $cmd
 # Check if the output matches the desired string
 if [ "$output" == "RTNETLINK answers: File exists" ]; then
 # If yes, return exit code 0
-exit 0
+	exit 0
 else
 # If not, return the original exit code
-exit $exit_code
+	exit $exit_code
 fi
 

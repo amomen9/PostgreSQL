@@ -20,8 +20,10 @@
 4. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available server, even a separate one. Here we setup the watchdog on all the nodes.
 5. Note that many of the commands that have "sudo" at their beginning in this document do not have to have this command if they are run under postgres user. However, I have assumed that
  these commands are being executed under another sudoer user.
-6. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
-7. The following are the node details used in this documentation:
+6. The scripts and configuration files are both embedded in this doc and included in the repository.
+7. Most of the steps in this document are sequential and the later steps depend on the earlier steps. So, follow the steps in order.
+7. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
+8. The following are the node details used in this documentation:
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 
@@ -41,7 +43,7 @@ The replication topology is composed of:
 | 3   |  funleashpgdb03  | 172.23.124.73 | Node 3 (asynchronous) |
 | 4   | vip (delegate_ip) | 172.23.124.74 | floating Virtual IP    |
 
-1. set hostnames and IP adresses if necessary (every node):
+1. set hostnames and IP adresses if necessary (Every Node):
 
 * set hostnames:
 ```shell
@@ -52,7 +54,7 @@ sudo hostnamectl set-hostname <hostname>
 
 ### Installation and Configuration of PostgreSQL (Preparing PostgreSQL for pgPool):
 
-#### 1. Install PostgreSQL (every node):
+#### 1. Install PostgreSQL (Every Node):
 
 Add the pg official repository and install PostgreSQL on all the nodes. You can see how to install PostgreSQL [here](../PostgreSQL%20in%20General%20%28Single%20Node%20or%20Cluster%29/README.md).
 Do the necessary configurations for PostgreSQL. Make sure that the postgres service is up on the 1st node. The following steps demonstrate how to do that.
@@ -82,7 +84,11 @@ In this document, these are the major directories paths. If you need to make alt
 
 `/data/postgresql/15/main/data`
 
-#### 1. Correct the environment variables for Ubuntu (Skip for Red Hat) (every node):
+**Maintenance scripts and glitch fixing scripts**
+
+`/data/postgresql/scripts`
+
+#### 1. Correct the environment variables for Ubuntu (Skip for Red Hat) (Every Node):
 
 * For a comprehensive list of pg environment variables, refer to the following reference:
 
@@ -148,7 +154,7 @@ Let the password for postgres user be the same on all the nodes for simplicity.
 sudo passwd postgres
 ```
 
-#### 7. Create Replication, Health Check, and Recovery users with required privileges on every node.  (Node 1st)
+#### 7. Create Replication, Health Check, and Recovery users with required privileges on Every Node.  (Node 1st)
 
 ```pgsql
 -- inside pg engine, create pg users and assign a password to the postgres user in the database cluster engine too, and set up pg_hba.conf file accordingly. A sample of the pg_hba.conf file was given. We take all the passwords to be the same for simplicity.
@@ -197,7 +203,7 @@ chmod 0600 ~postgres/.pgpass
 
 replication must be enabled for streaming replication and also pg_basebackup to work.
 
-pg_hba.conf sample for every node:
+pg_hba.conf sample for Every Node:
 
 ```conf
 local   all             postgres                                peer
@@ -240,7 +246,7 @@ sudo mkdir -p /var/postgresql/{pg-wal-archive,pg-local-full-backup}
 sudo chown -R postgres:postgres /var/postgresql
 ```
 
-postgresql.conf sample for every node:
+postgresql.conf sample for Every Node:
 
 ```conf
 #------------------------------------------------------------------------------
@@ -285,4 +291,4 @@ systemctl stop postgresql@15-main.service	# for pg version '15', and cluster nam
 rm -rf $PGDATA/*
 ```
 
-# [Next: Part II, Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)
+# [Next: Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)

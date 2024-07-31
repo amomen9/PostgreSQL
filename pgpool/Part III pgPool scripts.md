@@ -11,6 +11,8 @@
 # PGPOOL (Ubuntu) Part III
 **pgPool scripts**
 
+* A support for tablespaces is added to the original script files.
+
 #### 3. Copy template files (Every Node):
 
 Copy template shell script files from the following directory to a specific directory of your choice, rename and remove .sample from the end of the files. Two such specific directories are suggested here. You have to keep in mind to define the path for these scripts in the `*_command` directives accordingly in the pgpool.conf file, though.
@@ -339,9 +341,21 @@ exit 0
 
 #### 19. follow_primary.sh (Every Node)
 
-Just like we said in failover.sh, in the event of a manual failover, the follow_primary.sh script will also be executed subsequently:
+Just like we said in failover.sh, in the event of a manual failover, the follow_primary.sh script will also be executed subsequently.
 
-After preparing, editing, and carrying out the necessary modifications on this script, you can run the following to test its functionality:
+One of the commands that is used in this script is `pg_rewind` which has a differnt path on Ubuntu than RHEL. Therefore, one of the measures you should 
+ implement on Ubuntu is creating a `symbolic link` for `pg_rewind` to work in this script. pw_rewind is used to return the old primary to 
+ a common point of recovery with the new primary. pg_rewind is the first attempt for this purpose. If failed, pgpool will try to reconstruct
+ the old primary from a full backup of the new primary. This approach is common between some HA solutions of PostgreSQL. 
+ The path that this script uses for pg_rewind is "${PGHOME}/bin/pg_rewind". the place of this binary on Ubuntu is 
+ "/usr/lib/postgresql/<pg major version>/bin/pg_rewind". So, we create a symbolic link to fix that:
+ 
+ ```shell
+ ln -s /usr/lib/postgresql/<pg major version>/bin/pg_rewind /usr/bin/pg_rewind
+ ```
+
+
+After preparing, editing, and carrying out all the other necessary modifications on this script, as well, you can run the following line to test its functionality:
 
 ```shell
 /etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA
@@ -959,4 +973,4 @@ exit 0
 
 
 
-### [Next: Part IV, fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
+# [Next: Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)

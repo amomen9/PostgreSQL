@@ -15,3 +15,5 @@
 #### Periodically check for VIP
 
 
+
+# [Next: Part VI: Simulations, tests, notes ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)

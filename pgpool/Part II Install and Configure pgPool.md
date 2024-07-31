@@ -13,7 +13,7 @@
 
 ### Installation and Configuration of pgPool:
 
-#### 2. Install pgpool (every node):
+#### 2. Install pgpool (Every Node):
 After adding the PostgreSQL's official repository, you can find pgpool and its related packages in that repository.
 
 For pg version **15** (Ubuntu), you can execute the following:
@@ -37,7 +37,7 @@ postgresql-15-pgpool2 contains extensions for pgpool and is mandatory too. They 
 
 #### 4. Create pgpool_node_id file (Every Node, but with different content)
 
-create the pgpool_node_id file with the node id (ex 0) below on every node:
+create the pgpool_node_id file with the node id (ex 0) below on Every Node:
 Write the following inside shell. The node id starts from 0 for Node 1, 1 for Node 2, and so on.
 
 ```shell
@@ -1770,7 +1770,7 @@ Finally, test if an ssh connection can be estabilished with funleashpgdb02 witho
 sudo -u postgres sh -c 'ssh -i ~postgres/.ssh/id_rsa_pgpool funleashpgdb02'
 ```
 
-Do this for all the nodes, i.e. every node must be able to connect to any node (including itself) using ssh (postgres ----> postgres user). 
+Do this for all the nodes, i.e. Every Node must be able to connect to any node (including itself) using ssh (postgres ----> postgres user). 
 
 #### Create extension on the primary server's template1 database
 You must install and create the extensions in each database where you plan to use pgPool-II.
@@ -1846,4 +1846,4 @@ sudo systemctl restart pgpool2
 ```
 
 
-# [Next: Part III, pgPool scripts](./Part%20III%20pgPool%20scripts.md)
+# [Next: Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
