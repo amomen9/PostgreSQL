@@ -342,3 +342,6 @@ $ pg_verifybackup /usr/local/pgsql/data
 Read more at:
 
 [https://www.postgresql.org/docs/current/app-pgverifybackup.html](https://www.postgresql.org/docs/current/app-pgverifybackup.html)
+
+
+Finish ■
