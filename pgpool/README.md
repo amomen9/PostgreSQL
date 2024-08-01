@@ -30,4 +30,4 @@ For more, follow [this link](./pgpool%20references.md).
 
 --- 
 
-### [•  Part VI: Simulations, tests, notes ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
+### [•  Part VI: Finish up, simulations, tests, notes ](./Part%20VI%20Finish%20up%2C%20simulations%2C%20tests%2C%20notes.md)

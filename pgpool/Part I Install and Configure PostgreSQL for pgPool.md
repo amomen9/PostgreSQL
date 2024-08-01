@@ -6,7 +6,7 @@
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
 * [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
 * [Part V: pgpool command, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
-* [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
+* [Part VI: Finish up, simulations, tests, notes.md ](./Part%20VI%20Finish%20up%2C%20simulations%2C%20tests%2C%20notes.md)
 
 
 # PGPOOL (Ubuntu) Part I
@@ -22,8 +22,9 @@
  these commands are being executed under another sudoer user.
 6. The scripts and configuration files are both embedded in this doc and included in the repository.
 7. Most of the steps in this document are sequential and the later steps depend on the earlier steps. So, follow the steps in order.
-7. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
-8. The following are the node details used in this documentation:
+8. Not mentioning the non-mandatory command-line arguments means their default values.
+9. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
+10. The following are the node details used in this documentation:
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 

@@ -5,7 +5,7 @@
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
 * [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
 * [Part V: pgpool command, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
-* [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
+* [Part VI: Finish up, simulations, tests, notes.md ](./Part%20VI%20Finish%20up%2C%20simulations%2C%20tests%2C%20notes.md)
 
 
 # PGPOOL (Ubuntu) Part II
@@ -68,6 +68,8 @@ We obtain the hashed password by executing the following command:
 ```shell
 pg_md5 <password>
 ```
+
+**Be sure** to escape the special characters like $ or provide the password interactively.
 
 ![Screenshot_40](image/PartIInstallandConfigurePostgreSQLforpgPool/Screenshot_40.png)
 
@@ -189,7 +191,7 @@ sudo -u postgres pg_enc -m -f /etc/pgpool2/pgpool.conf -K ~postgres/.pgpoolkey -
 Repeat this for all the users that you want to create an entry for in this file using this encryption algorithm.
  Here we create and entry for postgres, pgpool, and repl users.
 
-Some command-line arguments can be not provided if their values are the default ones. For example, the pgpool.conf file path (default is /etc/pgpool2/pgpool.conf),
+We can ignore some command-line arguments if their values are the default ones. For example, the pgpool.conf file path (default is /etc/pgpool2/pgpool.conf),
  the .pgpoolkey file path is ~/.pgpoolkey
 
 You will be prompted to enter the user's password. -m flag will make the pg_md5 command to update the pool_passwd file automatically.

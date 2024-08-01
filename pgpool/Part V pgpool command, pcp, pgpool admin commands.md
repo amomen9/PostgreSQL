@@ -5,7 +5,7 @@
 * [Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
 * [Part IV: fix some glitches for Ubuntu](./Part%20IV%20fix%20some%20glitches%20for%20Ubuntu.md)
 * [Part V: pgpool command, pcp, pgpool admin commands.md ](./Part%20V%20pgpool%20command%2C%20pcp%2C%20pgpool%20admin%20commands.md)
-* [Part VI: Simulations, tests, notes.md ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
+* [Part VI: Finish up, simulations, tests, notes.md ](./Part%20VI%20Finish%20up%2C%20simulations%2C%20tests%2C%20notes.md)
 
 
 # PGPOOL (Ubuntu) Part V
@@ -78,6 +78,33 @@ function pgpool_pgctl(text,text)
 function pgpool_switch_xlog(text)
 ```
 
+* Common flags:
+
+Some flags are common between many pcp and PostgreSQL commands. I say the ones that are common between
+ the pcp commands here. They include:
+
+`-U`: user
+
+`-h`: host
+
+`-p`: port
+
+`-n`: node id
+
+`-a`: all nodes
+
+`-d`: debug
+
+`-v`: verbose
+
+`-w`: Do not prompt for password (Meaning when the password is not needed or the password can be obtained from the password files)
+In pgpool 4.3.5 and earlier, this flag was mandatory even if the pcp password file was present.
+
+`-W`: Prompt for password
+
+`--help`: Display help in command-line
+
+
 Now, we dive into the pcp commands one by one<br/> (nearly in the importance order):
 <br/>
 <br/>
@@ -85,6 +112,7 @@ Now, we dive into the pcp commands one by one<br/> (nearly in the importance ord
 ---
 •  **pcp_node_info:** Displays information on the given node ID.
 <br/>Displays the following info about one or all the nodes
+![]
 <br/><br/>•  **pcp_watchdog_info:** Displays the watchdog status of Pgpool-II.
 <br/>watchdog info for the nodes.
 <br/><br/>•  **pcp_promote_node:** Promotes the given node as new main to Pgpool-II.
@@ -120,12 +148,13 @@ If any configuration change for postgres is deemed necessary, here is the follow
 5. one of the standby nodes will become the new primary.
 6. recovery process will be carried out for the old primary node.
 
+---
 
 #### Some common errors:
 
 1. If you got the following error,
 
-pcp_recovery_node -h vip -p 9898 -U pgpool -n 1
+`pcp_recovery_node -h vip -p 9898 -U pgpool -n 1`
 
 | ERROR:  executing recovery, execution of command failed at "1st stage"<br/>DETAIL:  command:"recovery_1st_stage"|
 | :-------------------------------------------------------------------------------------------------------------: |
@@ -146,6 +175,38 @@ It is likely that:
 
 | psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: No such file or directory<br/>Is the server running locally and accepting connections on that socket? |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+
+3. Check the proxy and backends' status. The client cannot connect to the proxy. 
+
+`psql -p 9999`
+
+| psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: ERROR:  pgpool is not accepting any new connections<br/>DETAIL:  all backend nodes are down, pgpool requires at least one valid node<br/>HINT:  repair the backend nodes and restart pgpool | 
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+
+One example as in the following case, is that all nodes' status is 'quarantine':
+
+```shell
+postgres@funleashpgdb01:~$ pcp_node_info -U pgpool -w -a
+funleashpgdb01 5432 3 0.333333 quarantine up standby unknown 0 none none 2024-08-01 01:58:06
+funleashpgdb02 5432 3 0.333333 quarantine down standby unknown 0 none none 2024-08-01 01:58:08
+funleashpgdb03 5432 3 0.333333 quarantine down standby unknown 0 none none 2024-08-01 01:58:08
+```
+4. `.pgpoolkey` is not accessible or the encryption key is wrong.
+
+`psql -p 9999`
+
+| psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: ERROR:  SCRAM authentication failed<br/>DETAIL:  unable to decrypt password from pool_passwd <br/>HINT:  verify the valid pool_key exists |
+| :----: |
+
+5. Something is wrong about the pcp.conf file or the .pcppass file and they do not match (The
+ password inside `.pcppass`, the password provided interactively, or its hashed value inside
+ the `pcp.conf` file). If you have created the md5 password by `pg_md5 Pa\$svvord`, make sure that
+ you have escaped the special characters like in `pg_md5 Pa\$svvord`.
+
+`pcp_node_info -U pgpool -w -a`
+
+| FATAL:  authentication failed for user "pgpool"<br/>DETAIL:  username and/or password does not match |
+| :-----: |
 
 
 # [Next: Part VI: Simulations, tests, notes ](./Part%20VI%20Simulations%2C%20tests%2C%20notes.md)
