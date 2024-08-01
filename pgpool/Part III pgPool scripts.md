@@ -11,6 +11,8 @@
 # PGPOOL (Ubuntu) Part III
 **pgPool scripts**
 
+Study the scripts thoroughly and try to understand them. Some explainatory comments have been added to the scripts but you should understand all of their contents.
+
 * A support for tablespaces is added to the original script files in the pg_basebackup command.
 
 #### 3. Copy template files (Every Node):

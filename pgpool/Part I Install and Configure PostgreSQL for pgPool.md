@@ -17,14 +17,15 @@
 1. PostgreSQL major version specified here is 15. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, and most likely later versions, as well.
 2. pgpool version is 4.5.2
 3. There are some glitches for pgpool on Ubuntu, which do not exist on the RHEL. That is because EnterpriseDB is rather Redhat oriented than other Linux distros. I have tried to make up for them and included the solutions in this document. The tests have shown a satisfactory result for myself but the solutions are offered **without a guarantee**.
-4. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available server, even a separate one. Here we setup the watchdog on all the nodes.
-5. Note that many of the commands that have "sudo" at their beginning in this document do not have to have this command if they are run under postgres user. However, I have assumed that
+4. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we setup the watchdog on all the backend (pg) nodes themselves.
+5. Note that many of the commands that have "sudo" at their beginning in this document do not have to have this command if they run under postgres user. However, I have assumed that
  these commands are being executed under another sudoer user.
-6. The scripts and configuration files are both embedded in this doc and included in the repository.
+6. The scripts and configuration files are both embedded in this doc and included in the git repository.
 7. Most of the steps in this document are sequential and the later steps depend on the earlier steps. So, follow the steps in order.
 8. Not mentioning the non-mandatory command-line arguments means their default values.
-9. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
-10. The following are the node details used in this documentation:
+9. Study the scripts thoroughly and try to understand them. Some explainatory comments have been added to the scripts but you should understand all of their contents.
+10. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
+11. The following are the node details used in this documentation:
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 
