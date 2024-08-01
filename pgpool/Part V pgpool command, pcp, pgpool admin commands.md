@@ -26,7 +26,7 @@ This command is mostly used to reload, stop, and start pgpool. It bypasses syste
  `-x` and `-d` are for debug aid, and shutdown modes are similar to that of PostgreSQL because the proxy's nature
  is similar to the direct connections with the database clusters.
 
-#### pcp commans:
+#### pcp commands:
 
 pcp stands for "Pgpool-II Control Program" commands.
  pcp cli tools can either be used by installing pgpool2 package or by installing its python module like below and running its commands using python. We will use shell commands anyways.
@@ -156,7 +156,7 @@ If any configuration change for postgres is deemed necessary, here is the follow
 
 `pcp_recovery_node -h vip -p 9898 -U pgpool -n 1`
 
-| ERROR:  executing recovery, execution of command failed at "1st stage"<br/>DETAIL:  command:"recovery_1st_stage"|
+| <div align="left">ERROR:  executing recovery, execution of command failed at "1st stage"<br/>DETAIL:  command:"recovery_1st_stage"</div>|
 | :-------------------------------------------------------------------------------------------------------------: |
 
 It is likely that:
@@ -173,14 +173,14 @@ It is likely that:
 
 `psql -p 9999`
 
-| psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: No such file or directory<br/>Is the server running locally and accepting connections on that socket? |
+| <div align="left">psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: No such file or directory<br/>Is the server running locally and accepting connections on that socket?</div> |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 
 3. Check the proxy and backends' status. The client cannot connect to the proxy. 
 
 `psql -p 9999`
 
-| psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: ERROR:  pgpool is not accepting any new connections<br/>DETAIL:  all backend nodes are down, pgpool requires at least one valid node<br/>HINT:  repair the backend nodes and restart pgpool | 
+| <div align="left">psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: ERROR:  pgpool is not accepting any new connections<br/>DETAIL:  all backend nodes are down, pgpool requires at least one valid node<br/>HINT:  repair the backend nodes and restart pgpool</div> | 
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 
 One example as in the following case, is that all nodes' status is 'quarantine':
@@ -195,7 +195,7 @@ funleashpgdb03 5432 3 0.333333 quarantine down standby unknown 0 none none 2024-
 
 `psql -p 9999`
 
-| psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: ERROR:  SCRAM authentication failed<br/>DETAIL:  unable to decrypt password from pool_passwd <br/>HINT:  verify the valid pool_key exists |
+| <div align="left">psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: ERROR:  SCRAM authentication failed<br/>DETAIL:  unable to decrypt password from pool_passwd <br/>HINT:  verify the valid pool_key exists</div> |
 | :----: |
 
 5. Something is wrong about the pcp.conf file or the .pcppass file and they do not match (The
@@ -205,7 +205,7 @@ funleashpgdb03 5432 3 0.333333 quarantine down standby unknown 0 none none 2024-
 
 `pcp_node_info -U pgpool -w -a`
 
-| FATAL:  authentication failed for user "pgpool"<br/>DETAIL:  username and/or password does not match |
+| <div align="left">FATAL:  authentication failed for user "pgpool"<br/>DETAIL:  username and/or password does not match</div> |
 | :-----: |
 
 
