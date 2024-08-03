@@ -69,7 +69,7 @@ sudo hostnamectl set-hostname <hostname>
 
 #### 1. Install PostgreSQL (Every Node):
 
-Add the pg official repository and install PostgreSQL on all the nodes. You can see how to install PostgreSQL [here](../PostgreSQL%20in%20General%20%28Single%20Node%20or%20Cluster%29/README.md).
+Add the pg official repository and install PostgreSQL on all the nodes. You can see how to install PostgreSQL in the "PostgreSQL in General (Single Node or Cluster)/README.md" of this repository.
 Do the necessary configurations for PostgreSQL. Make sure that the postgres service is up on the 1st node. The following steps demonstrate how to do that.
 
 **Very important note!**

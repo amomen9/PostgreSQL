@@ -37,7 +37,7 @@ install in python:
 
 
 
-These are the pcp commands and their bried explainations. We already know some info like authentication about them from the previous sections:
+These are the shell pcp commands and their brief explainations. We already know some info like authentication about them from the previous sections:
 
 **Reference:**
 
@@ -47,8 +47,14 @@ These are the pcp commands and their bried explainations. We already know some i
 |:----------------:|
 | <div align="left"> •  **pcp_attach_node:** Attaches a given node to Pgpool-II.<br/><br/> •  **pcp_detach_node:** Detaches the given node from Pgpool-II.<br/><br/> •  **pcp_node_count:** Displays the total number of database nodes.<br/><br/> •  **pcp_node_info:** Displays information on the given node ID.<br/><br/> •  **pcp_health_check_stats:** Displays health check statistics data on the given node ID.<br/><br/> •  **pcp_watchdog_info:** Displays the watchdog status of Pgpool-II.<br/><br/> •  **pcp_proc_count:** Displays the list of Pgpool-II children process IDs.<br/><br/> •  **pcp_proc_info:** Displays information on the given Pgpool-II child process ID.<br/><br/> •  **pcp_pool_status:** Displays the parameter values as defined in pgpool.conf.<br/><br/> •  **pcp_promote_node:** Promotes the given node as new main to Pgpool-II.<br/><br/> •  **pcp_stop_pgpool:** Terminates the Pgpool-II process.<br/><br/> •  **pcp_reload_config:** Reloads the Pgpool-II config file.<br/><br/> •  **pcp_recovery_node:** Attaches the given backend node with recovery. </div> |
 
-The pcp commands also have SQL statements. They are dependent to these statements, because when they execute the SQL statements are also executed behind the scenes. That is why creating their extension is mandatory.
- These are some of these statements which are added by creating the pgpool_adm extension:
+
+The shell pcp commands also have SQL functions which we do not execute them directly
+ but can be used for debugging purposes as to why the pcp commands have problems and
+ do not work. The pcp commands are dependent to these statements, because when they
+ execute, the SQL statements are also executed behind the scenes. That is why creating
+ their extension is mandatory.
+
+These are some of these statements which are added by creating the pgpool_adm extension:
 
 ```pgsql 
 function pcp_attach_node(integer,text)
