@@ -161,12 +161,37 @@ sudo reboot -i
  using EnvironmentFile directive in systemd service, etc.
 
 
-#### 6. Assign a password to the user postgres in Linux (Every Node)
+#### 6. (**Only with pgpool**) Assign a password to the user postgres in Linux (Every Node)
+
+The `postgres` user does not come with a password after installing PostgreSQL by default for security reasons. 
+So, **it is not generally recommended to assign it a password and you should avoid it except for the pgpool case.**
 
 Let the password for postgres user be the same on all the nodes for simplicity.
 ```shell
 sudo passwd postgres
 ```
+
+| Hardening:<br/><br/>Also deny postgres user from logging in using ssh connection like below. <br/>However, you should do this at the end of setting up the pgpool cluster for your convenience, <br/>because you are going to copy postgres and pgpool files to the machines using ssh. <br/>If you do this using the postgres user, you will not be forced to change the ownership <br/>of those files to postgres. This way you will spare yourself a big turmoil. |
+| :-------:|
+
+----
+1. Open the SSH configuration file
+```shell
+sudo nano /etc/ssh/sshd_config
+```
+
+2. Add the DenyUsers directive
+```shell
+DenyUsers postgres
+```
+
+3. Save and close the file.
+
+4. Restart the SSH service to apply the changes
+```shell
+sudo systemctl restart sshd
+```
+----
 
 #### 7. Create Replication, Health Check, and Recovery users with required privileges on Every Node.  (Node 1st)
 
