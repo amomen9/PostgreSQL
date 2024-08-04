@@ -1851,5 +1851,47 @@ sudo systemctl daemon-reload
 sudo systemctl restart pgpool2
 ```
 
+#### Take configuration changes into effect
+
+In the event that you modify the configuration files, there are some approaches you can put
+ those changes into effect. Some are cold and require a restart of the service. Such directives
+ are pointed out in the pgpool.conf file. Some others are warm, meaning a pgpool reload will
+ put them into effect. Though this is a primary explaination and I do not explain the syntax of the
+ commands here except for `pgpool reload` which is pretty simple but has to run on the target
+ machine's shell itself. The commands' syntaxes are explained in the part V.
+
+These are the commands that can be used for making such warm configuration changes effective:
+
+1.
+```shell
+pcp_reload_config [OPTION...]
+```
+
+2.
+```shell
+pgpool reload
+```
+
+
+
+#### First test
+
+After setting up and configuring pgpool, the very first test is to try to connect to its proxy. It can be done
+ on any node using `psql -p 9999` command. Replace 9999 with your configured port if you have changed the pgpool default.
+ the `psql -p 9999` should connect, and there are some extra commands and capabilities for the proxy engine than every 
+ backend's engine. Capability examples include choosing the node for load balancing, sending read/write queries to the
+ primary node, object-specific query routing, and many other features you have seen in the pgpool.conf file. If you connect
+ to any node for example Node 1 using `psql -h Node1 -p 9999`, pgpool decides where to send the query and it can be any node
+ and not necessarily Node 1. Connecting directly to that Node backend shall be using the PostgreSQL which is 5432 by default.
+ So, if you execute `psql -p 5432` on the Node 1, it will bypass pgpool and directly connect to the backend database cluster
+ of Node 1. Some other added commands are the pgpool-specific `show` commands. The most famous one is `show pool_nodes`.
+ Obviously if you run this command on port 5432, it will return an error that it does not recognize such a config.
+
+So, after connecting to the cluster using pgpool port, run the following command to show pgpool nodes' status.
+
+```pgsql
+show pool_nodes;
+```
+
 
 # [Next: Part III: pgPool scripts](./Part%20III%20pgPool%20scripts.md)
