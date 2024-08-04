@@ -37,8 +37,13 @@ postgresql-15-pgpool2 contains extensions for pgpool and is mandatory too. They 
 
 #### 4. Create pgpool_node_id file (Every Node, but with different content)
 
-create the pgpool_node_id file with the node id (ex 0) below on Every Node:
-Write the following inside shell. The node id starts from 0 for Node 1, 1 for Node 2, and so on.
+Create the pgpool_node_id file with the node id (ex 0) below on Every Node:
+
+Write the following inside shell. The node id starts from 0 for Node 1, 1 for Node 2, and so on. After
+ creating the node id file empty or with a wrong value but the hostnames and the IP addresses and the
+ dns resolution results are correct (at least pgpool 4.5.2 and later), the node id will be correctly
+ written in the pgpool_node_id file correctly. The user postgres must have write permission to this
+ file though:
 
 ```shell
 sudo -u postgres cat > /etc/pgpool2/pgpool_node_id << EOT
