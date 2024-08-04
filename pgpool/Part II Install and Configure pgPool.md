@@ -39,11 +39,7 @@ postgresql-15-pgpool2 contains extensions for pgpool and is mandatory too. They 
 
 Create the pgpool_node_id file with the node id (ex 0) below on Every Node:
 
-Write the following inside shell. The node id starts from 0 for Node 1, 1 for Node 2, and so on. After
- creating the node id file empty or with a wrong value but the hostnames and the IP addresses and the
- dns resolution results are correct (at least pgpool 4.5.2 and later), the node id will be correctly
- written in the pgpool_node_id file correctly. The user postgres must have write permission to this
- file though:
+Write the following inside shell. The node id starts from 0 for Node 1, 1 for Node 2, and so on:
 
 ```shell
 sudo -u postgres cat > /etc/pgpool2/pgpool_node_id << EOT
@@ -1778,6 +1774,23 @@ sudo -u postgres sh -c 'ssh -i ~postgres/.ssh/id_rsa_pgpool funleashpgdb02'
 ```
 
 Do this for all the nodes, i.e. Every Node must be able to connect to any node (including itself) using ssh (postgres ----> postgres user). 
+
+A summary of you should execute on every node is below:
+
+```shell
+# Create public/private key pair
+sudo -iu postgres sh -c 'ssh-keygen -f .ssh/id_rsa_pgpool'
+
+# Copy them to the remote hosts
+sudo -iu postgres sh -c 'ssh-copy-id -i .ssh/id_rsa_pgpool.pub funleashpgdb01'
+sudo -iu postgres sh -c 'ssh-copy-id -i .ssh/id_rsa_pgpool.pub funleashpgdb02'
+sudo -iu postgres sh -c 'ssh-copy-id -i .ssh/id_rsa_pgpool.pub funleashpgdb03'
+
+# test passwordless connection:
+sudo -iu postgres sh -c 'ssh -i .ssh/id_rsa_pgpool funleashpgdb01'
+sudo -iu postgres sh -c 'ssh -i .ssh/id_rsa_pgpool funleashpgdb02'
+sudo -iu postgres sh -c 'ssh -i .ssh/id_rsa_pgpool funleashpgdb03'
+```
 
 #### Create extension on the primary server's (1st node) template1 and postgres databases
 You must install and create the extensions in each database where you plan to use pgPool-II.
