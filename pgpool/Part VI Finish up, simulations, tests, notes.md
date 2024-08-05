@@ -52,6 +52,9 @@ Meaning, the data directory will be built up and the database cluster will also 
 Now, everything has completely been carried out and our cluster is ready. We can now put it
  to test for manual and automatic failovers and also connecting the application to the pgPool
  proxy port that in our case, it is on port 9999
+ 
+Note that in the event of a manual failover, you have to rebuild the old primary after it is
+ brought up.
 
 
 
