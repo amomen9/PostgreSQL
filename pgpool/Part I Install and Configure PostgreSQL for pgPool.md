@@ -64,6 +64,16 @@ sudo hostnamectl set-hostname <hostname>
 
 ```
 
+#### Firewall (Every Node)
+
+Either disable the firewall or allow the needed incoming TCP ports for it.
+The needed TCP ports (If you are using the defaults) are:
+PostgreSQL:
+5432/tcp
+pgpool:
+9999/tcp, 9000/tcp, 9694/tcp
+
+These ports must be open in both local machine and infrastructure/cloud firewall for the required sources.
 
 ### Installation and Configuration of PostgreSQL (Preparing PostgreSQL for pgPool):
 
@@ -146,6 +156,7 @@ declare -x HOSTNAME_VAR=$(hostname)
 declare -x PGPOOLHOST=$(hostname)
 declare -x PGPASSFILE="$(echo ~postgres)/.pgpass"
 declare -x PCPPASSFILE="$(echo ~postgres)/.pcppass"
+declare -x PGPOOLKEYFILE="$(echo ~postgres)/.pgpoolkey"
 ```
 
 2. After saving the file, the new shells that are instantiated will have the environment variables. **However**,

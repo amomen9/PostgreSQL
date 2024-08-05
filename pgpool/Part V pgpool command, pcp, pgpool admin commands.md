@@ -189,13 +189,20 @@ It is likely that:
 | <div align="left">psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: ERROR:  pgpool is not accepting any new connections<br/>DETAIL:  all backend nodes are down, pgpool requires at least one valid node<br/>HINT:  repair the backend nodes and restart pgpool</div> | 
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 
-One example as in the following case, is that all nodes' status is 'quarantine':
+One example as in the following case, is that all nodes' status is 'quarantine' or 'down':
 
 ```shell
 postgres@funleashpgdb01:~$ pcp_node_info -U pgpool -w -a
 funleashpgdb01 5432 3 0.333333 quarantine up standby unknown 0 none none 2024-08-01 01:58:06
 funleashpgdb02 5432 3 0.333333 quarantine down standby unknown 0 none none 2024-08-01 01:58:08
 funleashpgdb03 5432 3 0.333333 quarantine down standby unknown 0 none none 2024-08-01 01:58:08
+```
+or
+```shell
+postgres@funleashpgdb01:~$ pcp_node_info -U pgpool -w -a
+funleashpgdb01 5432 3 0.333333 down up standby primary 0 none none 2024-08-04 16:00:05
+funleashpgdb02 5432 3 0.333333 down up standby standby 0 none none 2024-08-04 16:00:05
+funleashpgdb03 5432 3 0.333333 down up standby standby 0 none none 2024-08-04 16:00:05
 ```
 4. `.pgpoolkey` is not accessible or the encryption key is wrong.
 

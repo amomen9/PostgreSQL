@@ -12,8 +12,8 @@ DEST_NODE_PORT="$6"
 PRIMARY_NODE_HOST="$7"
 
 #PGHOME=/usr/pgsql-15
-PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
+PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 ARCHIVEDIR=/var/postgresql/pg-wal-archive
 REPLUSER=repl
@@ -105,4 +105,3 @@ fi
 
 echo recovery_1st_stage: end: recovery_1st_stage is completed successfully
 exit 0
-

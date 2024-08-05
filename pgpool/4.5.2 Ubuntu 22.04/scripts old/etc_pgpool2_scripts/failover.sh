@@ -33,8 +33,8 @@ OLD_PRIMARY_NODE_PORT="${12}"
 
 
 # PGHOME=/usr/pgsql-15
-PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
+PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 # REPL_SLOT_NAME=$(echo ${FAILED_NODE_HOST,,} | tr -- -. _)
 REPL_SLOT_RAW_NAME=$(echo ${FAILED_NODE_HOST} | cut -c 2-)
@@ -42,6 +42,7 @@ REPL_SLOT_NAME=$(echo ${REPL_SLOT_RAW_NAME,,} | tr -- -. _)
 
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool
+#SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
 
 
@@ -79,7 +80,7 @@ fi
 
 ## If there's no main node anymore, skip failover.
 if [ $NEW_MAIN_NODE_ID -lt 0 ]; then
-  
+    
 	#---------------------------
 	ERROR_LEVEL="error 2"
 	COMMAND_PLACE_HOLDER="
@@ -111,7 +112,7 @@ if [ $? -ne 0 ]; then
 
 	#---------------------------
 
-  
+    
     exit 1
 fi
 
@@ -119,7 +120,7 @@ fi
 COMMAND_PLACE_HOLDER="echo $(date '+%Y-%m-%d %H:%M:%S.%3N: '): $(hostname): script_log: OLD_PRIMARY_NODE_ID=${OLD_PRIMARY_NODE_ID}, FAILED_NODE_ID=${FAILED_NODE_ID} >> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 eval $COMMAND_PLACE_HOLDER
 if [ $OLD_PRIMARY_NODE_ID != "-1" -a $FAILED_NODE_ID != $OLD_PRIMARY_NODE_ID ]; then
-
+	
     # If Standby node is down, drop replication slot.
     ${PGHOME}/bin/psql -h ${OLD_PRIMARY_NODE_HOST} -p ${OLD_PRIMARY_NODE_PORT} postgres \
         -c "SELECT pg_drop_replication_slot('${REPL_SLOT_NAME}');"  >/dev/null 2>&1
@@ -134,9 +135,9 @@ if [ $OLD_PRIMARY_NODE_ID != "-1" -a $FAILED_NODE_ID != $OLD_PRIMARY_NODE_ID ]; 
 		fi 
 		set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
         echo ERROR: failover.sh: drop replication slot \"${REPL_SLOT_NAME}\" failed. You may need to drop replication slot manually.
-
+		
 		#---------------------------
-  
+        
     fi
 	#---------------------------
 	ERROR_LEVEL="error 2"
@@ -149,7 +150,7 @@ if [ $OLD_PRIMARY_NODE_ID != "-1" -a $FAILED_NODE_ID != $OLD_PRIMARY_NODE_ID ]; 
     echo failover.sh: end: standby node is down. Skipping failover.
 
 	#---------------------------
-  
+    
     exit 2
 fi
 
@@ -182,7 +183,7 @@ if [ $? -ne 0 ]; then
     echo ERROR: failover.sh: promote failed
 
 	#---------------------------
-  
+    
     exit 1
 else
 	# Remove standby.signal on the new primary and restart the pg service (RECOVERYCONF may or may not be removed) amomen
@@ -225,4 +226,3 @@ echo failover.sh: end: new_main_node_id=$NEW_MAIN_NODE_ID on ${NEW_MAIN_NODE_HOS
 #---------------------------
 
 exit 0
-

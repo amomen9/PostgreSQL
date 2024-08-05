@@ -132,13 +132,17 @@ This script is as follows:
 
 2. Another script `cluster_vip.sh` is to bring the virtual IP up on the primary node if not exists.
 
+
+* Set the value of the parameter **DEVICE** in this script manually if you have multiple
+ interfaces except the loopback interface. Otherwise, the formula will work. 
+ 
 This script is as follows:
 
 ```shell
 #!/bin/bash
-IF_NAME=$(ip -br link | awk '$1 != "lo" {print $1}' | tail -1)
+DEVICE=$(ip -br link | awk '$1 != "lo" {print $1}' | tail -1)
 # Command to be executed
-cmd="ssh -T -i ~/.ssh/id_rsa_pgpool $(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1)) /usr/bin/sudo /sbin/ip addr add 172.23.124.74/24 dev ${IF_NAME} label ${IF_NAME}:0"
+cmd="ssh -T -i ~/.ssh/id_rsa_pgpool $(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1)) /usr/bin/sudo /sbin/ip addr add 172.23.124.74/24 dev ${DEVICE} label ${DEVICE}:0"
 
 # Execute the command and capture the output
 output=$($cmd 2>&1)
@@ -157,6 +161,8 @@ else
 # If not, return the original exit code
 	exit $exit_code
 fi
+
+
 
 
 ```

@@ -7,8 +7,8 @@ DEST_NODE_HOST="$1"
 DEST_NODE_PGDATA="$2"
 
 #PGHOME=/usr/pgsql-15
-PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
+PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool
@@ -44,4 +44,3 @@ fi
 
 echo pgpool_remote_start: end: PostgreSQL on ${DEST_NODE_HOST} is started successfully.
 exit 0
-

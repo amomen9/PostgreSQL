@@ -101,8 +101,15 @@ This script is executed right after a failover occurs first. Then in the event o
 After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:
 
 ```shell
+# Failover to a standby node
 sudo -iu postgres sh -c '/etc/pgpool2/scripts/failover.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA funleashpgdb01 5432'
 ```
+
+Here is a breakdown of the arguments:
+
+|FAILED_NODE_ID="$1"<br/>FAILED_NODE_HOST="$2"<br/>FAILED_NODE_PORT="$3"<br/>FAILED_NODE_PGDATA="$4"<br/>NEW_MAIN_NODE_ID="$5"<br/>NEW_MAIN_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_MAIN_NODE_PORT="$9"<br/>NEW_MAIN_NODE_PGDATA="${10}"<br/>OLD_PRIMARY_NODE_HOST="${11}"<br/>OLD_PRIMARY_NODE_PORT="${12}"|
+|:---------:|
+
 
 <details>
 <summary>(click to expand) failover.sh </summary>
@@ -143,8 +150,8 @@ OLD_PRIMARY_NODE_PORT="${12}"
 
 
 # PGHOME=/usr/pgsql-15
-PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
+PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 # REPL_SLOT_NAME=$(echo ${FAILED_NODE_HOST,,} | tr -- -. _)
 REPL_SLOT_RAW_NAME=$(echo ${FAILED_NODE_HOST} | cut -c 2-)
@@ -360,8 +367,14 @@ sudo ln -s /usr/lib/postgresql/<pg major version>/bin/pg_rewind /usr/bin/pg_rewi
 After preparing, editing, and carrying out all the other necessary modifications on this script, as well, you can run the following line **to test its functionality**:
 
 ```shell
+# Get the old primary back to synchronization with the new primary node.
 sudo -iu postgres sh -c '/etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA'
 ```
+
+Here is a breakdown of the arguments:
+
+|NODE_ID="$1"<br/>NODE_HOST="$2"<br/>NODE_PORT="$3"<br/>NODE_PGDATA="$4"<br/>NEW_PRIMARY_NODE_ID="$5"<br/>NEW_PRIMARY_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_PRIMARY_NODE_PORT="$9"<br/>NEW_PRIMARY_NODE_PGDATA="${10}"|
+|:---------:|
 
 
 <details>
@@ -402,8 +415,8 @@ NEW_PRIMARY_NODE_PORT="$9"
 NEW_PRIMARY_NODE_PGDATA="${10}"
 
 #PGHOME=/usr/pgsql-15
-PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
+PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 ARCHIVEDIR=/var/postgresql/pg-wal-archive
 REPLUSER=repl
@@ -720,7 +733,7 @@ exit 0
 
 This file is executed in the event that the VIP is changed from one node to another. In such event, the IP must be removed from the old replica and assigned to the interface of the new replica which is to host the virtual IP. This script is executed on the new host to remove VIP from the other nodes using ssh command.
 
-* Change the variable DEVICE value to your interface name.
+* Change the variable **DEVICE** value to your interface name.
 
 <details>
 <summary>(click to expand) escalation.sh </summary>
@@ -733,7 +746,8 @@ This file is executed in the event that the VIP is changed from one node to anot
 
 set -o xtrace
 
-POSTGRESQL_STARTUP_USER=postgres
+# POSTGRESQL_STARTUP_USER=postgres
+POSTGRESQL_STARTUP_USER=$(whoami)
 SSH_KEY_FILE=id_rsa_pgpool
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
 SSH_TIMEOUT=2
@@ -789,9 +803,17 @@ This script is executed upon execution of the `pcp_recovery_node` command to res
 
 After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:
 
+
 ```shell
+# Recover node 1 from the primary node, no matter which node is primary.
+# If you try to recover the primary node, you will get an error:
 sudo -iu postgres sh -c '$PGDATA/recovery_1st_stage $PGDATA funleashpgdb02 $PGDATA 5432 1 5432 $HOSTNAME'
 ```
+
+Here is a breakdown of the arguments:
+
+|PRIMARY_NODE_PGDATA="$1"<br/>DEST_NODE_HOST="$2"<br/>DEST_NODE_PGDATA="$3"<br/>PRIMARY_NODE_PORT="$4"<br/>DEST_NODE_ID="$5"<br/>DEST_NODE_PORT="$6"<br/>PRIMARY_NODE_HOST="$7"|
+|:---------:|
 
 <details>
 <summary>(click to expand) recovery_1st_stage </summary>
@@ -811,8 +833,8 @@ DEST_NODE_PORT="$6"
 PRIMARY_NODE_HOST="$7"
 
 #PGHOME=/usr/pgsql-15
-PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
+PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 ARCHIVEDIR=/var/postgresql/pg-wal-archive
 REPLUSER=repl
@@ -914,9 +936,16 @@ Like what was said for the recovery_1st_stage script, subsequently, the `pcp_rec
 
 After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:
 
+
 ```shell
+# Start node 1 from the current node:
 sudo -iu postgres sh -c '$PGDATA/pgpool_remote_start funleashpgdb02 $PGDATA'
 ```
+
+Here is a breakdown of the arguments:
+
+|DEST_NODE_HOST="$1"<br/>DEST_NODE_PGDATA="$2"|
+|:---------:|
 
 <details>
 <summary>(click to expand) pgpool_remote_start </summary>
@@ -931,8 +960,8 @@ DEST_NODE_HOST="$1"
 DEST_NODE_PGDATA="$2"
 
 #PGHOME=/usr/pgsql-15
-PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
+PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool

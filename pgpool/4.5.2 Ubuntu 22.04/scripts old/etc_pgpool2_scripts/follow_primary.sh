@@ -31,8 +31,8 @@ NEW_PRIMARY_NODE_PORT="$9"
 NEW_PRIMARY_NODE_PGDATA="${10}"
 
 #PGHOME=/usr/pgsql-15
-PGHOME=$(which psql | rev | cut -d"/" -f3- | rev)
-PGMAJVER=$((`psql -tc "show server_version_num"` / 10000))
+PGHOME=$(sudo -iu postgres which psql | rev | cut -d"/" -f3- | rev)
+PGMAJVER=$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
 PGCLU=main
 ARCHIVEDIR=/var/postgresql/pg-wal-archive
 REPLUSER=repl
@@ -46,6 +46,7 @@ REPL_SLOT_RAW_NAME=$(echo ${NODE_HOST} | cut -c 2-)
 REPL_SLOT_NAME=$(echo ${REPL_SLOT_RAW_NAME,,} | tr -- -. _)
 POSTGRESQL_STARTUP_USER=postgres
 SSH_KEY_FILE=id_rsa_pgpool
+#SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
 
 TBSP_DIR=/data/postgresql/$PGMAJVER/$PGCLU/tablespaces
@@ -86,12 +87,12 @@ if [ $? -ne 0 ]; then
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
-
+	
 	set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
     echo follow_primary.sh: node_id=${NODE_ID} is not running. skipping follow primary command
 	#---------------------------
 
-  
+    
     exit 1
 fi
 
@@ -106,9 +107,9 @@ if [ $? -ne 0 ]; then
 	if [ $LOG_OUTPUT = "pgpool_log" ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
-
+	
 	set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
-    echo follow_main.sh: passwordless SSH to ${POSTGRESQL_STARTUP_USER}@${NEW_PRIMARY_NODE_HOST} failed. Please setup passwordless SSH.
+    echo follow_main.sh: passwordless SSH to ${POSTGRESQL_STARTUP_USER}@${NEW_PRIMARY_NODE_HOST} failed. Please setup passwordless SSH.	
 	#---------------------------
 
     exit 1
@@ -153,7 +154,7 @@ if [ $? -ne 0 ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
 	set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
-	echo follow_primary.sh: create replication slot \"${REPL_SLOT_NAME}\" failed. You may need to create replication slot manually.
+	echo follow_primary.sh: create replication slot \"${REPL_SLOT_NAME}\" failed. You may need to create replication slot manually.		
 	#---------------------------
 fi
 
@@ -199,7 +200,7 @@ if [ $? -ne 0 ]; then
 		COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 	fi 
 	set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
-    echo follow_primary.sh: end: pg_rewind failed. Try pg_basebackup.
+    echo follow_primary.sh: end: pg_rewind failed. Try pg_basebackup.	
 	#---------------------------
 
 
@@ -249,8 +250,8 @@ EOT
 				COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 			fi 
 			set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
-            echo ERROR: follow_primary.sh: drop replication slot \"${REPL_SLOT_NAME}\" failed. You may need to drop replication slot manually.
-			#---------------------------
+            echo ERROR: follow_primary.sh: drop replication slot \"${REPL_SLOT_NAME}\" failed. You may need to drop replication slot manually.			
+			#---------------------------	
         fi
 		#---------------------------
 		ERROR_LEVEL="error 1"
@@ -261,7 +262,7 @@ EOT
 		fi 
 		set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
         echo follow_primary.sh: end: pg_basebackup failed
-
+	
 		#---------------------------
 
         exit 1
@@ -289,7 +290,7 @@ if [ $? -eq 0 ]; then
 		fi 
 		set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
         echo ERROR: follow_primary.sh: end: pcp_attach_node failed. The old primary is not part of the pgpool cluster.
-
+	
 		#---------------------------
 
         exit 1
@@ -339,4 +340,3 @@ echo follow_primary.sh: end: follow primary command is completed successfully
 #---------------------------
 
 exit 0
-
