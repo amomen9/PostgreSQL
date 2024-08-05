@@ -12,7 +12,7 @@
 
 ## Fix some glitches of pgpool for Ubuntu
  
-#### Change heartbeat port (Every Node)
+#### 34. Change heartbeat port (Every Node)
 
 As I stated before, we changed the heartbeat port to **9999** (or proxy default port) instead of 9694 because this port will
  sometimes not come up. This is done in the pgpool.conf file.
@@ -21,7 +21,7 @@ As I stated before, we changed the heartbeat port to **9999** (or proxy default 
 
 * We place the following script files under /data/postgresql/scripts. So place these script files in a proper location which is the location that the service file uses for these scripts.
 
-#### Copy the following script files to the target directory (Every Node)
+#### 35. Copy the following script files to the target directory (Every Node)
 
 Copy the following script files to the target directory and make them executable.
  The script file names are:
@@ -42,7 +42,7 @@ sudo chmod +x /data/postgresql/scripts/*
 ```
 
 
-#### Remove socket files' residuals for the symbolic links (Every Node)
+#### 36. Remove socket files' residuals for the symbolic links (Every Node)
 
 3. One other script is `remove_socket_symlinks.sh` to remove the residuals of the socket symbolic link files
  created by unix_domain_sockets_repair script at the startup of the pgpool service. This script is executed
@@ -90,18 +90,18 @@ sudo systemctl restart pgpool2
 ```
 
 
-#### Periodically check for unix domain socket files' symbolic links (Every Node)
+#### 37. Periodically check for unix domain socket files' symbolic links (Every Node)
 
-#### Periodically check for the VIP (Every Node)
+#### 38. Periodically check for the VIP (Every Node)
 
-#### Periodically fix the mode for PGDATA directory (Every Node)
+#### 39. Periodically fix the mode for PGDATA directory (Every Node)
 
 For these two above, we create a service to be periodically triggered by a timer.
  The service executes two scripts. 
  
-1. Sometimes, the unix domain socket file is misplaced in another location.
+1. Sometimes, the UNIX domain socket file is misplaced in another location.
  This causes for example the `psql -p 9999` command (or any other client) for connecting to the pgpool proxy to fail. 
- Thats's why we create a symbolic link for the socket file in a place that this command thinks it should
+ That is why we create a symbolic link for the socket file in a place that this command thinks it should
  look for. The name of the script for this is `unix_domain_sockets_repair.sh`.
 
 This script is as follows:
@@ -182,7 +182,7 @@ This script is as follows:
 /usr/bin/chmod -R 0750 /data/postgresql
 ```
 
-####  Create the service file and the timer (Every Node)
+#### 40. Create the service file and the timer (Every Node)
 
 Now create a service file and timer for these scripts. The name of the service file is `pgpool_repair.service`:
 

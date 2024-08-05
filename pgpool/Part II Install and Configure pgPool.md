@@ -13,7 +13,7 @@
 
 ### Installation and Configuration of pgPool:
 
-#### 2. Install pgpool (Every Node):
+#### 13. Install pgpool (Every Node):
 After adding the PostgreSQL's official repository, you can find pgpool and its related packages in that repository.
 
 For pg version **15** (Ubuntu), you can execute the following:
@@ -35,7 +35,7 @@ sudo chown -R postgres:postgres /etc/pgpool2
 Note that the packages pgpool2, libpgpool2, and their dependents, do not rely on the PostgreSQL major version, however, the pgpool extensions (postgresql-15-pgpool2) for PostgreSQL database cluster engine do rely on the PostgreSQL's major version and must be chosen accordingly.
 postgresql-15-pgpool2 contains extensions for pgpool and is mandatory too. They will be mentioned later. Choose the version of this package which corresponds with your pg major version.
 
-#### Special permissions for the postgres user (Every Node)
+#### 14. Special permissions for the postgres user (Every Node)
 
 We have opted not to make the postgres user a sudoer for hardening purposes. This will require us to grant it
  some extra permissions. For example, the if_up/down_cmd or arping_cmd need extra permissions. The if_up/down_cmd
@@ -63,7 +63,7 @@ postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add 172.23.124.74/24 dev ens160 l
 After this, though the postgres user is not a sudoer, we have to add a sudo before the commands that require us to do so.
 
 
-#### 4. Create pgpool_node_id file (Every Node, but with different content)
+#### 15. Create pgpool_node_id file (Every Node, but with different content)
 
 Create the pgpool_node_id file with the node id (ex 0) below on Every Node:
 
@@ -75,7 +75,7 @@ sudo -u postgres cat > /etc/pgpool2/pgpool_node_id << EOT
 EOT
 ```
 
-#### 5. Create the backend status file (Every Node)
+#### 16. Create the backend status file (Every Node)
 
 It will be explained later. With the following commands, the `logdir` directive of pgpool.conf **must**
  be set to `'/var/log/pgpool'`.
@@ -86,7 +86,7 @@ sudo chown -R postgres:postgres /var/log/pgpool		# Log location
 ```
 
 
-#### 9. Modify pcp.conf password file (Every Node)
+#### 17. Modify pcp.conf password file (Every Node)
 
 It is used to define the pcp commands password. When you run the pcp commands, the password you provide there will be first converted to its MD5 hash, and then this hash will be checked against this file to see if the `<user>`:`<hashed password>` combination actually exist in this file. pcp.conf file path is /etc/pgpool2/pcp.conf by default. It shall have the following format:
 
@@ -117,7 +117,7 @@ sudo chmod 0755 /etc/pgpool2/pcp.conf
 sudo chown postgres:postgres /etc/pgpool2/pcp.conf
 ```
 
-#### 10. Create pgpool pcp password file (.pcppass) (Every Node)
+#### 18. Create pgpool pcp password file (.pcppass) (Every Node)
 
 It is used to authenticate to the pcp commands without providing a password from the machine on which we create this file.
 
@@ -150,7 +150,7 @@ The .pcppass file must only be accessible by the owner. They must have 0600 mode
 sudo -u postgres chmod 0600 ~postgres/.pcppass
 ```
 
-#### 11. Create pgpool pool_passwd file (Every Node)
+#### 19. Create pgpool pool_passwd file (Every Node)
 
 * Note!
 
@@ -244,7 +244,7 @@ sudo -u postgres cat /etc/pgpool2/pool_passwd
 ```
 
 
-#### 14. pgpool configuration files: pgpool.conf (Every Node)
+#### 20. pgpool configuration files: pgpool.conf (Every Node)
 
 The major configuration file for pgpool is pgpool.conf. Now we dive into this file. This is the default configuration file of pgpool 4.5.2. The parts that are commented out show the default value in effect for that directive. We have added some extra explanations for some parts. 
 
@@ -1666,7 +1666,7 @@ memqcache_auto_cache_invalidation = on
 </details>
 
 
-#### 15. pgpool configuration files: pool_hba.conf (Every Node)
+#### 21. pgpool configuration files: pool_hba.conf (Every Node)
 
 There is a directive in the pgpool.conf file for pool_hba.conf. It is "enable_pool_hba" which is off by default. We need this feature and want to use it. Thus, we have switched it to on in the pgpool.conf file. It has a similar functionality to pg_hba.conf for pgpool proxy.
 
@@ -1765,7 +1765,7 @@ host    replication     all             0.0.0.0/0               md5
 
 On Ubuntu, heartbeat port appears to be glitchy and sometimes will not open. In such case, pgpool will send the signal to 9999 port instead automatically, that's why I have directly assigned the 9999 port to heartbeat instead of 9694.
 
-#### 16. Setup passwordless ssh (Every Node)
+#### 22. Setup passwordless ssh (Every Node)
 
 For the scripts' execution, some commands have to execute on other replicas using
  passwordless ssh. Thus, we need to set it up on **all the nodes**. According to
@@ -1882,7 +1882,7 @@ ssh -i ~/.ssh/id_rsa_pgpool funleashpgdb03
 
 Now revert the changes to the `/etc/ssh/sshd_config` file as noted first.
 
-#### Create extension on the primary server's (1st node) template1 and postgres databases
+#### 23. Create extension on the primary server's (1st node) template1 and postgres databases
 You must install and create the extensions in each database where you plan to use pgPool-II.
  This shall be done on the 1st node which we set it as our primary server at the initial Installation
  and configuration. When recovering the other nodes from the 1st node, all primary node's data including 
@@ -1902,7 +1902,7 @@ CREATE EXTENSION pgpool_adm;
 ```
 
 
-#### Modifying the serivce file for pgPool (Not recommended for production) (Every Node)
+#### 24. Modifying the serivce file for pgPool (Not recommended for production) (Every Node)
 The following service modification to pgpool is for development and test purposes and
  is not recommended for a production environment. Yet, some may choose to do so.
 
@@ -1960,7 +1960,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart pgpool2
 ```
 
-#### Take configuration changes into effect
+#### 25. Take configuration changes into effect
 
 In the event that you modify the configuration files, there are some approaches you can put
  those changes into effect. Some are cold and require a restart of the service. Such directives
@@ -1983,7 +1983,7 @@ pgpool reload
 
 
 
-#### First test
+#### 26. First test
 
 After setting up and configuring pgpool, the very first test is to try to connect to its proxy. It can be done
  on any node using `psql -p 9999` command. Replace 9999 with your configured port if you have changed the pgpool default.

@@ -12,7 +12,7 @@
 
 ### pgpool command, pcp commands, pgpool admin commands
 
-#### pgpool:
+#### 41. pgpool:
 
 ```shell
 pgpool --help
@@ -26,7 +26,7 @@ This command is mostly used to reload, stop, and start pgpool. It bypasses syste
  `-x` and `-d` are for debug aid, and shutdown modes are similar to that of PostgreSQL because the proxy's nature
  is similar to the direct connections with the database clusters.
 
-#### pcp commands:
+#### 42. pcp commands:
 
 pcp stands for "Pgpool-II Control Program" commands.
  pcp cli tools can either be used by installing pgpool2 package or by installing its python module like below and running its commands using python. We will use shell commands anyways.
@@ -147,7 +147,7 @@ try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will sh
 <br/><br/>•  **pcp_detach_node:** Detaches the given node from Pgpool-II.
 <br/>The node will be removed from the consensus and voting.
 <br/><br/>•  **pcp_node_count:** Displays the total number of database nodes.
-<br/>Numer of the nodes
+<br/>Number of the nodes
 <br/><br/>•  **pcp_health_check_stats:** Displays health check statistics data on the given node ID.
 <br/>Similar to the pcp_node_info
 <br/><br/>•  **pcp_proc_count:** Displays the list of Pgpool-II children process IDs.
@@ -157,7 +157,7 @@ try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will sh
 
 ---
 
-#### important! 
+#### 43. important! 
 If any configuration change for postgres is deemed necessary, here is the following approach:
 
 1. change the configuration on the primary server
@@ -169,7 +169,7 @@ If any configuration change for postgres is deemed necessary, here is the follow
 
 ---
 
-#### Some common errors:
+#### 44. Some common errors:
 
 1. If you got the following error,
 

@@ -15,7 +15,7 @@
 As noted, every installation, configuration, and fixation is almost ready. First, we do the following that we also noted in Part I.
  We say it again here.
  
-#### 2.  Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only, meaning the secondary nodes):
+#### 45. Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only, meaning the secondary nodes):
 
 **Important Note!**
 Only remove the contents of the data directory on the 2nd and 3rd nodes.
@@ -38,7 +38,7 @@ rm -rf $PGDATA/*
 
 The first one can be executed by using the postgres user without the sudo privilege.
 
-#### Online recovery (Primary node only)
+#### 46. Online recovery (Primary node only)
 
 We execute the PCP online recovery command like below on the primary node. It will in turn, build up the data directory
  on the secondary nodes.

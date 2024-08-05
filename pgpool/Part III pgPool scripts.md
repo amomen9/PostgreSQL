@@ -15,7 +15,7 @@ Study the scripts thoroughly and try to understand them. Some explanatory commen
 
 * A support for tablespaces is added to the original script files in the pg_basebackup command.
 
-#### 3. Copy template files (Every Node):
+#### 27. Copy template files (Every Node):
 
 Copy template shell script files from the following directory to a specific directory of your choice, rename and remove .sample from the end of the files. Two such specific directories are suggested here. You have to keep in mind to define the path for these scripts in the `*_command` directives accordingly in the pgpool.conf file, though.
 
@@ -54,7 +54,7 @@ sudo -u postgres chmod -R 750 $PGDATA
 sudo -u chmod -R 750 /etc/pgpool2/scripts
 ```
 
-#### 17. Create script.conf (Every Node)
+#### 28. Create script.conf (Every Node)
 
 I have added a script.conf file. This file helps with logging the script execution messages by defining some parameters such as log_level and log_destination for the script files
 
@@ -94,7 +94,7 @@ We copied the script files with .sh extension to the /etc/pgpool2/scripts direct
 I have also added logging of the echo commands' output to the pgpool log files themselves manually. You can compare the following scripts with the original ones:
 
 
-#### 18. failover.sh (Every Node):
+#### 29. failover.sh (Every Node):
 
 This script is executed right after a failover occurs first. Then in the event of a manual failover, the follow_primary.sh script will also be executed.
 
@@ -348,7 +348,7 @@ exit 0
 
 </details>
 
-#### 19. follow_primary.sh (Every Node)
+#### 30. follow_primary.sh (Every Node)
 
 Just like we said in failover.sh, in the event of a manual failover, the follow_primary.sh script will also be executed subsequently.
 
@@ -729,7 +729,7 @@ exit 0
 
 </details>
 
-#### 20. escalation.sh (Every Node)
+#### 31. escalation.sh (Every Node)
 
 This file is executed in the event that the VIP is changed from one node to another. In such event, the IP must be removed from the old replica and assigned to the interface of the new replica which is to host the virtual IP. This script is executed on the new host to remove VIP from the other nodes using ssh command.
 
@@ -797,7 +797,7 @@ First of all, make sure that the scripts are executable
 sudo -u postgres chmod +x <all scripts>
 ```
 
-#### 21. recovery_1st_stage (Every Node)
+#### 32. recovery_1st_stage (Every Node)
 
 This script is executed upon execution of the `pcp_recovery_node` command to restore the pg data directory of a node from another node (usually the primary node). The <b>pcp commands</b> will be explained later. After this script, the `pcp_recovery_node` command will trigger the `pgpool_remote_start` script to start the recovered node remotely.
 
@@ -931,7 +931,7 @@ exit 0
 
 </details>
 
-#### 22. pgpool_remote_start (Every Node)
+#### 33. pgpool_remote_start (Every Node)
 Like what was said for the recovery_1st_stage script, subsequently, the `pcp_recovery_node` command will trigger the `pgpool_remote_start` script to start the recovered node remotely. Note that inside the following script the pg_ctlcluster command is used to start the remote pg database cluster. It bypasses systemd mechanism to start the pg service. That is why although the pg service is functional, the `systemctl status postgresql@15-main.service` shows the pg service status as failed but all is well.
 
 After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:

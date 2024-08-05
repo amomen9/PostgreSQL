@@ -48,14 +48,14 @@ The replication topology is composed of:
 
 1. set hostnames and IP addresses if necessary (Every Node):
 
-* set hostnames:
+* 1. set hostnames:
 ```shell
 sudo hostnamectl set-hostname <hostname>
 ```
 
-* set static IP addresses either using DHCP or directly giving the machines static IP addresses.
+* 2. set static IP addresses either using DHCP or directly giving the machines static IP addresses.
 
-* Add hostnames and IPs to the `/etc/hosts` file for local hostname resolution (Every Node):
+* 3. Add hostnames and IPs to the `/etc/hosts` file for local hostname resolution (Every Node):
 
 ```hosts
 172.23.124.71 funleashpgdb01
@@ -65,7 +65,7 @@ sudo hostnamectl set-hostname <hostname>
 
 ```
 
-#### Firewall (Every Node)
+#### 4. Firewall (Every Node)
 
 Either disable the firewall or allow the needed incoming TCP ports for it.
 The needed TCP ports (If you are using the defaults) are:
@@ -78,7 +78,7 @@ These ports must be open in both local machine and infrastructure/cloud firewall
 
 ### Installation and Configuration of PostgreSQL (Preparing PostgreSQL for pgPool):
 
-#### 1. Install PostgreSQL (Every Node):
+#### 5. Install PostgreSQL (Every Node):
 
 Add the pg official repository and install PostgreSQL on all the nodes. You can see how to install PostgreSQL in the "PostgreSQL in General (Single Node or Cluster)/README.md" of this repository.
 Do the necessary configurations for PostgreSQL. Make sure that the postgres service is up on the 1st node. The following steps demonstrate how to do that.
@@ -113,7 +113,7 @@ In this document, these are the major directories paths.
 
 `/data/postgresql/scripts`
 
-#### 1. Correct the environment variables for Ubuntu (Skip for Red Hat) (Every Node):
+#### 6. Correct the environment variables for Ubuntu (Skip for Red Hat) (Every Node):
 
 * For a comprehensive list of pg environment variables, refer to the following reference:
 
@@ -173,7 +173,7 @@ sudo reboot -i
  using EnvironmentFile directive in systemd service, etc.
 
 
-#### 6. (**Only with pgpool**) Assign a password to the user postgres in Linux (Every Node)
+#### 7. (**Only with pgpool**) Assign a password to the user postgres in Linux (Every Node)
 
 The `postgres` user does not come with a password after installing PostgreSQL by default for security reasons. 
 So, **it is not generally recommended to assign it a password and you should avoid it except for the pgpool case.**
@@ -205,7 +205,7 @@ sudo systemctl restart ssh
 ```
 ----
 
-#### 7. Create Replication, Health Check, and Recovery users with required privileges on Every Node.  (Node 1st)
+#### 8. Create Replication, Health Check, and Recovery users with required privileges on Every Node.  (Node 1st)
 
 ```pgsql
 -- inside pg engine, create pg users and assign a password to the postgres user in the database cluster engine too, and set up pg_hba.conf file accordingly. A sample of the pg_hba.conf file was given. We take all the passwords to be the same for simplicity.
@@ -225,7 +225,7 @@ SET password_encryption = 'scram-sha-256';
 \password postgres
 ```
 
-#### 8. Create pg password file (.pgpass) (Every Node)
+#### 9. Create pg password file (.pgpass) (Every Node)
 
 It is used to connect to the database cluster without providing a password from the machine
  on which we create this file. In fact, the password is taken from this file instead of
@@ -250,7 +250,7 @@ The .pgpass file must only be accessible by the owner. They must have 0600 mode.
 chmod 0600 ~postgres/.pgpass
 ```
 
-#### 12. postgresql configuration files: pg_hba.conf (Every Node)
+#### 10. postgresql configuration files: pg_hba.conf (Every Node)
 
 replication must be enabled for streaming replication and also pg_basebackup to work.
 
@@ -279,7 +279,7 @@ host    all             all             127.0.0.1/32            scram-sha-256
 host    all             all             ::1/128                 scram-sha-256
 ```
 
-#### 13. postgresql configuration files: postgresql.conf (Every Node)
+#### 11. postgresql configuration files: postgresql.conf (Every Node)
 
 Here, we only mention and change the parameters which are necessary for setting up this pgpool cluster. Note that these parameter configurations are similar to other HA and clustering solutions. We choose streaming physical replication method. Some configurations are default, but they are noted anyways for their importance.
 
@@ -330,7 +330,7 @@ promote_trigger_file = 'standalone.signal'
 hot_standby = on
 ```
 
-#### 2.  Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only):
+#### 12.  Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only):
 
 **Important Note!**
 Only remove the contents of the data directory on the 2nd and 3rd nodes.
