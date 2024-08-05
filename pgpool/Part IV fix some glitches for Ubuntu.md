@@ -202,8 +202,8 @@ Wants=pgpool_repair.timer
 [Service]
 Type=oneshot
 
-User=root
-Group=root
+User=postgres
+Group=postgres
 
 
 # Where to send early-startup messages from the server
@@ -223,12 +223,8 @@ SuccessExitStatus=0 1 2
 # assign vip to the primary node if not already assigned
 ExecStart=/bin/sh -c /data/postgresql/scripts/cluster_vip.sh
 
-# rectify the mode of the /data/postgresql directory recursively
-ExecStart=/bin/sh -c /data/postgresql/scripts/correct\ pg\ data\ dir\ mode.sh
-
-
-# StandardOutput=journal
-# StandardError=journal+console
+StandardOutput=journal
+StandardError=journal+console
 
 [Install]
 WantedBy=multi-user.target

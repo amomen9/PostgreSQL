@@ -1873,6 +1873,31 @@ CREATE EXTENSION pgpool_recovery;
 CREATE EXTENSION pgpool_adm;
 ```
 
+#### Special permissions for the postgres user
+
+We have opted not to make the postgres user a sudoer for hardening purposes. This will require us to grant it
+ some extra permissions. For example, the if_up/down_cmd or arping_cmd need extra permissions. The if_up/down_cmd
+ commands are also used in the escalation.sh script. That is why we do the following:
+
+Add the upcomming lines to the `/etc/sudoers` file or its drop-in, meaning a file inside `/etc/sudoers.d/`:
+
+```shell
+sudo vi /etc/sudoers
+```
+
+This is the template of the entries that you should write inside the sudoers file (The first line is not
+ always mandatory. If you are interested, search for it.):
+
+| Defaults:postgres !requiretty<br/>postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add &lt;VIP&gt;/24 dev &lt;IF Name&gt; label &lt;IF Name&gt;:0, /usr/sbin/ip addr del &lt;VIP&gt;/24 dev &lt;IF Name&gt; |
+|:-----:|
+
+In our case, we write the following:
+
+```shell
+Defaults:postgres !requiretty
+postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add 172.23.124.74/24 dev ens160 label ens160:0, /usr/sbin/ip addr del 172.23.124.74/24 dev ens160
+```
+
 #### Modifying the serivce file for pgPool (Not recommended for production) (Every Node)
 The following service modification to pgpool is for development and test purposes and
  is not recommended for a production environment. Yet, some may choose to do so.

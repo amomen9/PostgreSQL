@@ -221,5 +221,27 @@ funleashpgdb03 5432 3 0.333333 down up standby standby 0 none none 2024-08-04 16
 | <div align="left">FATAL:  authentication failed for user "pgpool"<br/>DETAIL:  username and/or password does not match</div> |
 | :-----: |
 
+6. If one of your node's status is always down like below:
+
+```shell
+postgres@funleashpgdb01:/data/postgresql/scripts$ pcp_node_info -h localhost -U pgpool -w
+funleashpgdb01 5432 1 0.333333 waiting up primary primary 0 none none 2024-08-05 09:33:39
+funleashpgdb02 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 09:33:39
+funleashpgdb03 5432 3 0.333333 down up standby standby 0 none none 2024-08-05 09:34:05
+```
+
+It can mean that one of the interfaces of that machine is in a down state. Resolve the issue
+ or remove that interface according to your need. Also, setting the wd_monitoring_interfaces_list = ''
+ directive to empty (default) according to the pgpool documentation should work, but sometimes it
+ might not.
+ 
+After correcting the problem:
+
+```shell
+postgres@funleashpgdb01:~$ pcp_node_info -h localhost -U pgpool -w
+funleashpgdb01 5432 1 0.333333 waiting up primary primary 0 none none 2024-08-05 13:33:09
+funleashpgdb02 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 13:33:09
+funleashpgdb03 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 13:33:32
+```
 
 # [Next: Part VI: Finish up, simulations, tests, notes ](./Part%20VI%20Finish%20up%2C%20simulations%2C%20tests%2C%20notes.md)
