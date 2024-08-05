@@ -22,7 +22,7 @@ pgpool --help
 
 This command is mostly used to reload, stop, and start pgpool. It bypasses systemd. It is also used to start
  pgpool service in the pgpool's systemd service file. Just like other applications, using it for the service
- user (here postgres) does not need root priviledges. We already know the important flags `-D, -n, -a, -f, -k, -F`
+ user (here postgres) does not need root privileges. We already know the important flags `-D, -n, -a, -f, -k, -F`
  `-x` and `-d` are for debug aid, and shutdown modes are similar to that of PostgreSQL because the proxy's nature
  is similar to the direct connections with the database clusters.
 
@@ -37,7 +37,7 @@ install in python:
 
 
 
-These are the shell pcp commands and their brief explainations. We already know some info like authentication about them from the previous sections:
+These are the shell pcp commands and their brief explanations. We already know some info like authentication about them from the previous sections:
 
 **Reference:**
 
@@ -118,13 +118,26 @@ Now, we dive into the pcp commands one by one<br/> (nearly in the importance ord
 ---
 •  **pcp_node_info:** Displays information on the given node ID.
 <br/>Displays the following info about one or all the nodes
-![]
+![Screenshot_54](image/Part%20V/Screenshot_54.png)
+
+If you see "waiting" like the following, there is nothing to worry about! It means that a query has
+ not yet been issued for the proxy. When the first query is issued, it will turn to "up" instead.
+```shell
+postgres@funleashpgdb01:~$ pcp_node_info -h localhost -U pgpool -w
+funleashpgdb01 5432 1 0.333333 waiting up primary primary 0 none none 2024-08-05 07:54:10
+funleashpgdb02 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 07:54:03
+funleashpgdb03 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 07:54:10
+```
+try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will show an expanded and
+ more informative result.
+
 <br/><br/>•  **pcp_watchdog_info:** Displays the watchdog status of Pgpool-II.
 <br/>watchdog info for the nodes.
+![Screenshot_55](image/Part%20V/Screenshot_55.png)
 <br/><br/>•  **pcp_promote_node:** Promotes the given node as new main to Pgpool-II.
 <br/>Promotes a node as the watchdog leader.
 <br/><br/>•  **pcp_recovery_node:** Attaches the given backend node with recovery.
-<br/>One of the most important ones to recover a node from another node (usually primary node)
+<br/>One of the most important ones to recover a node from another node (always the primary node). It is called "Online Recovery".
 <br/><br/>•  **pcp_stop_pgpool:** Terminates the Pgpool-II process.
 <br/>Same as `pgpool stop`
 <br/><br/>•  **pcp_reload_config:** Reloads the Pgpool-II config file.
@@ -171,7 +184,7 @@ It is likely that:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. Scripts do not exist in the right location, or are not executable
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. Or any other reason that casues the SQL functions noted before to fail.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. Or any other reason that causes the SQL functions noted before to fail.
 
 2. If you get the following error,<br/>
  the socket file is probably placed somewhere else because of the pgpool bug, or it is not

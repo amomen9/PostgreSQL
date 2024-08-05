@@ -35,6 +35,34 @@ sudo chown -R postgres:postgres /etc/pgpool2
 Note that the packages pgpool2, libpgpool2, and their dependents, do not rely on the PostgreSQL major version, however, the pgpool extensions (postgresql-15-pgpool2) for PostgreSQL database cluster engine do rely on the PostgreSQL's major version and must be chosen accordingly.
 postgresql-15-pgpool2 contains extensions for pgpool and is mandatory too. They will be mentioned later. Choose the version of this package which corresponds with your pg major version.
 
+#### Special permissions for the postgres user (Every Node)
+
+We have opted not to make the postgres user a sudoer for hardening purposes. This will require us to grant it
+ some extra permissions. For example, the if_up/down_cmd or arping_cmd need extra permissions. The if_up/down_cmd
+ commands are also used in the escalation.sh script. That is why we do the following:
+
+Add the upcoming lines to the `/etc/sudoers` file or its drop-in, meaning a file inside `/etc/sudoers.d/`:
+
+```shell
+sudo vi /etc/sudoers
+```
+
+This is the template of the entries that you should write inside the sudoers file (The first line is not
+ always mandatory. If you are interested, search for it.):
+
+| Defaults:postgres !requiretty<br/>postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add &lt;VIP&gt;/24 dev &lt;IF Name&gt; label &lt;IF Name&gt;:0, /usr/sbin/ip addr del &lt;VIP&gt;/24 dev &lt;IF Name&gt; |
+|:-----:|
+
+In our case, we write the following:
+
+```shell
+Defaults:postgres !requiretty
+postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add 172.23.124.74/24 dev ens160 label ens160:0, /usr/sbin/ip addr del 172.23.124.74/24 dev ens160
+```
+
+After this, though the postgres user is not a sudoer, we have to add a sudo before the commands that require us to do so.
+
+
 #### 4. Create pgpool_node_id file (Every Node, but with different content)
 
 Create the pgpool_node_id file with the node id (ex 0) below on Every Node:
@@ -86,7 +114,7 @@ The mode for pcp.conf file should be 0755.
 ```shell
 sudo chmod 0755 /etc/pgpool2/pcp.conf
 
-sudo chown postgre:postgres /etc/pgpool2/pcp.conf
+sudo chown postgres:postgres /etc/pgpool2/pcp.conf
 ```
 
 #### 10. Create pgpool pcp password file (.pcppass) (Every Node)
@@ -218,7 +246,7 @@ sudo -u postgres cat /etc/pgpool2/pool_passwd
 
 #### 14. pgpool configuration files: pgpool.conf (Every Node)
 
-The major configuration file for pgpool is pgpool.conf. Now we dive into this file. This is the default configuration file of pgpool 4.5.2. The parts that are commented out show the default value in effect for that directive. We have added some extra explainations for some parts. 
+The major configuration file for pgpool is pgpool.conf. Now we dive into this file. This is the default configuration file of pgpool 4.5.2. The parts that are commented out show the default value in effect for that directive. We have added some extra explanations for some parts. 
 
 Furthermore, the only default directive that is not commented out by default is the following:
 
@@ -513,7 +541,7 @@ backend_clustering_mode = 'streaming_replication'
                                    # Log all statements
 #log_per_node_statement = off
                                    # Log all statements
-                                   # with node and backend informations
+                                   # with node and backend information
 #notice_per_node_statement = off
                                    # logs notice message for per node detailed SQL statements
 #log_client_messages = off
@@ -596,11 +624,11 @@ backend_clustering_mode = 'streaming_replication'
                                         # in all cases.
 
 #log_rotation_age = 1d
-                                        # Automatic rotation of logfiles will
+                                        # Automatic rotation of log files will
                                         # happen after that (minutes)time.
                                         # 0 disables time based rotation.
 #log_rotation_size = 10MB
-                                        # Automatic rotation of logfiles will
+                                        # Automatic rotation of log files will
                                         # happen after that much (KB) log output.
                                         # 0 disables size based rotation.
 #------------------------------------------------------------------------------
@@ -681,7 +709,7 @@ backend_clustering_mode = 'streaming_replication'
 # LOAD BALANCING MODE
 
 #------------------------------------------------------------------------------
-# Some parameters depend on wether the other nodes are synchronous or not
+# Some parameters depend on weather the other nodes are synchronous or not
 
 #load_balance_mode = on
                                    # Activate load balancing mode
@@ -727,7 +755,7 @@ backend_clustering_mode = 'streaming_replication'
                                    # query cache is possible.
                                    # If off, SQL comments effectively prevent the judgment
                                    # (pre 3.4 behavior).
-# Tell pgpool whether it should take account of SQL comments inside the incomming SQL Statements
+# Tell pgpool whether it should take account of SQL comments inside the incoming SQL Statements
 
 #disable_load_balance_on_write = 'transaction'
                                    # Load balance behavior when write query is issued
@@ -862,7 +890,7 @@ backend_clustering_mode = 'streaming_replication'
                                    # Password in pool_passwd file before using the empty password
 
 #health_check_database = ''
-                                   # Database name for health check. If '', tries 'postgres' frist,
+                                   # Database name for health check. If '', tries 'postgres' first,
 #health_check_max_retries = 0
                                    # Maximum number of times to retry a failed health check before giving up.
 #health_check_retry_delay = 1
@@ -996,7 +1024,7 @@ backend_clustering_mode = 'streaming_replication'
 
 #auto_failback = off
                                    # Detached backend node reattach automatically
-                                   # if replicatiotate is 'streaming'.
+                                   # if replication state is 'streaming'.
 #auto_failback_interval = 1min
                                    # Min interval of executing auto_failback in
                                    # seconds.
@@ -1097,7 +1125,7 @@ backend_clustering_mode = 'streaming_replication'
                                     # ping command path
                                     # (change requires restart)
 
-# - Behaivor on escalation Setting -
+# - Behavior on escalation Setting -
 
 #clear_memqcache_on_escalation = on
                                     # Clear all the query cache on shared memory
@@ -1125,7 +1153,7 @@ backend_clustering_mode = 'streaming_replication'
 
 #failover_require_consensus = on
                                     # Perform failover when majority of Pgpool-II nodes
-                                    # aggrees on the backend node status change
+                                    # agrees on the backend node status change
                                     # (change requires restart)
 
 #allow_multiple_failover_requests_from_node = off
@@ -1326,7 +1354,7 @@ backend_clustering_mode = 'streaming_replication'
                                    # Defaults to localhost.
                                    # (change requires restart)
 #memqcache_memcached_port = 11211
-                                   # Memcached port number. Mondatory if memqcache_method = 'memcached'.
+                                   # Memcached port number. Mandatory if memqcache_method = 'memcached'.
                                    # Defaults to 11211.
                                    # (change requires restart)
 #memqcache_total_size = 64MB
@@ -1474,7 +1502,7 @@ logdir = '/var/log/pgpool/'
 #------------------------------------------------------------------------------
 # LOAD BALANCING MODE
 #------------------------------------------------------------------------------
-# Some parameters depend on wether the other nodes are synchronous or not
+# Some parameters depend on weather the other nodes are synchronous or not
 
 load_balance_mode = on
 allow_sql_comments = on
@@ -1536,7 +1564,7 @@ use_watchdog = on
 
 # -Connection to upstream servers -
 trusted_servers = 'funleashpgdb01,funleashpgdb02,funleashpgdb03'
-trusted_server_command = 'ping -q -c3 %h'
+trusted_server_command = 'ping -q -c2 %h'
 
 # - Watchdog communication Settings -
 hostname0 = 'funleashpgdb01'
@@ -1559,7 +1587,7 @@ if_down_cmd = '/usr/bin/sudo /usr/sbin/ip addr del $_IP_$/24 dev ens160'
 arping_path = '/usr/bin'
 arping_cmd = '/usr/bin/sudo /usr/sbin/arping -U $_IP_$ -w 1 -I ens160'
 
-# - Behaivor on escalation Setting -
+# - Behavior on escalation Setting -
 clear_memqcache_on_escalation = off
 wd_escalation_command = '/bin/sh /etc/pgpool2/scripts/escalation.sh'
 enable_consensus_with_half_votes = off
@@ -1802,7 +1830,7 @@ sudo -u postgres sh -c 'ssh-copy-id -i ~postgres/.ssh/id_rsa_pgpool.pub funleash
 sudo sh -c 'ssh-copy-id -i ~root/.ssh/id_rsa_pgpool.pub funleashpgdb02'
 ```
 
-Finally, test if an ssh connection can be estabilished with funleashpgdb02 without entering a password.
+Finally, test if an ssh connection can be established with funleashpgdb02 without entering a password.
 
 ```shell
 sudo -u postgres sh -c 'ssh -i ~postgres/.ssh/id_rsa_pgpool funleashpgdb02'
@@ -1873,30 +1901,6 @@ CREATE EXTENSION pgpool_recovery;
 CREATE EXTENSION pgpool_adm;
 ```
 
-#### Special permissions for the postgres user
-
-We have opted not to make the postgres user a sudoer for hardening purposes. This will require us to grant it
- some extra permissions. For example, the if_up/down_cmd or arping_cmd need extra permissions. The if_up/down_cmd
- commands are also used in the escalation.sh script. That is why we do the following:
-
-Add the upcomming lines to the `/etc/sudoers` file or its drop-in, meaning a file inside `/etc/sudoers.d/`:
-
-```shell
-sudo vi /etc/sudoers
-```
-
-This is the template of the entries that you should write inside the sudoers file (The first line is not
- always mandatory. If you are interested, search for it.):
-
-| Defaults:postgres !requiretty<br/>postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add &lt;VIP&gt;/24 dev &lt;IF Name&gt; label &lt;IF Name&gt;:0, /usr/sbin/ip addr del &lt;VIP&gt;/24 dev &lt;IF Name&gt; |
-|:-----:|
-
-In our case, we write the following:
-
-```shell
-Defaults:postgres !requiretty
-postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add 172.23.124.74/24 dev ens160 label ens160:0, /usr/sbin/ip addr del 172.23.124.74/24 dev ens160
-```
 
 #### Modifying the serivce file for pgPool (Not recommended for production) (Every Node)
 The following service modification to pgpool is for development and test purposes and
@@ -1905,10 +1909,10 @@ The following service modification to pgpool is for development and test purpose
 The pgpool_status file plays a crucial role in Pgpool-II's operation as it records 
 the status of backend PostgreSQL servers.
 
-Problems that might occur in the abscence of the pgpool_status file:
+Problems that might occur in the absence of the pgpool_status file:
  
 1. data inconsistency and discrepancy especially in scenarios where a backend might stop unexpectedly and Pgpool executes a failover procedure
-2. It says wether the node is up or down, and is retained across Pgpool-II restarts
+2. It says weather the node is up or down, and is retained across Pgpool-II restarts
 3. issues like a split-brain condition, where multiple primary servers exist.
 
 The OPTS="-D -n" configuration is used to configure environment variables and startup options for Pgpool-II.
@@ -1961,9 +1965,9 @@ sudo systemctl restart pgpool2
 In the event that you modify the configuration files, there are some approaches you can put
  those changes into effect. Some are cold and require a restart of the service. Such directives
  are pointed out in the pgpool.conf file. Some others are warm, meaning a pgpool reload will
- put them into effect. Though this is a primary explaination and I do not explain the syntax of the
+ put them into effect. Though this is a primary explanation and I do not explain the syntax of the
  commands here except for `pgpool reload` which is pretty simple but has to run on the target
- machine's shell itself. The commands' syntaxes are explained in the part V.
+ machine's shell itself. The commands' syntax is explained in the part V.
 
 These are the commands that can be used for making such warm configuration changes effective:
 

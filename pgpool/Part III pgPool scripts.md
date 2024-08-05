@@ -11,7 +11,7 @@
 # PGPOOL (Ubuntu) Part III
 **pgPool scripts**
 
-Study the scripts thoroughly and try to understand them. Some explainatory comments have been added to the scripts but you should understand all of their contents.
+Study the scripts thoroughly and try to understand them. Some explanatory comments have been added to the scripts but you should understand all of their contents.
 
 * A support for tablespaces is added to the original script files in the pg_basebackup command.
 
@@ -352,7 +352,7 @@ exit 0
 
 Just like we said in failover.sh, in the event of a manual failover, the follow_primary.sh script will also be executed subsequently.
 
-One of the commands that is used in this script is `pg_rewind` which has a differnt path on Ubuntu than RHEL. Therefore, one of the measures you should 
+One of the commands that is used in this script is `pg_rewind` which has a different path on Ubuntu than RHEL. Therefore, one of the measures you should 
  implement on Ubuntu is creating a `symbolic link` for `pg_rewind` to work in this script. pw_rewind is used to return the old primary to 
  a common point of recovery with the new primary. pg_rewind is the first attempt for this purpose. If failed, pgpool will try to reconstruct
  the old primary from a full backup of the new primary. This approach is common between some HA solutions of PostgreSQL. 

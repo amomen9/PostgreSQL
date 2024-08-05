@@ -16,16 +16,17 @@
 
 1. PostgreSQL major version specified here is 15. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, and most likely later versions, as well.
 2. pgpool version is 4.5.2
-3. There are some glitches for pgpool on Ubuntu, which do not exist on the RHEL. That is because EnterpriseDB is rather Redhat oriented than other Linux distros. I have tried to make up for them and included the solutions in this document. The tests have shown a satisfactory result for myself but the solutions are offered **without a guarantee**.
+3. There are some glitches for pgpool on Ubuntu, which do not exist on the RHEL. That is because EnterpriseDB is rather Red hat oriented than other Linux distros. I have tried to make up for them and included the solutions in this document. The tests have shown a satisfactory result for myself but the solutions are offered **without a guarantee**.
 4. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we setup the watchdog on all the backend (pg) nodes themselves.
 5. Note that many of the commands that have "sudo" at their beginning in this document do not have to have this command if they run under postgres user. However, I have assumed that
  these commands are being executed under another sudoer user.
 6. The scripts and configuration files are both embedded in this doc and included in the git repository.
 7. Most of the steps in this document are sequential and the later steps depend on the earlier steps. So, follow the steps in order.
 8. Not mentioning the non-mandatory command-line arguments means their default values.
-9. Study the scripts thoroughly and try to understand them. Some explainatory comments have been added to the scripts but you should understand all of their contents.
-10. In my opinion, this document also includes some practical linux learnings which might be usefull for you.
-11. The following are the node details used in this documentation:
+9. Study the scripts thoroughly and try to understand them. Some explanatory comments have been added to the scripts but you should understand all of their contents.
+10. The PostgreSQL database cluster can also initially be created from a backup rather than a raw database cluster.
+11. In my opinion, this document also includes some practical Linux learning which might be useful for you.
+12. The following are the node details used in this documentation:
 
 **Schematic of the sample pgpool replication topology setup (source: [pgpool.net](https://www.pgpool.net/docs/latest/en/html/example-cluster.html)):**
 
@@ -45,7 +46,7 @@ The replication topology is composed of:
 | 3   |  funleashpgdb03  | 172.23.124.73 | Node 3 (asynchronous) |
 | 4   | vip (delegate_ip) | 172.23.124.74 | floating Virtual IP    |
 
-1. set hostnames and IP adresses if necessary (Every Node):
+1. set hostnames and IP addresses if necessary (Every Node):
 
 * set hostnames:
 ```shell
@@ -86,7 +87,7 @@ Do the necessary configurations for PostgreSQL. Make sure that the postgres serv
 
 In this document, these are the major directories paths.
  All these directories must exist and the postgres user must have full access to them.
- If you need to make alterations, you must change the directories used in this document eveywhere:
+ If you need to make alterations, you must change the directories used in this document everywhere:
 
 **$PGDATA:**
 
@@ -200,7 +201,7 @@ DenyUsers postgres
 
 4. Restart the SSH service to apply the changes
 ```shell
-sudo systemctl restart sshd
+sudo systemctl restart ssh
 ```
 ----
 
@@ -334,12 +335,22 @@ hot_standby = on
 **Important Note!**
 Only remove the contents of the data directory on the 2nd and 3rd nodes.
 
-After installing and configuring postgres, remove postgres' data directory contents on the second and third nodes (be carefull not to delete the data directory itself), because at some point forward we are going to recover the second and third nodes from the first node using pgpool's online recovery process completely and at such point the data directory must be clean:
+After installing and configuring postgres, remove postgres' data directory contents on the second and third nodes (be careful not to delete the data directory itself), because at some point forward we are going to recover the second and third nodes from the first node using pgpool's online recovery process completely and at such point the data directory must be clean:
 
 ```shell
-systemctl stop postgresql@15-main.service	# for pg version '15', and cluster name 'main' which is the default cluster.
+pg_ctlcluster 15 main stop -m immediate	# for pg version '15', and cluster name 'main' which is the default cluster.
 
 rm -rf $PGDATA/*
 ```
+
+or
+
+```shell
+sudo systemctl stop postgresql@15-main.service	# for pg version '15', and cluster name 'main' which is the default cluster.
+
+rm -rf $PGDATA/*
+```
+
+The first one can be executed by using the postgres user without the sudo privilege.
 
 # [Next: Part II: Install and Configure pgPool](./Part%20II%20Install%20and%20Configure%20pgPool.md)

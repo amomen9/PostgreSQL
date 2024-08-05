@@ -141,8 +141,10 @@ This script is as follows:
 ```shell
 #!/bin/bash
 DEVICE=$(ip -br link | awk '$1 != "lo" {print $1}' | tail -1)
+PRIMARY_NODE=$(echo $(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | head -$(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1))
+
 # Command to be executed
-cmd="ssh -T -i ~/.ssh/id_rsa_pgpool $(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1)) /usr/bin/sudo /sbin/ip addr add 172.23.124.74/24 dev ${DEVICE} label ${DEVICE}:0"
+cmd="ssh -T -i ~/.ssh/id_rsa_pgpool ${PRIMARY_NODE} /usr/bin/sudo /sbin/ip addr add 172.23.124.74/24 dev ${DEVICE} label ${DEVICE}:0"
 
 # Execute the command and capture the output
 output=$($cmd 2>&1)
@@ -150,8 +152,10 @@ output=$($cmd 2>&1)
 exit_code=$?
 echo $exit_code
 
-cmd="ssh -T -i ~/.ssh/id_rsa_pgpool $(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1)) /etc/pgpool2/scripts/escalation.sh"
-eval $cmd
+if [ "$PRIMARY_NODE" == "$(hostname)" ]; then
+	cmd="ssh -T -i ~/.ssh/id_rsa_pgpool $(echo $(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | head -$(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1)) /etc/pgpool2/scripts/escalation.sh"
+	eval $cmd
+fi
 
 # Check if the output matches the desired string
 if [ "$output" == "RTNETLINK answers: File exists" ]; then
@@ -163,13 +167,11 @@ else
 fi
 
 
-
-
 ```
 
 
 3. Sometimes the mode for PGDATA directory might change probably by pgpool. We now that this mode must be either
- 0700 or 0755 when PostgreSQL wants to start. The script which ascertains consistance of this necessity is called
+ 0700 or 0755 when PostgreSQL wants to start. The script which ascertains consistence of this necessity is called
  `correct pg data dir mode.sh`
 
 This script is as follows: 
@@ -256,7 +258,7 @@ WantedBy=timers.target
 
 ```
 
-This timer triggers the service every 10 seconds. For more info on timers, services, and their schedulings 
+This timer triggers the service every 10 seconds. For more info on timers, services, and their scheduling 
  you can refer to the following link on this git repository:
  
 [Systemd Service and Timer](https://git.mofid.dev/a.momen/linux/-/blob/master/Systemd%20Service%20and%20Timer/README.md)
