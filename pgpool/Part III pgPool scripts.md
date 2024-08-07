@@ -102,7 +102,7 @@ After preparing, editing, and carrying out the necessary modifications on this s
 
 ```shell
 # Failover to a standby node
-sudo -E -u postgres sh -c '/etc/pgpool2/scripts/failover.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA funleashpgdb01 5432'
+/etc/pgpool2/scripts/failover.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA funleashpgdb01 5432
 ```
 
 Here is a breakdown of the arguments:
@@ -368,7 +368,7 @@ After preparing, editing, and carrying out all the other necessary modifications
 
 ```shell
 # Get the old primary back to synchronization with the new primary node.
-sudo -E -u postgres sh -c '/etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA'
+/etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA
 ```
 
 Here is a breakdown of the arguments:
@@ -815,7 +815,7 @@ After preparing, editing, and carrying out the necessary modifications on this s
 ```shell
 # Recover node 1 from the primary node, no matter which node is primary.
 # If you try to recover the primary node, you will get an error:
-sudo -E -u postgres sh -c '$PGDATA/recovery_1st_stage $PGDATA funleashpgdb02 $PGDATA 5432 1 5432 $HOSTNAME'
+$PGDATA/recovery_1st_stage $PGDATA funleashpgdb02 $PGDATA 5432 1 5432 $HOSTNAME
 ```
 
 Here is a breakdown of the arguments:
@@ -947,7 +947,7 @@ After preparing, editing, and carrying out the necessary modifications on this s
 
 ```shell
 # Start node 1 from the current node:
-sudo -E -u postgres sh -c '$PGDATA/pgpool_remote_start funleashpgdb02 $PGDATA'
+$PGDATA/pgpool_remote_start funleashpgdb02 $PGDATA
 ```
 
 Here is a breakdown of the arguments:
