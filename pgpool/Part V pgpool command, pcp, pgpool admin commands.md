@@ -164,7 +164,7 @@ try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will sh
 
 There are some SQL type commands for pgpool, many of which are similar to some PCP commands.
  
-#### 1. PGPOOL SHOW (SHOW command preceded by PGPOOL)
+#### 43. PGPOOL SHOW (SHOW command preceded by PGPOOL)
 
 Show configuration parameters in effect in the following sense. The show keyword must be
  preceded by the pgpool keyword.
@@ -194,7 +194,7 @@ You can also specify a single configuration parameter. Example:
 
 ![Screenshot_57](image/Part%20V/Screenshot_57.png)
 
-#### 1. SHOW
+#### 44. SHOW
 
 |<div align="left">SHOW POOL_STATUS<br/>SHOW POOL_NODES<br/>SHOW POOL_PROCESSES<br/>SHOW POOL_POOLS<br/>SHOW POOL_VERSION<br/>SHOW POOL_CACHE<br/>SHOW POOL_HEALTH_CHECK_STATS<br/>SHOW POOL_BACKEND_STATS</div>|
 |:-:|
@@ -203,7 +203,7 @@ These commands are rather dynamic compared to the `SHOW PGPOOL <conf keyword>`. 
  name suggests. You can run through them to figure what they are about.
 ---
 
-#### 44. important! 
+#### 45. important! 
 If any configuration change for postgres is deemed necessary, here is the following approach:
 
 1. change the configuration on the primary server
@@ -215,7 +215,7 @@ If any configuration change for postgres is deemed necessary, here is the follow
 
 ---
 
-#### 45. Some common errors:
+#### 46. Some common errors:
 
 1. If you got the following error,
 
