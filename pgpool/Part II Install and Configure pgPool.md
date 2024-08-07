@@ -152,7 +152,7 @@ sudo -u postgres chmod 0600 ~postgres/.pcppass
 
 #### 19. Create pgpool pool_passwd file (Every Node)
 
-* **Note!**
+* ***Note!***
 
 You can only use one of MD5 and AES encryption algorithms for the users in this file.
 
