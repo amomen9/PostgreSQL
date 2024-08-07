@@ -1,9 +1,10 @@
 #!/bin/bash
+VIP=172.23.124.74
 DEVICE=$(ip -br link | awk '$1 != "lo" {print $1}' | tail -1)
 PRIMARY_NODE=$(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1))
 
 # Command to be executed
-cmd="ssh -T -i ~/.ssh/id_rsa_pgpool ${PRIMARY_NODE} /sbin/ip addr add 172.23.124.74/24 dev ${DEVICE} label ${DEVICE}:0"
+cmd="ssh -T -i ~/.ssh/id_rsa_pgpool ${PRIMARY_NODE} /sbin/ip addr add ${VIP}/24 dev ${DEVICE} label ${DEVICE}:0"
 
 # Execute the command and capture the output
 output=$($cmd 2>&1)

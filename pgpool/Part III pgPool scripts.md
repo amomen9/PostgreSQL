@@ -761,8 +761,12 @@ for pgpool in "${PGPOOLS[@]}"; do
     [ "$HOSTNAME" = "${pgpool}" ] && continue
 
     timeout ${SSH_TIMEOUT} ssh -T ${SSH_OPTIONS} ${POSTGRESQL_STARTUP_USER}@${pgpool} "
-        /usr/bin/sudo /sbin/ip addr del ${VIP}/24 dev ${DEVICE}
-    "
+		if ip -4 addr show | grep -q ${VIP}; then
+			/usr/bin/sudo /sbin/ip addr del ${VIP}/24 dev ${DEVICE}
+		else
+			echo 'IP address ${VIP} not found on any interface.'
+		fi
+	"
     if [ $? -ne 0 ]; then
 		#---------------------------
 		ERROR_LEVEL="error 2"

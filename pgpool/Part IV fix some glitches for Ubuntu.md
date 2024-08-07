@@ -130,21 +130,26 @@ This script is as follows:
 ```
 
 
-2. Another script `cluster_vip.sh` is to bring the virtual IP up on the primary node if not exists.
+2. Another script `cluster_vip.sh` is to bring the virtual IP up on the primary node if not exists, also
+ bring it down on the other nodes by using escalation.sh if it is mounted on them.
 
 
-* Set the value of the parameter **DEVICE** in this script manually if you have multiple
- interfaces except the loopback interface. Otherwise, the formula will work. 
+* Set the value of the following parameters
+
+ 1. Set the parameter **DEVICE** in this script manually if you have multiple
+ interfaces except the loopback interface. Otherwise, the formula will work.
+ 2. Set the parameter **VIP** 
  
 This script is as follows:
 
 ```shell
 #!/bin/bash
+VIP=172.23.124.74
 DEVICE=$(ip -br link | awk '$1 != "lo" {print $1}' | tail -1)
-PRIMARY_NODE=$(echo $(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | head -$(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1))
+PRIMARY_NODE=$(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1))
 
 # Command to be executed
-cmd="ssh -T -i ~/.ssh/id_rsa_pgpool ${PRIMARY_NODE} /usr/bin/sudo /sbin/ip addr add 172.23.124.74/24 dev ${DEVICE} label ${DEVICE}:0"
+cmd="ssh -T -i ~/.ssh/id_rsa_pgpool ${PRIMARY_NODE} /sbin/ip addr add ${VIP}/24 dev ${DEVICE} label ${DEVICE}:0"
 
 # Execute the command and capture the output
 output=$($cmd 2>&1)
@@ -153,7 +158,7 @@ exit_code=$?
 echo $exit_code
 
 if [ "$PRIMARY_NODE" == "$(hostname)" ]; then
-	cmd="ssh -T -i ~/.ssh/id_rsa_pgpool $(echo $(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | head -$(sudo -iu postgres pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1)) /etc/pgpool2/scripts/escalation.sh"
+	cmd="ssh -T -i ~/.ssh/id_rsa_pgpool $(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node_info -h localhost -U pgpool -w | awk '{print $8}' | grep -n primary | cut -d":" -f1) | tail -1 | cut -d" " -f1)) /etc/pgpool2/scripts/escalation.sh"
 	eval $cmd
 fi
 
@@ -165,6 +170,7 @@ else
 # If not, return the original exit code
 	exit $exit_code
 fi
+
 
 
 ```
