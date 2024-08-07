@@ -20,10 +20,10 @@ DEVICE=ens160
 ERROR_LEVEL="info"
 COMMAND_PLACE_HOLDER="
 echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: escalation.sh: Begin escalation op. "
-if [ $LOG_OUTPUT = "pgpool_log" ]; then
+if [ "$LOG_OUTPUT" = "pgpool_log" ]; then
 	COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 fi 
-set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
+eval $COMMAND_PLACE_HOLDER;
 echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: escalation.sh: Begin escalation op.  
 #---------------------------
 
@@ -40,10 +40,10 @@ for pgpool in "${PGPOOLS[@]}"; do
 		ERROR_LEVEL="error 2"
 		COMMAND_PLACE_HOLDER="
 		echo $(date '+%Y-%m-%d %H:%M:%S.%3N: ') script_log: $(hostname) ${ERROR_LEVEL}::: ERROR: escalation.sh: failed to release VIP on ${pgpool}."
-		if [ $LOG_OUTPUT = "pgpool_log" ]; then
+		if [ "$LOG_OUTPUT" = "pgpool_log" ]; then
 			COMMAND_PLACE_HOLDER=$COMMAND_PLACE_HOLDER">> $(find ${LOG_ROOT} -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d ' ' -f2-)"
 		fi 
-		set +o xtrace; eval $COMMAND_PLACE_HOLDER; set -o xtrace;
+		eval $COMMAND_PLACE_HOLDER;
 		echo ERROR: escalation.sh: failed to release VIP on ${pgpool}.
 
 		#---------------------------
