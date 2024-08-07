@@ -230,6 +230,8 @@ It is likely that:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. Scripts do not exist in the right location, or are not executable
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. The `*_command` directives in the pgpool.conf file are not executable by the user under which pgpool is running (postgres in our case). For example, a permission problem.
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. Or any other reason that causes the SQL functions noted before to fail.
 
 2. If you get the following error,<br/>
