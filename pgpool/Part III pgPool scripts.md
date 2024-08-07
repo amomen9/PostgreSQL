@@ -107,8 +107,8 @@ sudo -E -u postgres sh -c '/etc/pgpool2/scripts/failover.sh 0 funleashpgdb01 543
 
 Here is a breakdown of the arguments:
 
-|<div align="right">FAILED_NODE_ID="$1"<br/>FAILED_NODE_HOST="$2"<br/>FAILED_NODE_PORT="$3"<br/>FAILED_NODE_PGDATA="$4"<br/>NEW_MAIN_NODE_ID="$5"<br/>NEW_MAIN_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_MAIN_NODE_PORT="$9"<br/>NEW_MAIN_NODE_PGDATA="${10}"<br/>OLD_PRIMARY_NODE_HOST="${11}"<br/>OLD_PRIMARY_NODE_PORT="${12}"</div>|
-|:---------:|
+|<div align="left">FAILED_NODE_ID="$1"<br/>FAILED_NODE_HOST="$2"<br/>FAILED_NODE_PORT="$3"<br/>FAILED_NODE_PGDATA="$4"<br/>NEW_MAIN_NODE_ID="$5"<br/>NEW_MAIN_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_MAIN_NODE_PORT="$9"<br/>NEW_MAIN_NODE_PGDATA="${10}"<br/>OLD_PRIMARY_NODE_HOST="${11}"<br/>OLD_PRIMARY_NODE_PORT="${12}"</div>|
+|:-:|
 
 
 <details>
@@ -373,8 +373,8 @@ sudo -E -u postgres sh -c '/etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb
 
 Here is a breakdown of the arguments:
 
-|<div align="right">NODE_ID="$1"<br/>NODE_HOST="$2"<br/>NODE_PORT="$3"<br/>NODE_PGDATA="$4"<br/>NEW_PRIMARY_NODE_ID="$5"<br/>NEW_PRIMARY_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_PRIMARY_NODE_PORT="$9"<br/>NEW_PRIMARY_NODE_PGDATA="${10}"</div>|
-|:---------:|
+|<div align="left">NODE_ID="$1"<br/>NODE_HOST="$2"<br/>NODE_PORT="$3"<br/>NODE_PGDATA="$4"<br/>NEW_PRIMARY_NODE_ID="$5"<br/>NEW_PRIMARY_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_PRIMARY_NODE_PORT="$9"<br/>NEW_PRIMARY_NODE_PGDATA="${10}"</div>|
+|:-:|
 
 
 <details>
@@ -820,8 +820,8 @@ sudo -E -u postgres sh -c '$PGDATA/recovery_1st_stage $PGDATA funleashpgdb02 $PG
 
 Here is a breakdown of the arguments:
 
-|<div align="right">PRIMARY_NODE_PGDATA="$1"<br/>DEST_NODE_HOST="$2"<br/>DEST_NODE_PGDATA="$3"<br/>PRIMARY_NODE_PORT="$4"<br/>DEST_NODE_ID="$5"<br/>DEST_NODE_PORT="$6"<br/>PRIMARY_NODE_HOST="$7"</div>|
-|:---------:|
+|<div align="left">PRIMARY_NODE_PGDATA="$1"<br/>DEST_NODE_HOST="$2"<br/>DEST_NODE_PGDATA="$3"<br/>PRIMARY_NODE_PORT="$4"<br/>DEST_NODE_ID="$5"<br/>DEST_NODE_PORT="$6"<br/>PRIMARY_NODE_HOST="$7"</div>|
+|:-:|
 
 <details>
 <summary>(click to expand) recovery_1st_stage </summary>
@@ -952,7 +952,7 @@ sudo -E -u postgres sh -c '$PGDATA/pgpool_remote_start funleashpgdb02 $PGDATA'
 
 Here is a breakdown of the arguments:
 
-|<div align="right">DEST_NODE_HOST="$1"<br/>DEST_NODE_PGDATA="$2"</div>|
+|<div align="left">DEST_NODE_HOST="$1"<br/>DEST_NODE_PGDATA="$2"</div>|
 |:---------:|
 
 <details>
