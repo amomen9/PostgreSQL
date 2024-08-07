@@ -44,4 +44,3 @@ fi
 
 echo pgpool_remote_start: end: PostgreSQL on ${DEST_NODE_HOST} is started successfully.
 exit 0
-

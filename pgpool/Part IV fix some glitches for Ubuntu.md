@@ -270,7 +270,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable pgpool_repair.timer
 ```
 
-The service will run every 10 seconds`
+The service will run every 10 seconds
 
 
 Now every installation, configuration, and fixation appears to be ready. Continue to the next parts.

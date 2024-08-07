@@ -4,7 +4,7 @@
 
 set -o xtrace
 
-POSTGRESQL_STARTUP_USER=postgres
+# POSTGRESQL_STARTUP_USER=postgres
 POSTGRESQL_STARTUP_USER=$(whoami)
 SSH_KEY_FILE=id_rsa_pgpool
 SSH_OPTIONS="-o StrictHostKeyChecking=no -o ConnectTimeout=2 -i ~/.ssh/${SSH_KEY_FILE}"
@@ -37,4 +37,3 @@ for pgpool in "${PGPOOLS[@]}"; do
     fi
 done
 exit 0
-

@@ -168,7 +168,7 @@ There are some SQL type commands for pgpool, many of which are similar to some P
 
 Show configuration parameters in effect in the following sense. 
 
-|PGPOOL SHOW configuration_parameter<br/>PGPOOL SHOW configuration_parameter_group<br/>PGPOOL SHOW ALL|
+|<div align="right">PGPOOL SHOW configuration_parameter<br/>PGPOOL SHOW configuration_parameter_group<br/>PGPOOL SHOW ALL</div>|
 |:----:|
 
 **configuration_parameter_group** means the configu

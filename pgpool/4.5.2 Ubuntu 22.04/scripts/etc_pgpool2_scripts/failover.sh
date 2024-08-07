@@ -225,4 +225,3 @@ echo failover.sh: end: new_main_node_id=$NEW_MAIN_NODE_ID on ${NEW_MAIN_NODE_HOS
 #---------------------------
 
 exit 0
-

@@ -339,4 +339,3 @@ echo follow_primary.sh: end: follow primary command is completed successfully
 #---------------------------
 
 exit 0
-
