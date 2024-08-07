@@ -744,7 +744,11 @@ This file is executed in the event that the VIP is changed from one node to anot
 # This script is run by wd_escalation_command to bring down the virtual IP on other pgpool nodes
 # before bringing up the virtual IP on the new active pgpool node.
 
-set -o xtrace
+if [ $1 -eq 0 ]; then
+	echo escalation.sh triggered by the cluster_vip.sh script
+else
+	set -o xtrace
+fi
 
 # POSTGRESQL_STARTUP_USER=postgres
 POSTGRESQL_STARTUP_USER=$(whoami)
