@@ -324,7 +324,7 @@ restore_command = 'cp /var/postgresql/pg-wal-archive/%f %p'
 #------------------------------------------------------------------------------
 # REPLICATION
 #------------------------------------------------------------------------------
-synchronous_standby_names = 'ANY 2 (funleashpgdb01,funleashpgdb02,funleashpgdb03)'
+synchronous_standby_names = 'ANY 1 (funleashpgdb01,funleashpgdb02,funleashpgdb03)'
 
 promote_trigger_file = 'standalone.signal'
 hot_standby = on

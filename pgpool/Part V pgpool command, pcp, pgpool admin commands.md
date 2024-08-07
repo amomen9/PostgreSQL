@@ -12,6 +12,11 @@
 
 ### pgpool command, pcp commands, pgpool admin commands
 
+A comprehensive reference of the pgpool commands are in the link below:
+
+[https://www.pgpool.net/docs/pgpool-II-4.5.2/en/html/reference.html](https://www.pgpool.net/docs/pgpool-II-4.5.2/en/html/reference.html)
+
+
 #### 41. pgpool:
 
 ```shell
@@ -155,9 +160,22 @@ try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will sh
 <br/><br/>•  **pcp_proc_info:** Displays information on the given Pgpool-II child process ID.
 <br/><br/>•  **pcp_pool_status:** Displays the parameter values as defined in pgpool.conf.
 
+#### 43. pgpool SQL type commands
+
+There are some SQL type commands for pgpool, many of which are similar to some PCP commands.
+ 
+##### 1. PGPOOL SHOW
+
+Show configuration parameters in effect in the following sense. 
+
+|PGPOOL SHOW configuration_parameter<br/>PGPOOL SHOW configuration_parameter_group<br/>PGPOOL SHOW ALL|
+|:----:|
+
+**configuration_parameter_group** means the configu
+
 ---
 
-#### 43. important! 
+#### 44. important! 
 If any configuration change for postgres is deemed necessary, here is the following approach:
 
 1. change the configuration on the primary server
@@ -169,7 +187,7 @@ If any configuration change for postgres is deemed necessary, here is the follow
 
 ---
 
-#### 44. Some common errors:
+#### 45. Some common errors:
 
 1. If you got the following error,
 

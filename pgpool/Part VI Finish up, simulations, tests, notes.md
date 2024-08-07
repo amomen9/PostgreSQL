@@ -12,7 +12,7 @@
 
 ### Finish up, simulations, tests, notes
 
-As noted, every installation, configuration, and fixation is almost ready. First, we do the following that we also noted in Part I.
+As noted, every installation, configuration, and fixation is almost ready. First, we do the following which we also noted in Part I.
  We say it again here.
  
 #### 45. Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only, meaning the secondary nodes):
@@ -55,7 +55,7 @@ Now, everything has completely been carried out and our cluster is ready. We can
  
 Note that in the event of a manual failover, you have to rebuild the old primary after it is
  brought up.
-
+<br/><br/>
 
 
 Finish ■

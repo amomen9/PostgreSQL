@@ -44,7 +44,7 @@ We have opted not to make the postgres user a sudoer for hardening purposes. Thi
 Add the upcoming lines to the `/etc/sudoers` file or its drop-in, meaning a file inside `/etc/sudoers.d/`:
 
 ```shell
-sudo vi /etc/sudoers
+sudo visudo
 ```
 
 This is the template of the entries that you should write inside the sudoers file (The first line is not
@@ -1792,10 +1792,10 @@ Now restart ssh daemon:
 sudo systemctl restart ssh
 ```
  
-* Hardening: 
+* **Hardening**: 
  
 After setting up passwordless ssh for the root user though we revert the changes to the 
- `/etc/ssh/sshd_config` file for the **hardening** reasons.
+ `/etc/ssh/sshd_config` file for the **hardening** reasons (disallow root from logging in using ssh).
 
 Next, we must know that the private key and authorized_keys files **must** be exclusive
  to the current user for read/write permissions. So, we make sure that they have
