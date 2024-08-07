@@ -152,7 +152,7 @@ sudo -u postgres chmod 0600 ~postgres/.pcppass
 
 #### 19. Create pgpool pool_passwd file (Every Node)
 
-* Note!
+* **Note!**
 
 You can only use one of MD5 and AES encryption algorithms for the users in this file.
 
@@ -1769,33 +1769,9 @@ On Ubuntu, heartbeat port appears to be glitchy and sometimes will not open. In 
 
 For the scripts' execution, some commands have to execute on other replicas using
  passwordless ssh. Thus, we need to set it up on **all the nodes**. According to
- our configurations, the most of the scripts and pgpool itself are run using the
- postgres user. The scripts `escalation.sh` and `cluster_vip.sh` are run using a
- sudoer user without the need to provide a password for the sudo command that we
- take it to be `root`. Therefore, we set passwordless ssh for the postgres and root
- users. 
+ our configurations, the scripts and pgpool itself are run using the
+ postgres user. Therefore, we set passwordless ssh for the postgres user. 
 
-We need root user's ssh **password login** when setting up its passwordless ssh (or we
- can edit the authorized_keys file on other nodes manually, but we choose the first one).
- For that matter, edit the `/etc/ssh/sshd_config` file to allow root ssh **password login**:
-
-```shell
-vi /etc/ssh/sshd_config
-```
-
-Change the directive `#PermitRootLogin prohibit-password` to `PermitRootLogin yes` and make
- sure that the directive `PubkeyAuthentication` is set to **yes** on all the nodes. 
- 
-Now restart ssh daemon:
-
-```shell
-sudo systemctl restart ssh
-```
- 
-* **Hardening**: 
- 
-After setting up passwordless ssh for the root user though we revert the changes to the 
- `/etc/ssh/sshd_config` file for the **hardening** reasons (disallow root from logging in using ssh).
 
 Next, we must know that the private key and authorized_keys files **must** be exclusive
  to the current user for read/write permissions. So, we make sure that they have
@@ -1806,7 +1782,6 @@ They are also placed under .ssh directory in the user's home directory. If .ssh
 
 ```shell
 sudo -u postgres mkdir -p ~postgres/.ssh
-sudo mkdir -p ~root/.ssh
 ```
 
 The file names for private and public key files conventionally include id_rsa_pgpool
@@ -1814,7 +1789,6 @@ The file names for private and public key files conventionally include id_rsa_pg
 
 ```shell
 sudo -u postgres ssh-keygen -f ~postgres/.ssh/id_rsa_pgpool -t rsa
-sudo ssh-keygen -f ~root/.ssh/id_rsa_pgpool -t rsa
 ```
 
 We choose no passphrase. Than means we press enter twice without entering any password.
@@ -1827,17 +1801,15 @@ The following must run with a postgres' and root user's subshells. Thus we use "
 
 ```shell
 sudo -u postgres sh -c 'ssh-copy-id -i ~postgres/.ssh/id_rsa_pgpool.pub funleashpgdb02'
-sudo sh -c 'ssh-copy-id -i ~root/.ssh/id_rsa_pgpool.pub funleashpgdb02'
 ```
 
 Finally, test if an ssh connection can be established with funleashpgdb02 without entering a password.
 
 ```shell
 sudo -u postgres sh -c 'ssh -i ~postgres/.ssh/id_rsa_pgpool funleashpgdb02'
-sudo sh -c 'ssh -i ~root/.ssh/id_rsa_pgpool funleashpgdb02'
 ```
 
-Do this for all the nodes, i.e. Every Node must be able to connect to any node (including itself) using ssh (**postgres ----> postgres** and **root ----> root** users). 
+Do this for all the nodes, i.e. Every Node must be able to connect to any node (including itself) using ssh (**postgres ----> postgres** user). 
 
 A summary of what you should execute in a non-postgres user shell on every node is below:
 
@@ -1859,7 +1831,7 @@ sudo -iu postgres sh -c 'ssh -i .ssh/id_rsa_pgpool funleashpgdb02'
 sudo -iu postgres sh -c 'ssh -i .ssh/id_rsa_pgpool funleashpgdb03'
 ```
 
-A summary of what you should execute in the postgres and root shells themselves (setting up passwordless ssh for 
+A summary of what you should execute in the postgres shell itself (setting up passwordless ssh for 
  the user in its own shell) is below:
 
 ```shell
@@ -1880,7 +1852,6 @@ ssh -i ~/.ssh/id_rsa_pgpool funleashpgdb02
 ssh -i ~/.ssh/id_rsa_pgpool funleashpgdb03
 ```
 
-Now revert the changes to the `/etc/ssh/sshd_config` file as noted first.
 
 #### 23. Create extension on the primary server's (1st node) template1 and postgres databases
 You must install and create the extensions in each database where you plan to use pgPool-II.
