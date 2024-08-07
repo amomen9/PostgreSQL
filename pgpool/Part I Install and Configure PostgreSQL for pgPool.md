@@ -298,7 +298,8 @@ sudo chown -R postgres:postgres /var/postgresql
 ```
 
 postgresql.conf sample for Every Node. This is a sample, but the nodes should
- have a configuration like this and these directives anyways:
+ have a configuration like this and these directives anyways. You can use this
+ configuration as a drop-in
 
 ```conf
 #------------------------------------------------------------------------------

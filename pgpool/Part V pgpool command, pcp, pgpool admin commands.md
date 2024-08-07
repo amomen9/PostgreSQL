@@ -160,19 +160,47 @@ try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will sh
 <br/><br/>•  **pcp_proc_info:** Displays information on the given Pgpool-II child process ID.
 <br/><br/>•  **pcp_pool_status:** Displays the parameter values as defined in pgpool.conf.
 
-#### 43. pgpool SQL type commands
+### pgpool SQL type commands
 
 There are some SQL type commands for pgpool, many of which are similar to some PCP commands.
  
-##### 1. PGPOOL SHOW
+#### 1. PGPOOL SHOW (SHOW command preceded by PGPOOL)
 
-Show configuration parameters in effect in the following sense. 
+Show configuration parameters in effect in the following sense. The show keyword must be
+ preceded by the pgpool keyword.
 
 |<div align="right">PGPOOL SHOW configuration_parameter<br/>PGPOOL SHOW configuration_parameter_group<br/>PGPOOL SHOW ALL</div>|
 |:----:|
 
-**configuration_parameter_group** means the configu
+**configuration_parameter_group** means a group of configurations. For example, if you write
 
+```pgsql
+PGPOOL SHOW BACKEND
+```
+
+It will bring up all the major configuration for all the backends. All the keywords for `configuration_parameter_group`
+ are the following:
+ 
+|<div align=left>backend<br/>watchdog<br/>heartbeat<br/>health_check<br/>ALL</div>|
+|:-:|
+
+Example:
+
+![Screenshot_56](image/Part%20V/Screenshot_56.png)
+
+'ALL' means all PGPOOL related configuration parameters in effect.
+
+You can also specify a single configuration parameter. Example:
+
+![Screenshot_57](image/Part%20V/Screenshot_57.png)
+
+#### 1. SHOW
+
+|<div align="left">SHOW POOL_STATUS<br/>SHOW POOL_NODES<br/>SHOW POOL_PROCESSES<br/>SHOW POOL_POOLS<br/>SHOW POOL_VERSION<br/>SHOW POOL_CACHE<br/>SHOW POOL_HEALTH_CHECK_STATS<br/>SHOW POOL_BACKEND_STATS</div>|
+|:-:|
+
+These commands are rather dynamic compared to the `SHOW PGPOOL <conf keyword>`. They show live statistics about what their
+ name suggests. You can run through them to figure what they are about.
 ---
 
 #### 44. important! 
