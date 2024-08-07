@@ -50,7 +50,7 @@ sudo visudo
 This is the template of the entries that you should write inside the sudoers file (The first line is not
  always mandatory. If you are interested, search for it.):
 
-| Defaults:postgres !requiretty<br/>postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add &lt;VIP&gt;/24 dev &lt;IF Name&gt; label &lt;IF Name&gt;:0, /usr/sbin/ip addr del &lt;VIP&gt;/24 dev &lt;IF Name&gt; |
+| <div align="left">Defaults:postgres !requiretty<br/>postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add &lt;VIP&gt;/24 dev &lt;IF Name&gt; label &lt;IF Name&gt;:0, /usr/sbin/ip addr del &lt;VIP&gt;/24 dev &lt;IF Name&gt;</div> |
 |:-----:|
 
 In our case, we write the following:
