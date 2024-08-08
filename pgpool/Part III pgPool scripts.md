@@ -107,8 +107,9 @@ After preparing, editing, and carrying out the necessary modifications on this s
 
 Here is a breakdown of the arguments:
 
-|<div align="left">FAILED_NODE_ID="$1"<br/>FAILED_NODE_HOST="$2"<br/>FAILED_NODE_PORT="$3"<br/>FAILED_NODE_PGDATA="$4"<br/>NEW_MAIN_NODE_ID="$5"<br/>NEW_MAIN_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_MAIN_NODE_PORT="$9"<br/>NEW_MAIN_NODE_PGDATA="${10}"<br/>OLD_PRIMARY_NODE_HOST="${11}"<br/>OLD_PRIMARY_NODE_PORT="${12}"</div>|
-|:-:|
+| <div align="left"> FAILED_NODE_ID="$1"<br/>FAILED_NODE_HOST="$2"<br/>FAILED_NODE_PORT="$3"<br/>FAILED_NODE_PGDATA="$4"<br/>NEW_MAIN_NODE_ID="$5"<br/>NEW_MAIN_NODE_HOST="$6"<br/>OLD_MAIN_NODE_ID="$7"<br/>OLD_PRIMARY_NODE_ID="$8"<br/>NEW_MAIN_NODE_PORT="$9"<br/>NEW_MAIN_NODE_PGDATA="${10}"<br/>OLD_PRIMARY_NODE_HOST="${11}"<br/>OLD_PRIMARY_NODE_PORT="${12}" </div> |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+
 
 
 <details>
