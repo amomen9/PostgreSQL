@@ -197,13 +197,14 @@ You can also specify a single configuration parameter. Example:
 
 #### 44. SHOW
 
-|<div align="center">SHOW</div>|
-|:---------------:|
-|<div align="left">SHOW POOL_STATUS<br/>SHOW POOL_NODES<br/>SHOW POOL_PROCESSES<br/>SHOW POOL_POOLS<br/>SHOW POOL_VERSION<br/>SHOW POOL_CACHE<br/>SHOW POOL_HEALTH_CHECK_STATS<br/>SHOW POOL_BACKEND_STATS</div>|
+| <div align="center">SHOW</div> |
+| :---------------: |
+| <div align="left">SHOW POOL_STATUS<br/>SHOW POOL_NODES<br/>SHOW POOL_PROCESSES<br/>SHOW POOL_POOLS<br/>SHOW POOL_VERSION<br/>SHOW POOL_CACHE<br/>SHOW POOL_HEALTH_CHECK_STATS<br/>SHOW POOL_BACKEND_STATS</div> |
 
 
 These commands are rather dynamic compared to the `SHOW PGPOOL <conf keyword>`. They show live statistics about what their
  name suggests. You can run through them to figure what they are about.
+
 ---
 
 #### 45. important! 
