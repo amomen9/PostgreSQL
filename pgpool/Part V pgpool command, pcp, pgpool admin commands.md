@@ -125,8 +125,8 @@ Now, we dive into the pcp commands one by one<br/> (nearly in the importance ord
 <br/>Displays the following info about one or all the nodes
 ![Screenshot_54](image/Part%20V/Screenshot_54.png)
 
-If you see "waiting" like the following, there is nothing to worry about! It means that a query has
- not yet been issued for the proxy (All pgpool pool forks are unoccupied). When the first query is issued, it will turn to "up" instead.
+If you see "waiting" like the following, there is nothing to worry about! It means a connection to the proxy has
+ not yet been made (All pgpool pool forks are unoccupied). When the first connection is made, it will turn to "up" instead.
 ```shell
 postgres@funleashpgdb01:~$ pcp_node_info -h localhost -U pgpool -w
 funleashpgdb01 5432 1 0.333333 waiting up primary primary 0 none none 2024-08-05 07:54:10
