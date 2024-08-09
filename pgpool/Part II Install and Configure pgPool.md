@@ -1564,7 +1564,7 @@ use_watchdog = on
 
 # -Connection to upstream servers -
 trusted_servers = 'funleashpgdb01,funleashpgdb02,funleashpgdb03'
-trusted_server_command = 'ping -q -c2 %h'
+trusted_server_command = 'ping -i 0.5 -q -c2 %h'		# tailored to our high quality and stable network
 
 # - Watchdog communication Settings -
 hostname0 = 'funleashpgdb01'
