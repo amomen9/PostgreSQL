@@ -150,6 +150,7 @@ PRIMARY_NODE=$(echo $(pcp_node_info -h localhost -U pgpool -w | head -$(pcp_node
 
 # Command to be executed
 cmd="ssh -T -i ~/.ssh/id_rsa_pgpool ${PRIMARY_NODE} /usr/bin/sudo /usr/sbin/ip addr add ${VIP}/24 dev ${DEVICE} label ${DEVICE}:0"
+# sudo is required before ip command for the command to work.
 
 # Execute the command and capture the output
 output=$($cmd 2>&1)
