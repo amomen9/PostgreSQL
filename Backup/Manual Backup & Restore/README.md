@@ -18,7 +18,9 @@ Note:
 $ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Ft -z -Xs -P
 ```
 
-3. Plain Format (Uncompressed data and tablespace directories)
+3. Plain Format (Uncompressed data and tablespace directories
+ 
+As will be noted later in this document (restore part), this command can be the backup and restore process in one place.
 
 ```shell
 $ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Fp -T olddir=newdir -Xs -P
@@ -58,6 +60,7 @@ Includes only the required WAL files in the backup using the "stream" method.
 Displays a progress meter during the backup process.
 
 
+
 Approach 1 creates 3 + # of tablespaces files in the target backup directory:
 
 ![1720591911543](image/README/1720591911543.png "backup directory contents")
@@ -70,7 +73,7 @@ Approach 2, because of its plain format, creates 1 + # of tablespaces directorie
 
 According to the pg_basebackup documentation, “ **As long as the client can keep up with the write-ahead log data** , using this method (stream method with -Xs flag) requires no extra write-ahead logs to be saved on the source server”. This means that the whole WAL segments might not be saved to the pg_wal.tar.gz archive. If they are actually not, the WAL files within this archive will not be enough and you will face the following error while trying to recover from the backup.
 
-![1720591980394](image/README/1720591980394.png "insuffiicient WAL files error")
+![1720591980394](image/README/1720591980394.png "insufficient WAL files error")
 
 Therefore, the DBA should not suffice with the WALs that are being archived inside pg_wal.tar.gz. There may be the need to use later WALs manually.
 
@@ -114,6 +117,8 @@ WALs:
 
 `-rw------- 1 root root 17075 Jun 23 15:22 pg_wal.tar.gz`
 
+### Restore
+
 **Important Note!**
 
 There are two scenarios for restoring:
@@ -122,6 +127,24 @@ There are two scenarios for restoring:
 2. When the infrastructure team delivers raw machines, and also for the raw cloud VMs. In such case, we will set up the PostgreSQL service and the HA/DR solution (like pgpool) with all of the initial user settings, a raw database, schema creation, and tablespaces.
 
 Afterwards, the restore steps are as follows:
+
+#### Plain backup format:
+
+Restoring the plain format is much easier. In fact, the backup and restore operations are usually done all in one place and with one command as follows.
+ You can also take the backup to a different location and then copy it to a later target for bringing up the database cluster anyway. As just noted,
+ the separation of backup and restore operations is usually done for using the backups at a later time, but on the occasion that we want to use the
+ taken backup right away, we specify the target through the `-D` flag:
+ 
+```shell
+$ pg_basebackup -h localhost -p 5432 -U postgres -D /path/to/the/target/database/cluster/data/directory -Fp -T olddir=newdir -Xs -P
+``` 
+ 
+`•  -R (also --progress): `
+Use this flag to restore the data directory in the **recovery** mode. This means that this cluster will be read_only to receive data updates from
+ a primary in a replication cluster. In such case, a standby.signal file will be created, and also the primary connection details will be created
+ automatically to instruct the secondary node that is being restored to be able to find its primary.
+
+#### Archived backup format (tar+compression)
 
 Restoring this type of backups is done according to the following procedure:
 
