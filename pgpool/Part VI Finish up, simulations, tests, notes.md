@@ -15,7 +15,7 @@
 As noted, every installation, configuration, and fixation is almost ready. First, we do the following which we also noted in Part I.
  We say it again here.
  
-#### 47. Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only, meaning the secondary nodes):
+#### 48. Stop postgres' service and remove postgres' data directory contents (Node 2nd and 3rd only, meaning the secondary nodes):
 
 **Important Note!**
 Only remove the contents of the data directory on the 2nd and 3rd nodes.
@@ -38,7 +38,7 @@ rm -rf $PGDATA/*
 
 The first one can be executed by using the postgres user without the sudo privilege.
 
-#### 48. Online recovery (Primary node only)
+#### 49. Online recovery (Primary node only)
 
 We execute the PCP online recovery command like below on the primary node. It will in turn, build up the data directory
  on the secondary nodes.
@@ -54,9 +54,9 @@ Now, everything has completely been carried out and our cluster is ready. We can
  proxy port which is the port 9999 in our case.
  
  
-### Failover and Node Recovery.
+### Failover and Node Recovery:
 
-#### 49. Disaster and Automatic Failover
+#### 50. Disaster and Automatic Failover
 
 In the event of a primary node disaster which brings it down, an automatic failover to a secondary node will occur
  and that secondary node will become the new primary. When a failover is triggered, the failover.sh script will be
@@ -85,7 +85,7 @@ Note that here the 1st node is recovered from the current primary node. The reco
  carried out from the primary node. During the recovery process, the physical replication slot will also
  be created for the node which is being recovered as part of the recovery process.
 
-#### 50. Manual Failover
+#### 51. Manual Failover
 
 In the event of a manual failover or a conditional failover in which the old primary node is somehow still
  in reach, in addition to the execution of failover.sh script, the follow_primary.sh will also be executed

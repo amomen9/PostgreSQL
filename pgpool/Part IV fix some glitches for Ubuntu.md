@@ -11,8 +11,13 @@
 # PGPOOL (Ubuntu) Part IV
 
 ## Fix some glitches of pgpool for Ubuntu
+
+#### 34. Add the environment variables: 
+
+As noted in number 1. of Part I, the environment variables are not present in Ubuntu distribution and thus cause a glitch.
+ They must be added manually. Therefore, follow that instruction and set the environment variables if you have not already.
  
-#### 34. Change heartbeat port (Every Node)
+#### 35. Change heartbeat port (Every Node)
 
 As I stated before, we changed the heartbeat port to **9999** (or proxy default port) instead of 9694 because this port will
  sometimes not come up. This is done in the pgpool.conf file.
@@ -21,7 +26,7 @@ As I stated before, we changed the heartbeat port to **9999** (or proxy default 
 
 * We place the following script files under /data/postgresql/scripts. So place these script files in a proper location which is the location that the service file uses for these scripts.
 
-#### 35. Copy the following script files to the target directory (Every Node)
+#### 36. Copy the following script files to the target directory (Every Node)
 
 Copy the following script files to the target directory and make them executable.
  The script file names are:
@@ -42,7 +47,7 @@ sudo chmod +x /data/postgresql/scripts/*
 ```
 
 
-#### 36. Remove socket files' residuals for the symbolic links (Every Node)
+#### 37. Remove socket files' residuals for the symbolic links (Every Node)
 
 3. One other script is `remove_socket_symlinks.sh` to remove the residuals of the socket symbolic link files
  created by unix_domain_sockets_repair script at the startup of the pgpool service. This script is executed
@@ -90,11 +95,11 @@ sudo systemctl restart pgpool2
 ```
 
 
-#### 37. Periodically check for unix domain socket files' symbolic links (Every Node)
+#### 38. Periodically check for unix domain socket files' symbolic links (Every Node)
 
-#### 38. Periodically check for the VIP (Every Node)
+#### 39. Periodically check for the VIP (Every Node)
 
-#### 39. Periodically fix the mode for PGDATA directory (Every Node)
+#### 40. Periodically fix the mode for PGDATA directory (Every Node)
 
 For these two above, we create a service to be periodically triggered by a timer.
  The service executes two scripts. 
@@ -189,7 +194,7 @@ This script is as follows:
 /usr/bin/chmod -R 0750 /data/postgresql
 ```
 
-#### 40. Create the service file and the timer (Every Node)
+#### 41. Create the service file and the timer (Every Node)
 
 Now create a service file and timer for these scripts. The name of the service file is `pgpool_repair.service`:
 

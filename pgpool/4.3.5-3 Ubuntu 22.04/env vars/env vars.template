@@ -1,6 +1,0 @@
-declare -x PGDATA=/data/postgresql/15/main/data
-declare -x HOSTNAME=$(hostname | cut -d '.' -f1)
-declare -x HOME=~
-declare -x LOGNAME=$(whoami)
-declare -x PWD=~
-declare -x USER=$(whoami)

@@ -17,7 +17,7 @@ A comprehensive reference of the pgpool commands are in the link below:
 [https://www.pgpool.net/docs/pgpool-II-4.5.2/en/html/reference.html](https://www.pgpool.net/docs/pgpool-II-4.5.2/en/html/reference.html)
 
 
-#### 41. pgpool:
+#### 42. pgpool:
 
 ```shell
 pgpool --help
@@ -31,7 +31,7 @@ This command is mostly used to reload, stop, and start pgpool. It bypasses syste
  `-x` and `-d` are for debug aid, and shutdown modes are similar to that of PostgreSQL because the proxy's nature
  is similar to the direct connections with the database clusters.
 
-#### 42. pcp commands:
+#### 43. pcp commands:
 
 pcp stands for "Pgpool-II Control Program" commands.
  pcp cli tools can either be used by installing pgpool2 package or by installing its python module like below and running its commands using python. We will use shell commands anyways.
@@ -128,11 +128,11 @@ Now, we dive into the pcp commands one by one<br/> (nearly in the importance ord
 If you see "waiting" like the following, there is nothing to worry about! It means a connection to the proxy has
  not yet been made (All pgpool pool forks are unoccupied). When the first connection is made, it will turn to "up" instead.
 ```shell
-postgres@funleashpgdb01:~$ pcp_node_info -h localhost -U pgpool -w
-funleashpgdb01 5432 1 0.333333 waiting up primary primary 0 none none 2024-08-05 07:54:10
-funleashpgdb02 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 07:54:03
-funleashpgdb03 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 07:54:10
+pcp_node_info -h localhost -U pgpool -w
 ```
+
+![Screenshot_59](image/Part%20V/Screenshot_59.png)
+
 try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will show an expanded and
  more informative result.
 
@@ -164,7 +164,7 @@ try also `pcp_node_info -h localhost -U pgpool -w -v` (with -v flag). It will sh
 
 There are some SQL type commands for pgpool, many of which are similar to some PCP commands.
  
-#### 43. PGPOOL SHOW (SHOW command preceded by PGPOOL)
+#### 44. PGPOOL SHOW (SHOW command preceded by PGPOOL)
 
 Show configuration parameters in effect in the following sense. The show keyword must be
  preceded by the pgpool keyword.
@@ -195,7 +195,7 @@ You can also specify a single configuration parameter. Example:
 
 ![Screenshot_57](image/Part%20V/Screenshot_57.png)
 
-#### 44. SHOW
+#### 45. SHOW
 
 | <div align="center">SHOW</div> |
 | :---------------: |
@@ -207,7 +207,7 @@ These commands are rather dynamic compared to the `SHOW PGPOOL <conf keyword>`. 
 
 ---
 
-#### 45. important! 
+#### 46. important! 
 If any configuration change for postgres is deemed necessary, here is the following approach:
 
 1. change the configuration on the primary server
@@ -219,7 +219,7 @@ If any configuration change for postgres is deemed necessary, here is the follow
 
 ---
 
-#### 46. Some common errors:
+#### 47. Some common errors:
 
 1. If you got the following error,
 
