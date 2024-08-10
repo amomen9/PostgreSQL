@@ -51,55 +51,10 @@ Meaning, the data directory will be built up and the database cluster will also 
 
 Now, everything has completely been carried out and our cluster is ready. We can now put it
  to test for manual and automatic failovers and also connecting the application to the pgPool
- proxy port which is the port 9999 in our case.
+ proxy port that in our case, it is on port 9999
  
- 
-### Failover and Node Recovery.
-
-#### 49. Disaster and Automatic Failover
-
-In the event of a primary node disaster which brings it down, an automatic failover to a secondary node will occur
- and that secondary node will become the new primary. When a failover is triggered, the failover.sh script will be
- executed in the background. The failover process includes creating physical replication
- slots for the other standby nodes on the new primary node and connecting the new primary node as the read/write
- transaction leader to the other standby nodes. 
-
-After the old primary is brought back online, it will be behind (maybe both ahead and behind, for which a combination
- of "undo of redo" and replay would be required) in the synchronization mechanism. Thus, we need to rebuild it and
- make it a new secondary. In such an event, the pcp_node_info reporting command would show **2 primaries**. One is
- the old one (which is actually a fake primary and is shown as primary because it is read/write and is not in a 
- recovery state) and the other is the new one. To bring the cluster back to a normal state, first we bring down the old
- primary using this command:
-
-```shell
-pg_ctlcluster 15 main stop -m immediate 
-```
-
-Subsequently, we recover it once again by issuing the following command:
-
-```shell
-pcp_recovery_node -h localhost -U pgpool -w -n 0
-```
-
-Note that here the 1st node is recovered from the current primary node. The recovery process is always
- carried out from the primary node. During the recovery process, the physical replication slot will also
- be created for the node which is being recovered as part of the recovery process.
-
-#### 50. Manual Failover
-
-In the event of a manual failover or a conditional failover in which the old primary node is somehow still
- in reach, in addition to the execution of failover.sh script, the follow_primary.sh will also be executed
- in the background for the old primary to synchronize itself with the new primary. This includes:
-
-1. Trying to rewind the changes that the old primary might have been ahead of the new primary at the moment
- of the failover (using pg_rewind as a reverting process). If pg_rewind fails, the next step will be executed
- 
-2. The old primary will be fully recovered from scratch using pg_basebackup and set as a new secondary (and with 
- "in recovery" state).
-
-3. The required physical replication slot will be added on the new primary for the new secondary.
-
-
+Note that in the event of a manual failover, you have to rebuild the old primary after it is
+ brought up.
 <br/><br/>
 
 

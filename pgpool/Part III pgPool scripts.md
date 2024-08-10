@@ -810,7 +810,7 @@ sudo -u postgres chmod +x <all scripts>
 
 #### 32. recovery_1st_stage (Every Node)
 
-This script is executed upon execution of the `pcp_recovery_node` command to restore the pg data directory of a node from another node (usually the primary node). The <b>pcp commands</b> will be explained later. After this script, the `pcp_recovery_node` command will trigger the `pgpool_remote_start` script to start the recovered node remotely.
+This script is executed upon execution of the `pcp_recovery_node` command to restore the pg data directory of a node from the primary node. The <b>pcp commands</b> will be explained later. After this script, the `pcp_recovery_node` command will trigger the `pgpool_remote_start` script to start the recovered node remotely.
 
 After preparing, editing, and carrying out the necessary modifications on this script, you can run the following **to test its functionality**:
 
