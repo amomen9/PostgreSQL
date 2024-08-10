@@ -12,7 +12,7 @@ Official documentation:
 
 
 
-### 1. Plain Backup Restore Format (Uncompressed data and tablespace directories)
+#### 1. Plain Backup Restore Format (Uncompressed data and tablespace directories)
  
 **Note:**
 
@@ -58,7 +58,7 @@ Includes only the required WAL files in the backup using the "stream" method.
 Displays a progress meter during the backup process.
 
 
-### 2. Archived Backup Restore Format (tar+compression)
+#### 2. Archived Backup Restore Format (tar+compression)
 
 **Note:**
 
