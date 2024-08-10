@@ -1,0 +1,38 @@
+[Unit]
+Description=pgpool socket repair service
+After=network.target
+After=multi-user.target
+After=sshd.service
+After=pgpool2.service
+Wants=pgpool_repair.timer
+
+[Service]
+Type=oneshot
+
+User=postgres
+Group=postgres
+
+
+# Where to send early-startup messages from the server
+# This is normally controlled by the global default set by systemd
+StandardOutput=syslog
+
+# Disable OOM kill on the scripts
+OOMScoreAdjust=-1000
+Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
+Environment=PGB_OOM_ADJUST_VALUE=0
+
+# create symbolic link to the socket file if not exists
+ExecStart=/bin/sh -c /data/postgresql/scripts/unix_domain_sockets_repair.sh
+
+SuccessExitStatus=0 1 2
+
+# assign vip to the primary node if not already assigned
+ExecStart=/bin/sh -c /data/postgresql/scripts/cluster_vip.sh
+
+StandardOutput=journal
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target
+

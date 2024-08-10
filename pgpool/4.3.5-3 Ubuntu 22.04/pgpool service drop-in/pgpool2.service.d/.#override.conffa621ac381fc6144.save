@@ -1,0 +1,29 @@
+### Editing /etc/systemd/system/pgpool2.service.d/override.conf
+### Anything between here and the comment below will become the new contents of the file
+
+### Editing /etc/systemd/system/pgpool2.service.d/override.conf
+### Anything between here and the comment below will become the new contents of the file
+
+[Service]
+ExecStartPre=/usr/bin/test -L /var/run/postgresql/.s.PGSQL.9999 && 
+
+
+### Lines below this comment will be discarded
+
+### /lib/systemd/system/pgpool2.service
+# [Unit]
+# Description=pgpool-II
+# Documentation=man:pgpool(8)
+# Wants=postgresql.service
+# After=network.target
+# 
+# [Service]
+# User=postgres
+# ExecStart=/usr/sbin/pgpool -n
+# ExecReload=/bin/kill -HUP $MAINPID
+# KillSignal=SIGINT
+# StandardOutput=syslog
+# SyslogFacility=local0
+# 
+# [Install]
+# WantedBy=multi-user.target

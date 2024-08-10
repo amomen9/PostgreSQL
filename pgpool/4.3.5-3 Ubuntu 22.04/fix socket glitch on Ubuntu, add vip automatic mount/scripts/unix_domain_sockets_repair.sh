@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+# create symbolic link to the socket file if not exists
+# 9999
+/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9999); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9999); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /tmp/$FILE_NAME 				 && /usr/bin/test ! -S /var/run/postgresql/$FILE_NAME && /usr/bin/ln -s /tmp/$FILE_NAME 				 /var/run/postgresql/$FILE_NAME  || /usr/bin/test -S /var/run/postgresql/$FILE_NAME'
+/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9999); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9999); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /var/run/postgresql/$FILE_NAME && /usr/bin/test ! -S /tmp/$FILE_NAME 				 && /usr/bin/ln -s /var/run/postgresql/$FILE_NAME /tmp/$FILE_NAME 				|| /usr/bin/test -S /tmp/$FILE_NAME'
+# 9898
+/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9898); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9898); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /tmp/$FILE_NAME 				 && /usr/bin/test ! -S /var/run/postgresql/$FILE_NAME && /usr/bin/ln -s /tmp/$FILE_NAME 				 /var/run/postgresql/$FILE_NAME  || /usr/bin/test -S /var/run/postgresql/$FILE_NAME'
+/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9898); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9898); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /var/run/postgresql/$FILE_NAME && /usr/bin/test ! -S /tmp/$FILE_NAME 				 && /usr/bin/ln -s /var/run/postgresql/$FILE_NAME /tmp/$FILE_NAME 				|| /usr/bin/test -S /tmp/$FILE_NAME'
+# 9000
+/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9000); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9000); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /tmp/$FILE_NAME 				 && /usr/bin/test ! -S /run/postgresql/$FILE_NAME 	 && /usr/bin/ln -s /tmp/$FILE_NAME 				 /run/postgresql/$FILE_NAME  		|| /usr/bin/test -S /run/postgresql/$FILE_NAME'
+/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9000); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9000); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /run/postgresql/$FILE_NAME 	 && /usr/bin/test ! -S /tmp/$FILE_NAME 				 && /usr/bin/ln -s /run/postgresql/$FILE_NAME /tmp/$FILE_NAME 					|| /usr/bin/test -S /tmp/$FILE_NAME'
+# 9694: this port is handled in pgpool.conf and must not be handled here anymore,
+# unless the modification of hearbeat_port directive in pgpool.conf be reverted to 9694 
+#ExecStart=/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9694); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9694); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /tmp/$FILE_NAME 				  && /usr/bin/test ! -S /var/run/postgresql/$FILE_NAME && /usr/bin/ln -s /tmp/$FILE_NAME 				 /var/run/postgresql/$FILE_NAME  || /usr/bin/test -S /var/run/postgresql/$FILE_NAME'
+#ExecStart=/bin/sh -c 'FILE_NAME=$(ls -1a /var/run/postgresql/ | grep '\.s\.' | grep 9694); [ "$FILE_NAME" = "" ] && FILE_NAME=$(ls -1a /tmp/ | grep '\.s\.' | grep 9694); [ "$FILE_NAME" != "" ] && /usr/bin/test -S /var/run/postgresql/$FILE_NAME && /usr/bin/test ! -S /tmp/$FILE_NAME 				  && /usr/bin/ln -s /var/run/postgresql/$FILE_NAME /tmp/$FILE_NAME 				|| /usr/bin/test -S /tmp/$FILE_NAME'

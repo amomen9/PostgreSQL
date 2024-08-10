@@ -99,6 +99,10 @@ In the event of a manual failover or a conditional failover in which the old pri
 
 3. The required physical replication slot will be added on the new primary for the new secondary.
 
+#### 52. Change the current primary node
+
+
+
 
 <br/><br/>
 

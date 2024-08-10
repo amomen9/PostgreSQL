@@ -1,0 +1,2 @@
+Defaults:postgres !requiretty
+postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add 172.23.124.74/24 dev ens160 label ens160:0, /usr/sbin/ip addr del 172.23.124.74/24 dev ens160

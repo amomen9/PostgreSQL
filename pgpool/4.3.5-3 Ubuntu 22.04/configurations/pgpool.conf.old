@@ -1,0 +1,251 @@
+######################### Optimized for Production ############################
+
+#------------------------------------------------------------------------------
+# BACKEND CLUSTERING MODE
+#------------------------------------------------------------------------------
+backend_clustering_mode = 'streaming_replication'
+
+#------------------------------------------------------------------------------
+# CONNECTIONS
+#------------------------------------------------------------------------------
+
+listen_addresses = '*'
+port = 9999
+socket_dir = '/var/run/postgresql'
+#socket_dir = '/tmp'
+
+
+pcp_listen_addresses = '*'	
+pcp_port = 9898
+pcp_socket_dir = '/var/run/postgresql'
+#pcp_socket_dir = '/tmp'
+
+listen_backlog_multiplier = 2
+
+# Replica Configurations
+						
+backend_hostname0 = 'funleashpgdb01'
+backend_port0 = 5432
+backend_weight0 = 1
+backend_data_directory0 = '/data/postgresql/15/main/data/'
+backend_flag0 = 'ALLOW_TO_FAILOVER'
+backend_application_name0 = 'funleashpgdb01'
+backend_hostname1 = 'funleashpgdb02'
+backend_port1 = 5432
+backend_weight1 = 1
+backend_data_directory1 = '/data/postgresql/15/main/data/'
+backend_flag1 = 'ALLOW_TO_FAILOVER'
+backend_application_name1 = 'funleashpgdb02'
+backend_hostname2 = 'funleashpgdb03'
+backend_port2 = 5432
+backend_weight2 = 1
+backend_data_directory2 = '/data/postgresql/15/main/data/'
+backend_flag2 = 'ALLOW_TO_FAILOVER'
+backend_application_name3 = 'funleashpgdb03'
+enable_pool_hba = on
+
+#------------------------------------------------------------------------------
+# POOLS
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# LOGS
+#------------------------------------------------------------------------------
+
+log_connections = on							
+log_hostname = on
+log_statement = on
+log_per_node_statement = on
+logging_collector = on
+log_error_verbosity = verbose
+log_client_messages = on
+syslog_ident = 'pgpool'
+client_min_messages = log
+log_min_messages = debug1
+log_truncate_on_rotation = on
+log_rotation_age = 7d
+log_rotation_size = 512MB
+log_directory = '/backup/pgpool_logs/'
+log_line_prefix = '%m: %a pid %p: '
+log_filename = 'pgpool-%Y-%m-%d_%H%M%S.log'
+log_hostname = on
+
+
+#log_connections = off							
+#log_hostname = off
+#log_statement = off
+#log_per_node_statement = off
+#logging_collector = off
+#log_error_verbosity = terse
+#log_client_messages = off
+#syslog_ident = 'pgpool'
+#client_min_messages = error
+#log_min_messages = panic
+#log_truncate_on_rotation = on
+#log_rotation_age = 7d
+#log_rotation_size = 512MB
+#log_directory = '/tmp/pgpool_logs/'
+
+
+#------------------------------------------------------------------------------
+# FILE LOCATIONS
+#------------------------------------------------------------------------------
+
+
+logdir = '/backup/pgpool_logs/'
+
+
+
+#------------------------------------------------------------------------------
+# CONNECTION POOLING
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# REPLICATION MODE
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# LOAD BALANCING MODE
+#------------------------------------------------------------------------------
+# Some parameters depend on wether the other nodes are synchronous or not
+load_balance_mode = on
+# Tell pgpool whether it should take account of SQL comments inside the incomming SQL Statements
+allow_sql_comments = on
+
+#Queries on the tables that have already been
+#modified within the current explicit transaction will
+#not be load balanced until the end of the transaction.
+disable_load_balance_on_write = 'dml_adaptive'
+
+statement_level_load_balance = off
+
+#------------------------------------------------------------------------------
+# STREAMING REPLICATION MODE
+#------------------------------------------------------------------------------
+
+sr_check_period = 3
+sr_check_user = 'repl'
+sr_check_password = ''
+# Specifies the maximum tolerance level of replication delay in WAL bytes on the standby server against the primary server:
+# If the delay exceeds this configured level, Pgpool-II stops sending the SELECT queries to the standby server and starts 
+# routing everything to the primary server even if load_balance_mode is enabled, until the standby catches-up with the primary
+delay_threshold = 1048576
+
+follow_primary_command = 'follow_primary.sh %d %h %p %D %m %H %M %P %r %R'
+
+
+#------------------------------------------------------------------------------
+# HEALTH CHECK GLOBAL PARAMETERS
+#------------------------------------------------------------------------------
+
+health_check_period = 5
+health_check_timeout = 1
+health_check_user = 'pgpool'
+health_check_password = ''
+health_check_database = 'postgres'
+health_check_max_retries = 2
+health_check_retry_delay = 2
+connect_timeout = 2000
+
+#------------------------------------------------------------------------------
+# HEALTH CHECK PER NODE PARAMETERS (OPTIONAL)
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# FAILOVER AND FAILBACK
+#------------------------------------------------------------------------------
+
+failover_on_backend_shutdown = on
+failover_on_backend_error = off
+detach_false_primary = on
+
+failover_command = 'failover.sh %d %h %p %D %m %H %M %P %r %R %N %S'
+failback_command = ''
+
+#------------------------------------------------------------------------------
+# ONLINE RECOVERY
+#------------------------------------------------------------------------------
+
+recovery_user = 'postgres'
+recovery_password = ''
+
+recovery_1st_stage_command = 'recovery_1st_stage'
+recovery_2nd_stage_command = ''
+
+#------------------------------------------------------------------------------
+# WATCHDOG
+#------------------------------------------------------------------------------
+
+
+use_watchdog = on
+
+trusted_servers = 'funleashpgdb01,funleashpgdb02,funleashpgdb03'
+ping_path = '/usr/bin'
+
+hostname0 = 'funleashpgdb01'
+wd_port0= 9000
+pgpool_port0 = 9999
+
+hostname1 = 'funleashpgdb02'
+wd_port1= 9000
+pgpool_port1 = 9999
+
+hostname2 = 'funleashpgdb03'
+wd_port2= 9000
+pgpool_port2 = 9999
+
+delegate_ip = '172.23.124.74'
+if_cmd_path = '/usr/sbin/ip'
+if_up_cmd = '/usr/bin/sudo /usr/sbin/ip addr add $_IP_$/24 dev ens160 label ens160:0'
+if_down_cmd = '/usr/bin/sudo /usr/sbin/ip addr del $_IP_$/24 dev ens160'
+arping_path = '/usr/bin'
+
+clear_memqcache_on_escalation = off
+
+
+enable_consensus_with_half_votes = on
+
+
+
+# - Lifecheck Setting -
+wd_monitoring_interfaces_list = 'any'
+# -- heartbeat mode --
+heartbeat_hostname0 = 'funleashpgdb01'
+heartbeat_hostname1 = 'funleashpgdb02'
+heartbeat_hostname2 = 'funleashpgdb03'
+heartbeat_port0 = 9999
+heartbeat_port1 = 9999
+heartbeat_port2 = 9999
+
+wd_escalation_command = 'escalation.sh'
+wd_de_escalation_command = ''
+
+#------------------------------------------------------------------------------
+# OTHERS
+#------------------------------------------------------------------------------
+
+relcache_expire = 3600
+
+relcache_size = 512
+
+#------------------------------------------------------------------------------
+# IN MEMORY QUERY MEMORY CACHE
+#------------------------------------------------------------------------------
+# https://www.pgpool.net/docs/latest/en/html/runtime-in-memory-query-cache.html
+
+memory_cache_enabled = off
+#memory_cache_enabled = on
+
+#memqcache_total_size = 256MB
+
+#memqcache_max_num_cache = 2796202
+
+#memqcache_cache_block_size = 2638400
+
+#memqcache_maxcache = 1638400
+
+# memqcache_oiddir = '/var/log/pgpool/oiddir'
+
+
+# memqcache_auto_cache_invalidation = on
+
