@@ -4,7 +4,7 @@
 
 ## Physical Backup/Restore
 
-#### Physical Backup
+#### Physical Backup (base backup)
 
 Official documentation:
 
@@ -333,9 +333,9 @@ Read more at:
 
 ---
 
-## Logical Backup/Restore
+## Logical Backup/Restore (dump)
 
-The process of restoring a backup on production services from a logical backup. Using this approach, we can also backup/restore a specific database or table (logical backup and restore or dump)
+Using this approach, we can also backup/restore a specific database or table (logical backup and restore or dump)
 
 • Backup/Restore the entire database cluster:
 
@@ -383,7 +383,8 @@ psql\l+   # show databases with tablespaces
 \dt # show tables or relations
 \dn # show schema
 ```
-
+<br/>
+<br/>
 
 
 Finish ■
