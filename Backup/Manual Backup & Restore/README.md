@@ -6,20 +6,14 @@ Official documentation:
 
 [https://www.postgresql.org/docs/current/app-pgbasebackup.html](https://www.postgresql.org/docs/current/app-pgbasebackup.html)
 
-Note:
 
-•  This backup method is also used in our systemd backing up method.
+
+1. Plain Format (Uncompressed data and tablespace directories)
+ 
+**Note:**
 
 •  You need to be able to establish a replication connection with the target server using the backup user.
 
-1. Tar and Compressed Format
-
-```shell
-pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Ft -z -Xs -P
-```
-
-3. Plain Format (Uncompressed data and tablespace directories
- 
 As will be noted later in this document (restore part), this command can be the backup and restore process in one place.
 
 ```shell
@@ -60,8 +54,18 @@ Includes only the required WAL files in the backup using the "stream" method.
 Displays a progress meter during the backup process.
 
 
+2. Tar and Compressed Format
 
-Approach 1 creates 3 + # of tablespaces files in the target backup directory:
+**Note:**
+
+•  This backup method is also used in our systemd backing up method.
+
+```shell
+pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Ft -z -Xs -P
+```
+
+
+Approach 2 creates 3 + # of tablespaces files in the target backup directory:
 
 ![1720591911543](image/README/1720591911543.png "backup directory contents")
 
@@ -123,12 +127,12 @@ WALs:
 
 There are two scenarios for restoring:
 
-1. When the production service has crashed,
+1. When the production service has crashed.
 2. When the infrastructure team delivers raw machines, and also for the raw cloud VMs. In such case, we will set up the PostgreSQL service and the HA/DR solution (like pgpool) with all of the initial user settings, a raw database, schema creation, and tablespaces.
 
 Afterwards, the restore steps are as follows:
 
-#### 1. Plain backup format:
+#### 1. Plain Format (Uncompressed data and tablespace directories)
 
 Restoring the plain format is much easier. In fact, the backup and restore operations are usually done all in one place and with one command as follows.
  You can also take the backup to a different location and then copy it to a later target for bringing up the database cluster anyway. As just noted,
