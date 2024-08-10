@@ -1,6 +1,10 @@
 # Manual Backup & Restore
 
-### Physical Backup/Restore
+
+
+## Physical Backup/Restore
+
+### Physical Backup
 
 Official documentation:
 
@@ -8,7 +12,7 @@ Official documentation:
 
 
 
-1. Plain Format (Uncompressed data and tablespace directories)
+### 1. Plain Backup Restore Format (Uncompressed data and tablespace directories)
  
 **Note:**
 
@@ -54,7 +58,7 @@ Includes only the required WAL files in the backup using the "stream" method.
 Displays a progress meter during the backup process.
 
 
-2. Tar and Compressed Format
+### 2. Archived Backup Restore Format (tar+compression)
 
 **Note:**
 
@@ -121,7 +125,7 @@ WALs:
 
 `-rw------- 1 root root 17075 Jun 23 15:22 pg_wal.tar.gz`
 
-### Restore
+### Physical Restore
 
 **Important Note!**
 
