@@ -128,7 +128,7 @@ There are two scenarios for restoring:
 
 Afterwards, the restore steps are as follows:
 
-#### Plain backup format:
+#### 1. Plain backup format:
 
 Restoring the plain format is much easier. In fact, the backup and restore operations are usually done all in one place and with one command as follows.
  You can also take the backup to a different location and then copy it to a later target for bringing up the database cluster anyway. As just noted,
@@ -152,7 +152,7 @@ Use this flag to restore the data directory in the **recovery** mode. This means
 primary_conninfo = 'user=postgres passfile=''/var/lib/postgresql/.pgpass'' channel_binding=prefer connect_timeout=2 host=localhost port=5432 sslmode=prefer sslcompression=0 sslcertmode=allow sslsni=1 ssl_min_protocol_version=TLSv1.2 gssencmode=prefer krbsrvname=postgres gssdelegation=0 target_session_attrs=any load_balance_hosts=disable'
 ``` 
 
-#### Archived backup format (tar+compression)
+#### 2. Archived backup format (tar+compression)
 
 Restoring this type of backups is done according to the following procedure:
 
