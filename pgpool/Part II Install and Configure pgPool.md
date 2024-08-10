@@ -41,7 +41,8 @@ We have opted not to make the postgres user a sudoer for hardening purposes. Thi
  some extra permissions. For example, the if_up/down_cmd or arping_cmd need extra permissions. The if_up/down_cmd
  commands are also used in the escalation.sh script. That is why we do the following:
 
-Add the upcoming lines to the `/etc/sudoers` file or its drop-in, meaning a file inside `/etc/sudoers.d/`:
+Add the upcoming lines to the `/etc/sudoers` file or its drop-in, meaning a file inside `/etc/sudoers.d/`. It is not
+ recommended to modify the `/etc/sudoers` file itself though. It is recommended that you use its drop-in directory:
 
 ```shell
 sudo visudo
