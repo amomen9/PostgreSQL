@@ -18,7 +18,7 @@ Note:
 $ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Ft -z -Xs -P
 ```
 
-3. Plain Format
+3. Plain Format (Uncompressed data and tablespace directories)
 
 ```shell
 $ pg_basebackup -h localhost -p 5432 -U postgres -D /backupdir/latest_backup -Fp -T olddir=newdir -Xs -P
