@@ -140,9 +140,9 @@ pg_basebackup -h localhost -p 5432 -U postgres -D /path/to/the/target/database/c
 ``` 
  
 `•  -R (also --progress): `
-Use this flag to restore the data directory in the **recovery** mode. This means that this cluster will be read_only to receive data updates from
+Use this flag to restore the data directory in the **recovery** mode. This means that this cluster will be read_only when started to receive data updates from
  a primary in a replication cluster. In such case, a standby.signal file will be created, and also the primary connection details will be created
- automatically to instruct the secondary node that is being restored to be able to find its primary. These instructions' directives are written to the
+ automatically to instruct the secondary node (that is being restored) to be able to find its primary. These instructions' directives are written to the
  postgresql.auto.conf file. You can manually write the same directives in a file named myrecovery.conf too. A sample of automatically created
  postgresql.auto.conf file contents can be the following:
  
