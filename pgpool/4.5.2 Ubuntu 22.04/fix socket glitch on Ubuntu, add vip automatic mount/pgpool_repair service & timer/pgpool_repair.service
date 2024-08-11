@@ -30,6 +30,9 @@ SuccessExitStatus=0 1 2
 # assign vip to the primary node if not already assigned
 ExecStart=/bin/sh -c /data/postgresql/scripts/cluster_vip.sh
 
+# Set the correct mode for the pg data directory ($PGDATA) recursively
+ExecStart=/bin/sh -c /data/postgresql/scripts/correct_pg_data_dir_mode.sh
+
 StandardOutput=journal
 StandardError=journal+console
 

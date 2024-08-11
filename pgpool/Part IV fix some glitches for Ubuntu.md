@@ -33,7 +33,7 @@ Copy the following script files to the target directory and make them executable
  
 `remove_socket_symlinks.sh`
 
-`correct pg data dir mode.sh`
+`correct_pg_data_dir_mode.sh`
 
 `cluster_vip.sh`
 
@@ -184,7 +184,7 @@ fi
 
 3. Sometimes the mode for PGDATA directory might change probably by pgpool. We now that this mode must be either
  0700 or 0755 when PostgreSQL wants to start. The script which ascertains consistence of this necessity is called
- `correct pg data dir mode.sh`
+ `correct_pg_data_dir_mode.sh`
 
 This script is as follows: 
 
@@ -236,6 +236,9 @@ SuccessExitStatus=0 1 2
 
 # assign vip to the primary node if not already assigned
 ExecStart=/bin/sh -c /data/postgresql/scripts/cluster_vip.sh
+
+# Set the correct mode for the pg data directory ($PGDATA) recursively
+ExecStart=/bin/sh -c /data/postgresql/scripts/correct_pg_data_dir_mode.sh
 
 StandardOutput=journal
 StandardError=journal+console

@@ -309,4 +309,11 @@ funleashpgdb02 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05
 funleashpgdb03 5432 1 0.333333 waiting up standby standby 0 none none 2024-08-05 13:33:32
 ```
 
+7. If you get the following error:
+
+![Screenshot_62](image/Part%20V/Screenshot_62.png)
+
+* The pgpool_remote_start script probably cannot start PostgreSQL service on the node being recovered. This might be because of any reason preventing the service from starting. 
+
+
 # [Next: Part VI: Finish up, simulations, tests, notes ](./Part%20VI%20Finish%20up%2C%20simulations%2C%20tests%2C%20notes.md)
