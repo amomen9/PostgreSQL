@@ -11,6 +11,10 @@ You have to manually create one of the directories used in this document which i
 ```shell
 mkdir -p /data/postgresql/scripts
 chown -R postgres:postgres /data/postgresql/scripts
+
+mkdir -p /var/postgresql/pg-wal-archive/
+mkdir -p /var/postgresql/pg-local-full-backup/systemd/
+chown -R postgres:postgres /var/postgresql
 ```
 
 ### 2. [X] **Scripts**
@@ -221,8 +225,8 @@ sudo systemctl enable PostgreSQL@postgres_backup.service
 
 3. enable timers
 ```shell
-sudo systemctl enable archive_wal.timer
-sudo systemctl enable postgres_backup.timer
+sudo systemctl enable --now archive_wal.timer
+sudo systemctl enable --now postgres_backup.timer
 ```
 
 
