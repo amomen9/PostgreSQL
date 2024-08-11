@@ -15,8 +15,8 @@ chown -R postgres:postgres /data/postgresql/scripts
 
 ### 2. [X] **Scripts**
 
-	* **Note**: The scripts will be placed under /data/postgresql/scripts/ directory.
-    1. WAL Backup & Purge Script (archive_wal.sh)
+* **Note**: The scripts will be placed under `/data/postgresql/scripts/ directory`.
+1. WAL Backup & Purge Script (archive_wal.sh)
 
 ```shell
 #!/bin/bash
