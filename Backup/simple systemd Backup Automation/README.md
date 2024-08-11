@@ -7,7 +7,7 @@ The systemd backup automation plan is a simple plan composed of a service templa
  in gzip format. The instantiated services run some scripts. All of them will be briefly explained below.
 
 
-### 1. [X] **Create required directories**
+### [X] **Create required directories**
 
 You have to manually create one of the directories used in this document which is the following.
  The others either already exist or are created by the scripts automatically. If you need to change
