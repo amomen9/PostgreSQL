@@ -85,6 +85,11 @@ Note that here the 1st node is recovered from the current primary node. The reco
  carried out from the primary node. During the recovery process, the physical replication slot will also
  be created for the node which is being recovered as part of the recovery process.
 
+A simulation video has been provided onwards:
+
+<video src="image/PartVI/pgpool_simulate_failover_annotated.mp4" width="320" height="240" controls></video>
+
+
 #### 51. Manual Failover
 
 In the event of a manual failover or a conditional failover in which the old primary node is somehow still
@@ -100,7 +105,6 @@ In the event of a manual failover or a conditional failover in which the old pri
 3. The required physical replication slot will be added on the new primary for the new secondary.
 
 #### 52. Change the current primary node
-
 
 
 
