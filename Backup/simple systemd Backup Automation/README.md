@@ -2,7 +2,18 @@
 
 The systemd backup automation plan is a simple plan composed of a service template with two timers without any additional/external tool like Barman (Backup and Recovery Manager for PostgreSQL). One of the timers triggers the service instance for compressing, backing up, and purging the old WAL files. The other one triggers the same for full backups. The backups are created in gzip format. The instantiated services run some scripts. All of them will be briefly explained below.
 
-1. [X] **Scripts**
+### 1. [X] **Create required directories**
+
+You have to manually create one of the directories used in this document which is the following.
+ The others either already exist or are created by the scripts automatically. If you need to change
+ a directory, you might need to change it inside the scripts:
+
+```shell
+mkdir -p /data/postgresql/scripts
+chown -R postgres:postgres /data/postgresql/scripts
+```
+
+### 2. [X] **Scripts**
 
 	* **Note**: The scripts will be placed under /data/postgresql/scripts/ directory.
     1. WAL Backup & Purge Script (archive_wal.sh)
@@ -103,7 +114,7 @@ find $PG_FULL_BACKUP_ARCHIVE_DIR -mtime +15 -type f -exec rm -f {} \;
 # purging operation
 ```
 
-* [X] Service template
+### 3. [X] Service template
 
 The following is the PostgreSQL@.service service template which is used to execute the above scripts on a regular basis. For more details regarding services, service templates, timers, and their schedules refer to the link to a short article about this below:
 
@@ -151,7 +162,7 @@ WantedBy=multi-user.target
 
 ```
 
-* [X] Timers
+### 4. [X] Timers
 
 1. Timer to trigger WAL backup (archive_wal.timer)
 
@@ -196,7 +207,7 @@ WantedBy=timers.target
 
 ```
 
-* [X] Activation
+### 5. [X] Activation
 1. Place the service and timer files in the following directory using root privileges:
 /lib/systemd/system/
 
