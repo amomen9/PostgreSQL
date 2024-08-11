@@ -26,7 +26,7 @@ chown -R postgres:postgres /var/postgresql
 
 List of scripts:
 
-|archive_wal.sh<br/>postgres_backup.sh|
+|<div align="left">archive_wal.sh<br/>postgres_backup.sh</div>|
 |:-:|
 
 * **Note**: The scripts will be placed under `/data/postgresql/scripts/ directory`.
@@ -132,7 +132,7 @@ find $PG_FULL_BACKUP_ARCHIVE_DIR -mtime +15 -type f -exec rm -f {} \;
 
 ### 3. [X] Service template
 
-|Service Template: PostgreSQL@.service<br/>base backup: PostgreSQL@postgres_backup.service<br/>WAL backup: PostgreSQL@archive_wal.service|
+|<div align="left">Service Template: `PostgreSQL@.service`<br/>base backup: `PostgreSQL@postgres_backup.service`<br/>WAL backup: `PostgreSQL@archive_wal.service`</div>|
 |:-:|
 
 The following is the PostgreSQL@.service service template which is used to execute the above scripts on a regular basis. For more details regarding services, service templates, timers, and their schedules refer to the link to a short article about this below:
