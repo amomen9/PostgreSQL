@@ -135,7 +135,7 @@ find $PG_FULL_BACKUP_ARCHIVE_DIR -mtime +15 -type f -exec rm -f {} \;
 |<div align="left">Service Template: `PostgreSQL@.service`<br/>base backup: `PostgreSQL@postgres_backup.service`<br/>WAL backup: `PostgreSQL@archive_wal.service`</div>|
 |:-:|
 
-The following is the PostgreSQL@.service service template which is used to execute the above scripts on a regular basis. For more details regarding services, service templates, timers, and their schedules refer to the link to a short article about this below:
+The following is the `PostgreSQL@.service` service template which is used to execute the above scripts on a regular basis. For more details regarding services, service templates, timers, and their schedules refer to the link to a short article about this below:
 
 [https://github.com/amomen9/Linux/tree/main/Systemd%20Service%20and%20Timer](https://github.com/amomen9/Linux/tree/main/Systemd%20Service%20and%20Timer)
 
