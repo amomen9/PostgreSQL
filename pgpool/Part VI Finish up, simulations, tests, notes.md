@@ -87,8 +87,9 @@ Note that here the 1st node is recovered from the current primary node. The reco
 
 A simulation video has been provided onwards:
 
-<video src="image/PartVI/pgpool_simulate_failover_annotated.mp4" width="320" height="240" controls></video>
+<video src="image/PartVI/pgpool_simulate_failover_annotated.gif" width="320" height="240" controls></video>
 
+![pgpool_simulate_failover_annotated](image/PartVI/pgpool_simulate_failover_annotated.gif)
 
 #### 51. Manual Failover
 
