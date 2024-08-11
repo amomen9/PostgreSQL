@@ -1,6 +1,11 @@
 # systemd Backup Automation
 
-The systemd backup automation plan is a simple plan composed of a service template with two timers without any additional/external tool like Barman (Backup and Recovery Manager for PostgreSQL). One of the timers triggers the service instance for compressing, backing up, and purging the old WAL files. The other one triggers the same for full backups. The backups are created in gzip format. The instantiated services run some scripts. All of them will be briefly explained below.
+The systemd backup automation plan is a simple plan composed of a service template with two 
+ timers without any additional/external tools or extensions like Barman, pgagent, pg_cron, 
+ etc. One of the timers triggers the service instance for compressing, backing up, and purging 
+ the old WAL files. The other one triggers the same for full backups. The backups are created 
+ in gzip format. The instantiated services run some scripts. All of them will be briefly explained below.
+
 
 ### 1. [X] **Create required directories**
 
@@ -18,6 +23,11 @@ chown -R postgres:postgres /var/postgresql
 ```
 
 ### 2. [X] **Scripts**
+
+List of scripts:
+
+|archive_wal.sh<br/>postgres_backup.sh|
+|:-:|
 
 * **Note**: The scripts will be placed under `/data/postgresql/scripts/ directory`.
 1. WAL Backup & Purge Script (archive_wal.sh)
@@ -121,6 +131,9 @@ find $PG_FULL_BACKUP_ARCHIVE_DIR -mtime +15 -type f -exec rm -f {} \;
 ```
 
 ### 3. [X] Service template
+
+|Service Template: PostgreSQL@.service<br/>base backup: PostgreSQL@postgres_backup.service<br/>WAL backup: PostgreSQL@archive_wal.service|
+|:-:|
 
 The following is the PostgreSQL@.service service template which is used to execute the above scripts on a regular basis. For more details regarding services, service templates, timers, and their schedules refer to the link to a short article about this below:
 
