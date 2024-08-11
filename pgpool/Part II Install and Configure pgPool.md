@@ -58,7 +58,7 @@ In our case, we write the following:
 
 ```shell
 Defaults:postgres !requiretty
-postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add, /usr/sbin/ip addr del
+postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr
 ```
 
 After this, though the postgres user is not a sudoer, we have to add a sudo before the commands that require us to do so.
