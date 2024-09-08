@@ -1,4 +1,4 @@
-# systemd Backup Automation
+# simple systemd Backup Automation (For pgPool Cluster with VIP)
 
 The systemd backup automation plan is a simple plan composed of a service template with two 
  timers without any additional/external tools or extensions like Barman, pgagent, pg_cron, 

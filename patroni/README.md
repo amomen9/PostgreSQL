@@ -1,6 +1,13 @@
 # Patroni
 
-Here we discuss different replication solutions with Patroni.
+Here we discuss different HA solutions with Patroni. Patroni needs to come with
+ a watchdog for the election and other issues that affect a highly available cluster.
+
+Some sample watchdog solutions for the record are the following, though we discuss
+ etcd solution in this document.
+
+* Linux Kernel Watchdog (Built-in Watchdog)
+	* External Watchdog Daemons
 
 ### * Setup Patroni with etcd watchdog (Ubuntu & RHEL)
 
