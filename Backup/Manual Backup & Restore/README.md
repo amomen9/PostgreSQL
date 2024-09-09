@@ -12,7 +12,7 @@ Official documentation:
 
 
 
-###### 1. Plain Backup Format (Uncompressed data and tablespace directories)
+###### 1. Plain Physical Backup Format (Uncompressed data and tablespace directories)
  
 **Note:**
 
@@ -58,7 +58,7 @@ Includes only the required WAL files in the backup using the "stream" method.
 Displays a progress meter during the backup process.
 
 
-###### 2. Archived Backup Format (tar+compression)
+###### 2. Archived Physical Backup Format (tar+compression)
 
 **Note:**
 
@@ -85,7 +85,7 @@ According to the pg_basebackup documentation, “ **As long as the client can ke
 
 Therefore, the DBA should not suffice with the WALs that are being archived inside pg_wal.tar.gz. There may be the need to use later WALs manually.
 
-•  Backup using the following command for all databases and objects in tar format (production environments):
+•  Backup using the following command for all databases and objects in tar format:
 
 ```shell
 pg_basebackup -h localhost -p 5432 -U postgres -D /backup/test1 -Ft -z -Xs -P
@@ -105,7 +105,7 @@ ls -l /data/postgresql/15/main/tablespaces
 
 `lrwxrwxrwx 1 postgres postgres 35 Jun 23 15:12 16409 -> /data/postgresql/15/main/tbs_test/tbs_test2`
 
-2. We check the integrity of the backup operation with the following command. A Tar file has been created for each tablespace:
+2. We manually check the integrity of the backup operation with the following command. A Tar archive file has been created for each tablespace:
 
 tablespaces:
 
@@ -361,12 +361,9 @@ drop database testdb 	# if exists;
 ```
 
 ```
-create database testdb owner database_user;
+create database testdb owner database_user TABLESPACE tbs_test;
 ```
 
-```
-ALTER DATABASE testdb SET TABLESPACE tbs_test;
-```
 
 5. The final step is to restore the dump:
 
