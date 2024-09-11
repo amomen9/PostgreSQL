@@ -11,8 +11,11 @@ Official documentation:
 [https://www.postgresql.org/docs/current/app-pgbasebackup.html](https://www.postgresql.org/docs/current/app-pgbasebackup.html)
 
 
+**Note:**
+Every physical backup waits for a checkpoint first. So, if it takes longer than usual, a checkpoint might be prolonging the
+ backup operation.
 
-###### 1. Plain Physical Backup Format (Uncompressed data and tablespace directories)
+##### 1. Plain Physical Backup Format (non-compressed data and tablespace directories)
  
 **Note:**
 
@@ -57,8 +60,9 @@ Includes only the required WAL files in the backup using the "stream" method.
 `•  -P (also --progress): `
 Displays a progress meter during the backup process.
 
+---
 
-###### 2. Archived Physical Backup Format (tar+compression)
+##### 2. Archived Physical Backup Format (data, tablespaces, and WALs in tar+compression format files)
 
 **Note:**
 
@@ -79,7 +83,7 @@ Approach 2, because of its plain format, creates 1 + # of tablespaces directorie
 
 **Important note!!!**
 
-According to the pg_basebackup documentation, “ **As long as the client can keep up with the write-ahead log data** , using this method (stream method with -Xs flag) requires no extra write-ahead logs to be saved on the source server”. This means that the whole WAL segments might not be saved to the pg_wal.tar.gz archive. If they are actually not, the WAL files within this archive will not be enough and you will face the following error while trying to recover from the backup.
+According to the pg_basebackup documentation, “**As long as the client can keep up with the write-ahead log data** , using this method (stream method with -Xs flag) requires no extra write-ahead logs to be saved on the source server”. This means that the whole WAL segments might not be saved to the pg_wal.tar.gz archive. If they are actually not, the WAL files within this archive will not be enough and you will face the following error while trying to recover from the backup.
 
 ![1720591980394](image/README/1720591980394.png "insufficient WAL files error")
 
@@ -91,9 +95,13 @@ Therefore, the DBA should not suffice with the WALs that are being archived insi
 pg_basebackup -h localhost -p 5432 -U postgres -D /backup/test1 -Ft -z -Xs -P
 ```
 
-Note: This type of backup includes all database objects including tablespaces.
+**Note:** This type of backup includes all database objects including tablespaces (one archive file per tablespace).
 
-1. In this example, we have two tablespaces, and we can verify the backup integrity with the following command:
+---
+
+###### Example Archived Backup Structure:
+
+* In the following example, we have two tablespaces as follows
 
 ```shell
 ls -l /data/postgresql/15/main/tablespaces
@@ -105,25 +113,27 @@ ls -l /data/postgresql/15/main/tablespaces
 
 `lrwxrwxrwx 1 postgres postgres 35 Jun 23 15:12 16409 -> /data/postgresql/15/main/tbs_test/tbs_test2`
 
-2. We manually check the integrity of the backup operation with the following command. A Tar archive file has been created for each tablespace:
+* We check the success of the backup operation with the following command. Also, a Tar archive file must be created for each tablespace:
 
-tablespaces:
+**tablespaces:**
 
 `-rw------- 1 root root 1027743 Jun 23 15:22 16400.tar.gz`
 
 `-rw------- 1 root root 1027499 Jun 23 15:22 16409.tar.gz`
 
-manifest:
+**manifest:**
 
 `-rw------- 1 root root 278651 Jun 23 15:22 backup_manifest`
 
-base:
+**base:**
 
 `-rw------- 1 root root 4115789 Jun 23 15:22 base.tar.gz`
 
-WALs:
+**WALs:**
 
 `-rw------- 1 root root 17075 Jun 23 15:22 pg_wal.tar.gz`
+
+---
 
 #### Physical Restore
 
@@ -136,7 +146,7 @@ There are two scenarios for restoring:
 
 Afterwards, the restore steps are as follows:
 
-###### 1. Plain Restore Format (Uncompressed data and tablespace directories)
+##### 1. Plain Restore Format (non-compressed data and tablespace directories)
 
 Restoring the plain format is much easier. In fact, the backup and restore operations are usually done all in one place and with one command as follows.
  You can also take the backup to a different location and then copy it to a later target for bringing up the database cluster anyway. As just noted,
@@ -160,7 +170,7 @@ Use this flag to restore the data directory in the **recovery** mode. This means
 primary_conninfo = 'user=postgres passfile=''/var/lib/postgresql/.pgpass'' channel_binding=prefer connect_timeout=2 host=localhost port=5432 sslmode=prefer sslcompression=0 sslcertmode=allow sslsni=1 ssl_min_protocol_version=TLSv1.2 gssencmode=prefer krbsrvname=postgres gssdelegation=0 target_session_attrs=any load_balance_hosts=disable'
 ``` 
 
-###### 2. Archived Restore Format (tar+compression)
+##### 2. Archived Restore Format (data, tablespaces, and WALs in tar+compression format files)
 
 Restoring this type of backups is done according to the following procedure:
 
@@ -333,55 +343,7 @@ Read more at:
 
 ---
 
-## Logical Backup/Restore (dump)
-
-Using this approach, we can also backup/restore a specific database or table (logical backup and restore or dump)
-
-• Backup/Restore the entire database cluster:
-
-```
-pg_dumpall -U postgres -h localhost -p 5432 > all_databases.sql	#On the source server
-
-psql -U postgres -h localhost -p 5432 -f all_databases.sql #On the target server
-
-```
-
-• Backup/Restore a specific object
-
-1. First, the latest backup is taken, and the restore process is performed according to step 3. (The three steps of the third stage should be done in the given order.) For that matter, first we take a dump of the database requested by the customer. For example, testdb:
-
-```shell
-pg_dump –U postgres –d testdb > testdb.sql	#(-t for a specific table)
-```
-
-Then we log in to the desired server machine and perform the following steps:
-
-```shell
-drop database testdb 	# if exists;
-```
-
-```
-create database testdb owner database_user TABLESPACE tbs_test;
-```
-
-
-5. The final step is to restore the dump:
-
-```shell
-psql –U postgres testdb < testdb.sql
-```
-
-To check whether the database dump has been correctly restored, the following commands are executed:
-
-```shell
-su – postgres
-psql\l+   # show databases with tablespaces
-\c testdb testuser # connect to db
-\dt # show tables or relations
-\dn # show schema
-```
 <br/>
 <br/>
-
 
 Finish ■

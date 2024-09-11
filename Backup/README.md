@@ -1,12 +1,16 @@
 # Backup
 
-### [•  Manual Backup & Restore](./Manual%20Backup%20&%20Restore/README.md)
+### •  Manual Backup &amp; Restore
+
+1. [Physical Backup & Restore](./Manual%20Backup%20&%20Restore/Physical%20Backup%20&%20Restore.md)
+2. [Logical Backup & Restore](./Manual%20Backup%20&%20Restore/Logical%20Backup%20&%20Restore.md)
+
 
 ---
 
 ### •  systemd Backup Automation
 
-[      •  For pgPool](./simple%20systemd%20Backup%20Automation/pgpool.md)<br/>
-[      •  For Patroni](./simple%20systemd%20Backup%20Automation/patroni.md)
+1. [For pgPool](./simple%20systemd%20Backup%20Automation/pgpool.md)
+2. [For Patroni](./simple%20systemd%20Backup%20Automation/patroni.md)
 
 ---
