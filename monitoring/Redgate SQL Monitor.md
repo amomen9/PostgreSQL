@@ -30,6 +30,11 @@ In addition, to this date, Sep. 2024, Redgate does not yet support PostgreSQL mo
 
 <div width="60">![1726317625176](image/RedgateSQLMonitor/1726317625176.png)</div>
 
+<br/>
+<br/>
+
+---
+
 ### Preparing PostgreSQL for monitoring
 
 #### 1. Firewall Requirements
@@ -70,7 +75,14 @@ auto_explain.log_nested_statements = true  # records the plan for any nested sta
 
 The auto_explain preload library is to enable **query plan monitoring** feature.
 
-**Important Note!**
+Sample figure for the query plan view tool that is enabled by
+ configuring auto_explain in the **server overview page**. If this section is not showing, then something should be wrong in the configurations above:
+
+![query plan sample](image/RedgateSQLMonitor/query%20plan%20sample.png)
+
+
+
+**- Important Note!**
 
 For Patroni cluster nodes, we apply the configuration modifications to either the `postgresql.base.conf` file
  in the pg data directory or Patroni Yaml configuration file in the following section.:
@@ -144,6 +156,12 @@ GRANT EXECUTE ON FUNCTION pg_catalog.pg_current_logfile(text) TO redgatemonitor;
 GRANT USAGE ON FOREIGN SERVER sqlmonitor_file_server TO redgatemonitor;
 ```
 
+Sample figure for the pg error log view tool that is enabled by
+ configuring the log in the **server overview page**. If this section is not showing, then something should be wrong in the configurations above:
+
+![error log sample.png](image/RedgateSQLMonitor/error%20log%20sample.png)
+
+
 #### 5. Connect to the Linux machine (Add pg instance to monitoring)
 
 For this purpose both SSH and database connections are required. Here is a sample of the add server page in the RedgateMonitor dashboard.
@@ -157,9 +175,14 @@ The SSH Key method for Linux local users needs an authorized_keys entry and publ
  in the RedgateMonitor `Add new SSH key` wizard in advance. If you have not already, you can click on its link in the `SSH Keys` section
  on the page below. If you have previously done so, the corresponding key can be chosen from a drop-down list.
 
-**Important!**
+**- Important!**
 
 For active directory SSH authentications, the public key must be registered in the active directory.
+
+<br/>
+<br/>
+
+---
 
 ### Cluster Monitoring Considerations for PostgreSQL
 
