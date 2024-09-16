@@ -43,7 +43,7 @@ create database business_name owner business_name TABLESPACE tbs_test;
 3. The final step is to restore the dump:
 
 ```shell
-psql –U postgres business_name < business_name.sql					# -d flag can be omitted, and not including it still implies the target database
+psql –U postgres business_name < business_name.sql				# -d flag can be omitted, and not including it still implies the target database
 ```
 
 4. To check whether the database dump has been correctly restored, the following commands are executed:
@@ -59,7 +59,7 @@ psql\l+   # show databases with tablespaces
 <hr style="border:3px;"/>
 <br/>
 
-**Backup & Restore in one line command:**
+**Backup & Restore in one command:**
 
 ```shell
 time \
