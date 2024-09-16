@@ -137,14 +137,14 @@ ls -l /data/postgresql/15/main/tablespaces
 
 #### Physical Restore
 
+This is for restore **from scratch** purposes only.
+
 **Important Note!**
 
-There are two scenarios for restoring:
+Here, there are two scenarios for restoring:
 
-1. When the production service has crashed.
-2. When the infrastructure team delivers raw machines, and also for the raw cloud VMs. In such case, we will set up the PostgreSQL service and the HA/DR solution (like pgpool) with all of the initial user settings, a raw database, schema creation, and tablespaces.
-
-Afterwards, the restore steps are as follows:
+1. To get a node participating in a PostgreSQL replication cluster again from scratch.
+2. To setup a new single node database cluster or a primary node database cluster.
 
 ##### 1. Plain Restore Format (non-compressed data and tablespace directories)
 
@@ -153,13 +153,16 @@ Restoring the plain format is much easier. In fact, the backup and restore opera
  the separation of backup and restore operations is usually done for using the backups at a later time, but on the occasion that we want to use the
  taken backup right away, we specify the target through the `-D` flag:
  
+You can either copy a previously backed-up database cluster to the target directory, or backup from the source and restore it to the target 
+ directory (specified by the `-D` flag) all in one place. The `-R` prepares the target service to be started in **recovery** mode:
 ```shell
+rm -rf /path/to/the/target/database/cluster/data/directory
 pg_basebackup -h localhost -p 5432 -U postgres -D /path/to/the/target/database/cluster/data/directory -Fp -T olddir=newdir -Xs -P
 ``` 
  
 `•  -R (also --write-recovery-conf): `
 Use this flag to restore the data directory in the **recovery** mode. This means that this cluster will be read_only when started to receive data updates from
- a primary in a replication cluster. In such case, a standby.signal file will be created, and also the primary connection details will be created
+ a primary in a replication cluster. In such case, a standby.signal file will be created, and also the primary connection details will be provided
  automatically to instruct the secondary node (that is being restored) to be able to find its primary. These instructions' directives are written to the
  postgresql.auto.conf file. You can manually write the same directives in a file named myrecovery.conf too. A sample of automatically created
  postgresql.auto.conf file contents can be the following:
@@ -174,45 +177,39 @@ primary_conninfo = 'user=postgres passfile=''/var/lib/postgresql/.pgpass'' chann
 
 Restoring this type of backups is done according to the following procedure:
 
-a) First, the **base.tar.gz** file: Before starting, the /data folder is unequivocally changed to /data_old, a new folder is created, and the service is stopped.
+**a)** First, the **base.tar.gz** file: Before starting, the /data folder is unequivocally changed to /data_old for cautionary measures if it already exists and is non-empty from a previous cluster, 
+ and the service is stopped.
 
-/backup/test2/ is the backup path - /data/postgresql/15/main/data/ is the PostgreSQL data directory path.
+Here `/backup/test2/` is the backup path and `/data/postgresql/15/main/data/` is the PostgreSQL data directory path.
 
-```
+```shell
 tar xvf /backup/test2/base.tar.gz -C /data/postgresql/15/main/data/
 ```
 
-b) After restoring, two files named backup_label and tablespace_map are created in the data directory path. When we open backup_label, it shows the location of the WAL file:
+**b)** After restoring, two files named `backup_label` and `tablespace_map` are created in the data directory path. When we open backup_label, it shows the location of the WAL file:
 
 ```shell
 cat backup_label
 ```
 
-`START WAL LOCATION: 0/66000028 (file 000000010000000000000066)`
+	START WAL LOCATION: 0/66000028 (file 000000010000000000000066)	
+	CHECKPOINT LOCATION: 0/66000060	
+	BACKUP METHOD: streamed	
+	BACKUP FROM: primary	
+	START TIME: 2024-07-09 10:02:15 +0330	
+	LABEL: pg_basebackup base backup	
+	START TIMELINE: 1
 
-`CHECKPOINT LOCATION: 0/66000060`
-
-`BACKUP METHOD: streamed`
-
-`BACKUP FROM: primary`
-
-`START TIME: 2024-07-09 10:02:15 +0330`
-
-`LABEL: pg_basebackup base backup`
-
-`START TIMELINE: 1`
-
-c) And the tablespace_map file shows the locations of the tablespaces:
+**c)** And the tablespace_map file shows the locations of the tablespaces:
 
 ```shell
 cat tablespace_map
 ```
 
-`16400 -> /data/postgresql/15/main/tbs_test`
+	16400 -> /data/postgresql/15/main/tbs_test
+	16409 -> /data/postgresql/15/main/tbs_test/tbs_test2
 
-`16409 -> /data/postgresql/15/main/tbs_test/tbs_test2`
-
-d) After the base, the tablespaces files are restored: (Note: Before restoring, make sure to create the folders and tablespaces.)
+**d)** After the base, the tablespaces files are restored: (Note: Before restoring, make sure to create the folders and tablespaces.)
 
 ```shell
 tar xzf 16400.tar.gz -C /data/postgresql/15/main/tbs_test
@@ -246,11 +243,10 @@ tar xzf 16409.tar.gz -C /new path
 vi tablespace_map
 ```
 
-`16400 /new path`
+	16400 /new path
+	16409 /new path
 
-`16409 /new path`
-
-e) Finally, the **pg_wal.tar.gz** file is restored:
+**e)** Finally, the **pg_wal.tar.gz** file is restored:
 
 ```shell
 tar xzf pg_wal.tar.gz -C /pgdata/pg_wal
@@ -261,7 +257,7 @@ In short,
 ```shell
 rm -rf /data/postgresql/15/main/data/*
 rm -rf /data/postgresql/15/main/tablespaces/tbs1/*
-rm -rf /data/postgresql/15/main/tablespaces/tbs2/*cd
+rm -rf /data/postgresql/15/main/tablespaces/tbs2/*
 ```
 
 and
@@ -281,7 +277,7 @@ server crashed at 3 PM. According to the backup routine, the WAL files of produc
 
 After restoring the backup and copying the archives, the following steps are performed:
 
-1. mknod (create empty file) recovery.signal which indicates you are in the recovery process. Upon completion of the recovery, this file will be deleted
+1. mknod (create empty file) `recovery.signal` which indicates you are in the recovery process. Upon completion of the recovery, this file will be deleted
    automatically.
 
 ```shell
