@@ -251,17 +251,30 @@ WantedBy=timers.target
 1. Place the service and timer files in the following directory using root privileges:
 /lib/systemd/system/
 
-2. enable services
+2. Enable services
 ```shell
 sudo systemctl enable PostgreSQL@archive_wal.service
 sudo systemctl enable PostgreSQL@postgres_backup.service
 ```
 
-3. enable timers
+3. Enable timers
 ```shell
 sudo systemctl enable --now archive_wal.timer
 sudo systemctl enable --now postgres_backup.timer
 ```
+
+4. View the status of created and enabled units:
+```shell
+sudo systemctl status archive_wal.timer
+sudo systemctl status postgres_backup.timer
+sudo systemctl status PostgreSQL@archive_wal.service
+sudo systemctl status PostgreSQL@postgres_backup.service
+```
+
+* Note: To manually take a full backup or archive WALs (for instance, in the event that there is a low disk space problem), you can simply execute their services and you do not need to manually write and execute the commands
+`sudo systemctl start PostgreSQL@archive_wal.service`
+`sudo systemctl start PostgreSQL@postgres_backup.service`
+
 
 
 Finish ■
