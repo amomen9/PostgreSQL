@@ -39,12 +39,14 @@ In addition, to this date, Sep. 2024, Redgate does not yet support PostgreSQL mo
 
 #### 1. Firewall Requirements
 
-The PostgreSQL and SSH ports on the target machine must be visible. Thus the firewall requirements would be as follows:
+The PostgreSQL and SSH ports on the target machine must be visible. Thus, the firewall requirements would be as follows:
 
 |         <div align="center">Required Ports</div>         |
 | :--------------------------------------------------------------: |
 |     <div align="left">SSH (TCP 22 by default)</div>     |
 | <div align="left">PostgreSQL (TCP 5432 by default)</div> |
+
+<br/>
 
 #### 2. Perform the necessary modifications in PostgreSQL configurations
 
@@ -71,9 +73,23 @@ auto_explain.log_triggers = true           # record trigger statistics
 auto_explain.sample_rate = 0.01            # record plans for only 1% of queries
 auto_explain.log_min_duration = 30000      # 30000 ms = 30 seconds  
 auto_explain.log_nested_statements = true  # records the plan for any nested statement invoked by a function call
+
+log_file_mode = 0640                       # The last line is required in cases that RedgateMonitor does not SSH log in to Linux using the user postgres. In such case, the chosen user must also be a member of the postgres or the group that is owning the PostgreSQL's log files.
+
 ```
 
 The auto_explain preload library is to enable **query plan monitoring** feature.
+
+The last line is required in cases that RedgateMonitor does not SSH log in to Linux
+ using the user postgres. In such case, the chosen user must also be a member of the
+ postgres or the group that is owning the PostgreSQL's log files. For instance, if
+ the user is an active directory user, we run the following commands to make it a
+ member of the local postgres group and verify its membership:
+ 
+```shell
+sudo usermod -aG postgres <AD-username>
+groups <AD-username>
+```
 
 Sample figure for the query plan view tool that is enabled by
  configuring auto_explain in the **server overview page**. If this section is not showing, then something should be wrong in the configurations above:
@@ -106,6 +122,8 @@ systemctl restart patroni.service
 You should decide how to restart PostgreSQL service specific to every cluster type's need. It might
  be using pg_ctlcluster or systemctl commands
 
+<br/>
+
 #### 3. Configure Base Monitor PostgreSQL user permissions
 
 * Create and grant required privileges to the base monitor user. (Using the user postgres is not a best practice)
@@ -136,18 +154,23 @@ Choose either of these options according to the preference. We have chosen optio
 ALTER USER redgatemonitor WITH SUPERUSER; /* option 4 */
 ```
 
-* Create the pg_stat_statements extension
+* Create the pg_stat_statements extension **on all the user databases and postgres and template1 databases:**
 
 ```pgsql
+\c dbname
 CREATE EXTENSION pg_stat_statements;
 ```
 
+<br/>
+
 #### 4. PostgreSQL running on a Linux machine: log file collection
 
-Collecting pg service error log requires some additional settings as follows including creating foreign data wrappers(FDW)
- One of the wrappers is for Linux machines and the other is for AWS. The Linux's one is as follows:
+Collecting pg service error log requires some additional settings as follows including creating **foreign data wrappers (FDW)**.
+ One of the wrappers is for Linux machines and the other is for AWS. The Linux's one is as follows:<br/> 
+(First, connect to **every user database and postgres and template1 databases**)
 
 ```pgsql
+\c dbname
 CREATE EXTENSION file_fdw;
 CREATE SERVER sqlmonitor_file_server FOREIGN DATA WRAPPER file_fdw;
 /* replace 'redgatemonitor' in this code block with the Base Monitor PostgreSQL user */
@@ -160,6 +183,8 @@ Sample figure for the pg error log view tool that is enabled by
  configuring the log in the **server overview page**. If this section is not showing, then something should be wrong in the configurations above:
 
 ![error log sample.png](image/RedgateSQLMonitor/error%20log%20sample.png)
+
+<br/>
 
 
 #### 5. Connect to the Linux machine (Add pg instance to monitoring)
