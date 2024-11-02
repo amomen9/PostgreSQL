@@ -24,6 +24,10 @@ log_truncate_on_rotation = on
 
 ##### 2. etcd
 
+For more info and reference, refer to the following link on the official website:
+
+[ https://etcd.io/docs/v3.4/op-guide/configuration/](https://etcd.io/docs/v3.4/op-guide/configuration/)
+
 etcd Logs are classified in the following groups:
 
 a- WAL files:
