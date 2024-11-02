@@ -2,7 +2,7 @@
 
 PG_WAL_BACKUP_ARCHIVE_DIR=/backup/postgresql/pg-wal-backup-archive/systemd/$(hostname)/	
 # Directory where backups are to be copied
-PG_WAL_ARCHIVE_DIR=/var/postgresql/pg-wal-archive/
+PG_WAL_ARCHIVE_DIR=/archive/postgresql/pg-wal-archive/
 # The directory where PostgreSQL DB Cluster copies the generated WAL files for archiving.
 # Note: Every node in a clustered replication generates its own WAL files, and thus we will
 # have # of nodes backup archives.

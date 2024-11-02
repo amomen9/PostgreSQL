@@ -1,6 +1,6 @@
 #!/bin/bash
 TIMESTAMP=$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
-PG_LOCAL_FULL_BACKUP_DIR=/var/postgresql/pg-local-full-backup/systemd/
+PG_LOCAL_FULL_BACKUP_DIR=/archive/postgresql/pg-local-full-backup/systemd/
 # Full backup root directory on a locally mounted drive (DAS)
 PG_FULL_BACKUP_DIR=/backup/postgresql/pg-full-backup/systemd/
 # Directory on a remote location to copy the full backups to

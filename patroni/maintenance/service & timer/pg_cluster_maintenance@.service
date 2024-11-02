@@ -13,7 +13,7 @@ Description=PG maintenace task service triggered by timer
 After=syslog.target
 After=network.target
 After=multi-user.target
-# After=postgresql@15-main.service
+#After=postgresql@15-main.service
 Wants=%I.timer
 
 [Service]

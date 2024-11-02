@@ -1,0 +1,16 @@
+# This timer unit is for pg_cluster_maintenance
+#
+
+[Unit]
+Description=timer unit is for pg_cluster_maintenance
+Requires=pg_cluster_maintenance@etcd_defrag.service
+
+[Timer]
+Unit=pg_cluster_maintenance@etcd_defrag.service
+# Every Friday 03:00:00 A.M.
+OnCalendar=Fri *-*-* 03:00:00
+
+
+
+[Install]
+WantedBy=timers.target

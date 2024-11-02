@@ -6,13 +6,13 @@ USER=replicator
 # User with which we take the physical backup
 PORT=5432
 # Connection port to the server
-PATRONI_YAML_PATH=/etc/patroni.yml
-export PGPASSWORD=`cat $(cat ${PATRONI_YAML_PATH} | grep pgpass | cut -d':' -f2) | grep repl | rev | cut -d ':' -f1 | rev`
+PATRONI_YAML_PATH=/etc/patroni/config.yml
+export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PATRONI_YAML_PATH")
 # Env variable for pg password. The password is extracted from the password file which is automatically created and 
 # updated by Patroni
 
 
-PG_LOCAL_FULL_BACKUP_DIR=/var/postgresql/pg-local-full-backup/systemd/
+PG_LOCAL_FULL_BACKUP_DIR=/archive/postgresql/pg-local-full-backup/systemd/
 # Full backup root directory on a locally mounted drive (DAS)
 PG_FULL_BACKUP_DIR=/backup/postgresql/pg-full-backup/systemd/
 # Directory on a remote location to copy the full backups to
@@ -42,7 +42,7 @@ fi
 # Full backup will be only taken from the primary replica in a replication cluster according to the policies. A secondary replica however can
 # also be manually specified.
 
-mkdir -p $PG_LOCAL_FULL_BACKUP_DIR && sudo chown -R postgres:postgres $PG_LOCAL_FULL_BACKUP_DIR
+mkdir -p $PG_LOCAL_FULL_BACKUP_DIR && chown -R postgres:postgres $PG_LOCAL_FULL_BACKUP_DIR
 
 
 mkdir -p $PG_FULL_BACKUP_DIR

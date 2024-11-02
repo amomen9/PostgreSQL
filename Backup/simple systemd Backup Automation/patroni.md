@@ -14,12 +14,12 @@ You have to manually create one of the directories used in this document which i
  a directory, you might need to change it inside the scripts:
 
 ```shell
-mkdir -p /data/postgresql/scripts
-chown -R postgres:postgres /data/postgresql/scripts
+mkdir -p /var/lib/postgresql/scripts
+chown -R postgres:postgres /var/lib/postgresql/scripts
 
-mkdir -p /var/postgresql/pg-wal-archive/
-mkdir -p /var/postgresql/pg-local-full-backup/systemd/
-chown -R postgres:postgres /var/postgresql
+mkdir -p /archive/postgresql/pg-wal-archive/
+mkdir -p /archive/postgresql/pg-local-full-backup/systemd/
+chown -R postgres:postgres /archive/postgresql
 ```
 
 ### 2. [X] **Scripts**
@@ -29,7 +29,7 @@ List of scripts:
 |<div align="left">archive_wal.sh<br/>postgres_backup.sh</div>|
 |:-:|
 
-* **Note**: The scripts will be placed under `/data/postgresql/scripts/ directory`.
+* **Note**: The scripts will be placed under `/var/lib/postgresql/scripts/ directory`.
 1. WAL Backup & Purge Script (archive_wal.sh)
 <br/>
 
@@ -39,7 +39,7 @@ List of scripts:
 PG_WAL_BACKUP_ARCHIVE_DIR=/backup/postgresql/pg-wal-backup-archive/systemd/$(hostname)/
 # Directory where backups are to be copied
 
-PG_WAL_ARCHIVE_DIR=/var/postgresql/pg-wal-archive/
+PG_WAL_ARCHIVE_DIR=/archive/postgresql/pg-wal-archive/
 # The directory where PostgreSQL DB Cluster copies the generated WAL files for archiving.
 # Note: Every node in a clustered replication generates its own WAL files, and thus we will
 # have # of nodes backup archives.
@@ -67,13 +67,13 @@ USER=replicator
 # User with which we take the physical backup
 PORT=5432
 # Connection port to the server
-PATRONI_YAML_PATH=/etc/patroni.yml
-export PGPASSWORD=`cat $(cat ${PATRONI_YAML_PATH} | grep pgpass | cut -d':' -f2) | grep repl | rev | cut -d ':' -f1 | rev`
+PATRONI_YAML_PATH=/etc/patroni/config.yml
+export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PATRONI_YAML_PATH")
 # Env variable for pg password. The password is extracted from the password file which is automatically created and 
 # updated by Patroni
 
 
-PG_LOCAL_FULL_BACKUP_DIR=/var/postgresql/pg-local-full-backup/systemd/
+PG_LOCAL_FULL_BACKUP_DIR=/archive/postgresql/pg-local-full-backup/systemd/
 # Full backup root directory on a locally mounted drive (DAS)
 PG_FULL_BACKUP_DIR=/backup/postgresql/pg-full-backup/systemd/
 # Directory on a remote location to copy the full backups to
@@ -169,7 +169,7 @@ Description=PG maintenace task service triggered by timer
 After=syslog.target
 After=network.target
 After=multi-user.target
-After=postgresql@15-main.service
+# After=postgresql@15-main.service
 Wants=%I.timer
 
 [Service]
@@ -178,10 +178,10 @@ Type=oneshot
 User=postgres
 Group=postgres
 
-Environment=PGDATA=/data/postgresql/15/main/data/
+Environment=PGDATA=/var/lib/postgresql/15/main/
 # pg data dir as an env variable for the service execution
-Environment=SCHOME=/data/postgresql/scripts/
-WorkingDirectory=/data/postgresql/scripts/
+Environment=SCHOME=/var/lib/postgresql/scripts/
+WorkingDirectory=/var/lib/postgresql/scripts/
 
 # Where to send early-startup messages from the server
 # This is normally controlled by the global default set by systemd
