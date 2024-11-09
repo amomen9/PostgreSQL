@@ -10,7 +10,7 @@ Link to the page with some PostgreSQL usefull references:
 
 ---
 
-### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
+<--! ### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md) -->
 
 ---
 
