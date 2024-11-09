@@ -8,9 +8,9 @@ Link to the page with some PostgreSQL usefull references:
 
 [Some PostgreSQL References](./some%20postgresql%20references.md)
 
----
+<!-- ---
 
-<--! ### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md) -->
+### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
 
 ---
 
@@ -31,3 +31,4 @@ Link to the page with some PostgreSQL usefull references:
 --- 
 
 ### [•  Part VI: Finish up, simulations, tests, notes ](./Part%20VI%20Finish%20up%2C%20simulations%2C%20tests%2C%20notes.md)
+ -->
