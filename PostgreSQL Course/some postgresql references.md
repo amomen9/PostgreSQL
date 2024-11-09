@@ -30,6 +30,26 @@
 
 [https://wiki.postgresql.org/wiki/Main_Page](https://wiki.postgresql.org/wiki/Main_Page)
 
+* This website also has a similar purpose:
+
+[https://pgpedia.info](https://pgpedia.info)
+
+---
+
+### • Percona Blog:
+
+* Percona is a website with useful tools and useful knowledge sources
+
+[https://www.percona.com/blog/](https://www.percona.com/blog/)
+
+---
+
+### • EnterpriseDB:
+
+* EnterpriseDB knowledge base
+
+[https://knowledge.enterprisedb.com/hc/en-us](https://knowledge.enterprisedb.com/hc/en-us)
+
 ---
 
 ### • Download PostgreSQL:
