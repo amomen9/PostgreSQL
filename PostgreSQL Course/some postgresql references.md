@@ -36,22 +36,6 @@
 
 ---
 
-### • Percona Blog:
-
-* Percona is a website with useful tools and useful knowledge sources
-
-[https://www.percona.com/blog/](https://www.percona.com/blog/)
-
----
-
-### • EnterpriseDB:
-
-* EnterpriseDB knowledge base
-
-[https://knowledge.enterprisedb.com/hc/en-us](https://knowledge.enterprisedb.com/hc/en-us)
-
----
-
 ### • Download PostgreSQL:
 
 * Download and install PostgreSQL instructions, repositories, etc. for different platforms and architectures.
@@ -76,6 +60,34 @@
 
 ---
 
+### • PostgreSQL Official Repository:
+
+* Mirror of the official PostgreSQL GIT repositories on GitHub.
+
+[https://github.com/postgres](https://github.com/postgres)
+
+---
+
+Apart from the official website, the resources are incredibly numerous. Here is some of the most
+ popular ones anyways:
+
+### • Percona Blog:
+
+* Percona is a website with useful tools and useful knowledge sources
+
+[https://www.percona.com/blog/](https://www.percona.com/blog/)
+
+---
+
+### • EnterpriseDB:
+
+* EnterpriseDB knowledge base
+
+[https://knowledge.enterprisedb.com/hc/en-us](https://knowledge.enterprisedb.com/hc/en-us)
+
+---
+
+
 ### • PostgreSQL Contrib extension pack details:
 
 * A clarification about different extensions included within the PostgreSQL Contrib side-package, version history, availability, and other useful info about them. The Contrib package is included by default with the PostgreSQL server main package since PostgreSQL 9.1.
@@ -84,11 +96,4 @@
 
 ---
 
-### • PostgreSQL Official Repository:
-
-* Mirror of the official PostgreSQL GIT repositories on GitHub.
-
-[https://github.com/postgres](https://github.com/postgres)
-
----
 
