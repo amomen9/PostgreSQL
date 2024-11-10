@@ -19,7 +19,7 @@
 • Read more at the link given below.
 
 
-**RedGate Survey about skill diversification:**
+<u>RedGate Survey about skill diversification:</u>
 
 
 Navigating the database landscape in 2024: Shifting skills to match constant demands - Redgate events (red-gate.com)
