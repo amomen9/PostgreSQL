@@ -78,7 +78,7 @@
 
 ### • PostgreSQL Contrib extension pack details:
 
-* A clarification about different extensions included within the PostgreSQL Contrib side-package, version history, availability, and other useful info about them.
+* A clarification about different extensions included within the PostgreSQL Contrib side-package, version history, availability, and other useful info about them. The Contrib package is included by default with the PostgreSQL server main package since PostgreSQL 9.1.
 
 [https://pgpedia.info/c/contrib-module.html](https://pgpedia.info/c/contrib-module.html)
 
