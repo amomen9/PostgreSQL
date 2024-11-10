@@ -1,5 +1,11 @@
+# Introduction to PostgreSQL
+
+
 ### A WORD FOR THE DATABASE ADMINISTRATORS
 
+#### Why should I learn PostgreSQL?
+
+##### 1. Necessity
 
 • Redgate recently launched theirState of the Database Landscape 2024 survey results, from almost 4,000 database professionals from around the globe. A clear picture emerged from the results, suggesting that 2024 is the year that skill diversification among database professionals is imperative. There’s the need to manage multiple databases, to migrate to the cloud, to introduce continuous delivery with DevOps, and even incorporating Generative AI into the mix.
 
@@ -22,6 +28,11 @@ Navigating the database landscape in 2024: Shifting skills to match constant dem
 [https://www.red-gate.com/hub/events/navigating-the-database-landscape-in-2024](https://www.red-gate.com/hub/events/navigating-the-database-landscape-in-2024)
 
 
+##### 2. Ease of learning
+
+In my opinion, with the fundamentals and theories of RDBMSs being all the same, as a specialist in one other RDBMS,
+ you can insanely easily learn a new RDBMS, namely PostgreSQL, relative to other people who have no prior knowledge.
+ Therefore, you need to invest dramatically less and yet be called a multi-skilled specialist.
 
 ---
 
