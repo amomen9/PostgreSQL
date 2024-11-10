@@ -2,7 +2,7 @@
 
 ### • postgresql.org:
 
-* It is the home of the PostgreSQL project
+* It is the home of the **PostgreSQL project**
 
 [www.postgresql.org](https://www.postgresql.org)
 
