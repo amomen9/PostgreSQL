@@ -1,6 +1,3 @@
-![1731307475455](image/somepostgresqlreferences/1731307475455.png)
-
-![1731307358158](image/somepostgresqlreferences/1731307358158.png)
 
 # Some PostgreSQL References
 
