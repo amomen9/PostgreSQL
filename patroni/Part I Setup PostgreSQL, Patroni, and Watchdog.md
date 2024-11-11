@@ -36,7 +36,7 @@ One of the standby nodes is synchronous and the other one is asynchronous in quo
  word "ANY 1" is used in the "synchronous_standby_names" directive of the postgresql.conf file)
 
 
-0. Disk layouts:
+0. Disk layouts (Every Node):
 
 For the database clusters with large amount of data, I used to move the data directory to somewhere else.
  For example, /data/postgresql/13/main or whatever. However, later on I came to the conclusion that the best

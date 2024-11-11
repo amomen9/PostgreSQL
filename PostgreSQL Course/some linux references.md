@@ -39,7 +39,7 @@ Apart from these books, there are many websites offering quality articles about 
 
 and many more.
 
-The best way to get command syntax and inquire about how to carry out some specific tasks are to use good AI Chat Bots.
+The best way to get command syntax and inquire about how to carry out some specific tasks is to use good AI Chat Bots.
 
 ---
 
