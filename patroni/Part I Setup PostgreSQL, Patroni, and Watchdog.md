@@ -23,6 +23,7 @@
 <br/>
 The replication topology is composed of:
 <br/>
+<br/>
 
 | row |   Node hostname   | IP Add        | Description            |
 | --- | :---------------: | ------------- | ---------------------- |
