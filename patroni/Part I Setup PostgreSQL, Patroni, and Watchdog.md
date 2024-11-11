@@ -47,9 +47,11 @@ For the database clusters with large amount of data, I used to move the data dir
  
 1. `/var/lib/postgresql/`
 
-2. `/var/log/postgresql/`
+2. `/var/log/`
+
+3. `/var/lib/etcd`
  
-3. `/var/lib/postgresql/17/main/pg_tblspc/`
+4. `/var/lib/postgresql/17/main/pg_tblspc/`
 
 Here is a sample figure of the disk layout:
 
