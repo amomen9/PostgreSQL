@@ -8,6 +8,8 @@ Link to the page with some PostgreSQL usefull references:
 
 [Some PostgreSQL References](./some%20postgresql%20references.md)
 
+[Some Linux References](./some%20linux%20references.md)
+
 <!-- ---
 
 ### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
