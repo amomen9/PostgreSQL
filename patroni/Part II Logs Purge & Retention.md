@@ -34,7 +34,7 @@ For more info and reference, refer to the following link on the official website
 
 etcd Logs are classified in the following groups:
 
-a- WAL files:
+a) WAL files:
 
 Configs: We set the following environment variable(s) in the /etc/default/etcd file for the
  etcd configurations to take effect
@@ -43,7 +43,7 @@ Configs: We set the following environment variable(s) in the /etc/default/etcd f
 ETCD_MAX_WALS=5
 ```
 
-b- snapshot files:
+b) snapshot files:
 
 Configs: We set the following environment variable(s) in the /etc/default/etcd file for the
  etcd configurations to take effect
@@ -53,7 +53,7 @@ ETCD_SNAPSHOT_COUNT=100000
 ETCD_MAX_SNAPSHOTS=5
 ```
 
-c- history purge:
+c) history purge:
 
 First we
 The revision history needs purging using the following variables:
