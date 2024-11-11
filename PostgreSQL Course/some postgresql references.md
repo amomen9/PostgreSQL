@@ -71,6 +71,8 @@
 Apart from the official website, the resources are incredibly numerous. Here is some of the most
  popular ones anyways:
 
+---
+
 ### • Percona Blog:
 
 * Percona is a website with useful tools and useful knowledge sources
