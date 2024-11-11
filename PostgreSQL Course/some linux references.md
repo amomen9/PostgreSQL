@@ -1,6 +1,7 @@
 
 # Some Linux Reference text-books
 
+The Linux references are incredibly numerous. Some of them are the following though:
 
 ### • The Linux Command Line:
 
