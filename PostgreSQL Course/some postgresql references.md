@@ -1,3 +1,7 @@
+![1731307475455](image/somepostgresqlreferences/1731307475455.png)
+
+![1731307358158](image/somepostgresqlreferences/1731307358158.png)
+
 # Some PostgreSQL References
 
 ### • postgresql.org:
@@ -81,14 +85,13 @@ Apart from the official website, the resources are incredibly numerous. Here is 
 
 ---
 
-### • EnterpriseDB:
+### • EnterpriseDB:![1731307475455](image/somepostgresqlreferences/1731307475455.png)
 
 * EnterpriseDB knowledge base
 
 [https://knowledge.enterprisedb.com/hc/en-us](https://knowledge.enterprisedb.com/hc/en-us)
 
 ---
-
 
 ### • PostgreSQL Contrib extension pack details:
 
@@ -108,13 +111,10 @@ This website is a substantial DBA-Oriented learning source, which actively gets 
 
 Mastering PostgreSQL 15 book, by Hans-Jürgen Schönig.
 
-This book is a comprehensive reference from many perspectives, especially development purposes. 
+This book is a comprehensive reference from many perspectives, especially development purposes.
 
 ![1731188617351](image/somepostgresqlreferences/1731188617351.png)
 
 ### • More book references from postgresql.org:
 
 [https://www.postgresql.org/docs/books/](https://www.postgresql.org/docs/books/)
-
-
-
