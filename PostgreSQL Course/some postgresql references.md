@@ -107,6 +107,8 @@ This website is a substantial DBA-Oriented learning source, which actively gets 
 
 [https://www.interdb.jp/pg/index.html](https://www.interdb.jp/pg/index.html)
 
+---
+
 ### • Mastering PostgreSQL 15:
 
 Mastering PostgreSQL 15 book, by Hans-Jürgen Schönig.
