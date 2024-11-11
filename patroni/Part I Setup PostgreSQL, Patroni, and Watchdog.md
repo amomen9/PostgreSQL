@@ -41,9 +41,9 @@ One of the standby nodes is synchronous and the other one is asynchronous in quo
 For the database clusters with large amount of data, I used to move the data directory to somewhere else.
  For example, /data/postgresql/13/main or whatever. However, later on I came to the conclusion that the best
  way is, at least regarding PostgreSQL, to keep everything in its default location and instead define mount
- points in the default location and attach separate disks to those mount points. For example, prior to the
- installation of PostgreSQL, we can consider the following mount points. We actually do the first 2 of the following
- 3 this in this document:
+ points in the default locations and attach separate disks to those mount points. For example, prior to the
+ installation of PostgreSQL, we can consider the following mount points. We actually do the first 3 of the following
+ 4 this in this document:
  
 1. `/var/lib/postgresql/`
 
@@ -56,6 +56,8 @@ For the database clusters with large amount of data, I used to move the data dir
 Here is a sample figure of the disk layout:
 
 ![1.png](images/1.png)
+
+
 
 1. set hostnames and IP addresses if necessary (Every Node):
 
