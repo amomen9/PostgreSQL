@@ -53,6 +53,7 @@ For the database clusters with large amount of data, I used to move the data dir
 
 Here is a sample figure of the disk layout:
 
+![1.png](images/1.png)
 
 1. set hostnames and IP addresses if necessary (Every Node):
 
