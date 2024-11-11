@@ -4,9 +4,9 @@
 
 ### • The Linux Command Line:
 
-* Official PostgreSQL Documentation on postgresql.org for the latest stable release:
+* The Linux Command Line
 
-[https://www.postgresql.org/docs/current/index.html](https://www.postgresql.org/docs/current/index.html)
+![1731188617351](image/somelinuxreferences/1.jpg)
 
 ---
 
@@ -14,11 +14,15 @@
 
 * LPIC-1 Study Guide Exam 101-400 and Exam 102-400
 
+![1731188617351](image/somelinuxreferences/2.jpg)
+
 ---
 
 ### • How Linux Works:
 
 * How Linux Works What Every Superuser Should Know by Brian Ward
+
+![1731188617351](image/somelinuxreferences/3.jpg)
 
 ---
 
