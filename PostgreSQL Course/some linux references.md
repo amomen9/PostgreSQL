@@ -22,7 +22,7 @@
 
 * How Linux Works What Every Superuser Should Know by Brian Ward
 
-![1731188617351](image/somelinuxreferences/3.jpg)
+![1731188617351](image/somelinuxreferences/3.png)
 
 ---
 
