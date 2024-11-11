@@ -96,4 +96,23 @@ Apart from the official website, the resources are incredibly numerous. Here is 
 
 ---
 
+### • Internals of PostgreSQL:
+
+This website is a substantial DBA-Oriented learning source, which actively gets updated by the author.
+
+[https://www.interdb.jp/pg/index.html](https://www.interdb.jp/pg/index.html)
+
+### • Mastering PostgreSQL 15:
+
+Mastering PostgreSQL 15 book, by Hans-Jürgen Schönig.
+
+This book is a comprehensive reference from many perspectives, especially development purposes. 
+
+![1731188617351](image/somepostgresqlreferences/1731188617351.png)
+
+### • More book references from postgresql.org:
+
+[https://www.postgresql.org/docs/books/](https://www.postgresql.org/docs/books/)
+
+
 
