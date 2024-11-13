@@ -69,7 +69,7 @@ ETCD_INITIAL_CLUSTER_STATE="new"
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster-pg"
 
 
-- make sure postgresql service is functional on the first node, connect to it and alter or
+- Make sure postgresql service is functional on the first node, connect to it and alter or
  create necessary users and their permissions. Check the changes:
 alter user postgres password 'i1AGdhtr86DeROdIAM';
 create user replicator replication password 'i1AGdhtr86DeROdIAM';

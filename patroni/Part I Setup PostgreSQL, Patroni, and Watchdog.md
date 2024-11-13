@@ -131,6 +131,7 @@ sudo apt install -y postgresql-17 postgresql-17-repack postgresql-17-plpgsql-che
 postgresql-17-cron postgresql-17-pgaudit postgresql-17-show-plans postgresql-doc-17 \
 postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepare iputils-arping
 
+systemctl disable --now postgresql.service postgresql@17-main.service
 systemctl mask postgresql.service postgresql@17-main.service
 ```
 
@@ -443,19 +444,43 @@ ETCD_MAX_WALS=5
 
 ```
 
-#### 11. Create the necessary PostgreSQL users (First Node)
+#### 11. Create the necessary PostgreSQL users (First Node Only)
 
-Make sure the postgresql database cluster is functional on the first node, connect to it and alter or
+Make sure the postgresql database cluster is functional on the first node, we disabled it
+ upon installation, thus we need to start it manually. Then connect to it and alter or
  create necessary users and their permissions. Then check the changes:
  
+```shell
+pg_ctlcluster 17 main start
+``` 
+
 ```PL/PGSQL
 alter user postgres password 'p@ssvv0rcl';
 create user replicator replication password 'p@ssvv0rcl';
 select * from pg_user;
-
 ```
 
-#### 12. Create the necessary PostgreSQL users (First Node)
+#### 12. Delete data directory contents (2nd and 3rd Nodes only)
+
+Delete data directory contents on the 2nd and 3rd nodes only
+
+```shell
+rm -rf /var/lib/postgresql/17/main/*
+```
+
+#### 13. Enable and start etcd service (Every Node)
+
+Start <ins>from the first node</ins>, then go on with other nodes, as well.
+
+```shell
+systemctl enable --now etcd
+```
+
+#### 14. Enable and start patroni service (First Node Only)
+
+We want to start patroni for the first time. Thus, we want
+ to make sure that postgresql is not running. postgresql  We do these by executing the following commands
+
 
 
 # [Next: Part II: Logs Purge & Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
