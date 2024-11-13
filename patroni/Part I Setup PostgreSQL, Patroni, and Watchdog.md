@@ -145,7 +145,7 @@ systemctl disable --now patroni
 # We are not needing dcs.yml in our implementation
 mv /etc/patroni/dcs.yml /etc/patroni/dcs.yml.bak
 chown -R postgres:postgres /etc/patroni
-vi /etc/patroni/config.yml
+
 ```
 
 #### 8. Modify the patroni's configuration file (Every Node):
@@ -153,6 +153,10 @@ vi /etc/patroni/config.yml
 Reference:
 
 [YAML Configuration Settings, Patroni Documentation](https://patroni.readthedocs.io/en/latest/yaml_configuration.html)
+
+```shell
+vi /etc/patroni/config.yml
+```
 
 The patroni yml configuration file should be something like the following on every node. Just note the <ins>node-specific
  configurations</ins> in this file
@@ -384,6 +388,9 @@ postgresql:
 ```
 
 <details>
+
+#### 9. put patroni config files in place (config.yml disable dcs.yml) (Every Node)
+
 
 
 # [Next: Part II: Logs Purge & Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
