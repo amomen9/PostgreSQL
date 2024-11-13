@@ -550,7 +550,9 @@ Create it with the address that we specified in the vip-manager service file:
 touch /etc/default/vip-manager.yml
 ```
 
-#### 19. Config VIP Manager. Set the following directives and others like below.
+#### 19. Config VIP Manager. 
+
+Set the following directives and others like below. The trigger-value must be specific to every node.
 
 ```YAML
 trigger-key: "/maunleashdb/17-main/leader"
