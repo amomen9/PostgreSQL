@@ -124,9 +124,12 @@ chown -R postgres:postgres /archive/postgresql
 
 #### 4. Install PostgreSQL (Every Node):
 
+First install the PostgreSQL's repository from its official website, [https://postgresql.org](https://postgresql.org).
+
 Install PostgreSQL and mask its service
 
 ```shell
+sudo apt update
 sudo apt install -y postgresql-17 postgresql-17-repack postgresql-17-plpgsql-check \
 postgresql-17-cron postgresql-17-pgaudit postgresql-17-show-plans postgresql-doc-17 \
 postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepare iputils-arping
@@ -163,14 +166,14 @@ Reference:
 vi /etc/patroni/config.yml
 ```
 
-The patroni yml configuration file should be something like the following on every node. Just note the <ins>node-specific
+The patroni .yml configuration file should be something like the following on every node. Just note the <ins>node-specific
  configurations</ins> in this file
 
 <details>
 <summary>(click to expand) The complete default <b>pgpool.conf</b> file with added explanations:</summary>
 
-```conf
-scope: "15-main"
+```YAML
+scope: "17-main"
 namespace: "maunleashdb"
 name: maunleash01
 
@@ -470,7 +473,8 @@ rm -rf /var/lib/postgresql/17/main/*
 
 #### 13. Enable and start etcd service (Every Node)
 
-Start <ins>from the first node</ins>, then go on with other nodes, as well.
+Start <ins>from the first node</ins>, then go on with other nodes, as well. We want
+ the first node to be the watchdog leader, thus we start from the first node.
 
 ```shell
 systemctl enable --now etcd
@@ -478,9 +482,87 @@ systemctl enable --now etcd
 
 #### 14. Enable and start patroni service (First Node Only)
 
-We want to start patroni for the first time. Thus, we want
- to make sure that postgresql is not running. postgresql  We do these by executing the following commands
+We want to start patroni for the first time. Thus, we want to make sure that postgresql is
+ not running. PostgreSQL should be running because we manually started it to set the 
+ postgres user's password and create the other initial users.
+ 
+We do these by executing the following commands:
+ 
+```shell
+pg_ctlcluster 17 main stop -m immediate
+systemctl enable --now patroni
+```
 
+#### 15. Enable and start patroni service (2nd and 3rd Nodes Only)
+
+Now that the first node is taken care of, we go over to the 2nd and 3rd to enable and start the patroni
+ service. The PGDATA directory and its contents will be created automatically using the patroni's
+ built-in functionality:
+ 
+```shell
+systemctl enable --now patroni
+```
+
+## Setup VIP handling mechanism:
+
+This can be done using some scripts and timers. However, for ease of use and setup we use `vip-manager`.
+
+#### 16. Install vip-manager 
+
+Install and setup vip-manager (version 2). Then stop it if it's running:
+
+```shell
+apt install -y vip-manager2
+systemctl stop vip-manager
+```
+
+#### 17. Edit vip-manager service:
+
+We want to create a configuration file. Therefore, we need to modify the vip-manager service file to read
+ from that configuration file upon start:
+ 
+```shell
+systemctl edit vip-manager
+```
+
+Write the following inside the drop-in
+
+```shell
+# /etc/systemd/system/vip-manager.service.d/override.conf
+[Service]
+
+ExecStart=
+ExecStart=/usr/bin/vip-manager --config=/etc/default/vip-manager.yml
+
+```
+
+Reload deamon:
+
+```shell
+systemctl daemon-reload
+```
+
+#### 18. Create the vip-manager configuration file:
+
+Create it with the address that we specified in the vip-manager service file:
+
+```shell
+touch /etc/default/vip-manager.yml
+```
+
+#### 19. Config VIP Manager. Set the following directives and others like below.
+
+```YAML
+trigger-key: "/maunleashdb/17-main/leader"
+trigger-value: "maunleash01"
+
+```
+
+#### 20. Start+enable vip-manager service:
+
+```shell
+systemctl enable --now vip-manager
+```
 
 
 # [Next: Part II: Logs Purge & Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
