@@ -139,7 +139,7 @@ apt install -y patroni
 systemctl disable --now patroni
 ```
 
-#### 7. put patroni config files in place (config.yml disable dcs.yml) (Every Node)
+#### 7. Put patroni config files in place (config.yml disable dcs.yml) (Every Node)
 
 ```shell
 # We are not needing dcs.yml in our implementation
@@ -387,10 +387,15 @@ postgresql:
 
 ```
 
-<details>
+</details>
 
-#### 9. put patroni config files in place (config.yml disable dcs.yml) (Every Node)
+#### 9. Install etcd and stop and disable it if it's running (Every Node)
 
+```shell
+apt install -y etcd
+systemctl disable --now etcd
+```
 
+#### 10. 
 
 # [Next: Part II: Logs Purge & Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
