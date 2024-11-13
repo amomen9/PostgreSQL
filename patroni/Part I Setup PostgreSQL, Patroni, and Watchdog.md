@@ -45,13 +45,13 @@ For the database clusters with large amount of data, I used to move the data dir
  installation of PostgreSQL, we can consider the following mount points. We actually do the first 3 of the following
  4 this in this document:
  
--. `/var/lib/postgresql/`
+- `/var/lib/postgresql/`
 
--. `/var/log/`
+- `/var/log/`
 
--. `/var/lib/etcd`
+- `/var/lib/etcd`
  
--. `/var/lib/postgresql/17/main/pg_tblspc/`
+- `/var/lib/postgresql/17/main/pg_tblspc/`
 
 Here is a sample figure of the disk layout:
 
