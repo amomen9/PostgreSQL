@@ -36,7 +36,7 @@ One of the standby nodes is synchronous and the other one is asynchronous in quo
  word "ANY 1" is used in the "synchronous_standby_names" directive of the postgresql.conf file)
 
 
-0. Disk layouts (Every Node):
+0. **Disk layouts (Every Node):**
 
 For the database clusters with large amount of data, I used to move the data directory to somewhere else.
  For example, /data/postgresql/13/main or whatever. However, later on I came to the conclusion that the best
@@ -45,13 +45,13 @@ For the database clusters with large amount of data, I used to move the data dir
  installation of PostgreSQL, we can consider the following mount points. We actually do the first 3 of the following
  4 this in this document:
  
-1. `/var/lib/postgresql/`
+-. `/var/lib/postgresql/`
 
-2. `/var/log/`
+-. `/var/log/`
 
-3. `/var/lib/etcd`
+-. `/var/lib/etcd`
  
-4. `/var/lib/postgresql/17/main/pg_tblspc/`
+-. `/var/lib/postgresql/17/main/pg_tblspc/`
 
 Here is a sample figure of the disk layout:
 
@@ -87,7 +87,7 @@ sudo hostnamectl set-hostname <hostname>
 
 ```
 
-#### 4. Firewall (Every Node)
+#### 2. Firewall (Every Node)
 
 Either disable the firewall or allow the needed incoming TCP ports for it.
 The needed TCP ports (If you are using the defaults) are:
@@ -107,7 +107,7 @@ systemctl disable --now ufw
 systemctl mask ufw
 ```
 
-#### 5. Create required directories (Every Node):
+#### 3. Create required directories (Every Node):
 
 Directories to create:
 
@@ -122,15 +122,19 @@ mkdir -p /archive/postgresql/pg-local-full-backup/systemd/
 chown -R postgres:postgres /archive/postgresql
 ```
 
-#### 6. Install PostgreSQL (Every Node):
+#### 4. Install PostgreSQL (Every Node):
+
+Install PostgreSQL and mask its service
 
 ```shell
 sudo apt install -y postgresql-17 postgresql-17-repack postgresql-17-plpgsql-check \
 postgresql-17-cron postgresql-17-pgaudit postgresql-17-show-plans postgresql-doc-17 \
 postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepare iputils-arping
+
+systemctl mask postgresql.service postgresql@17-main.service
 ```
 
-#### 6. Install Patroni (Every Node):
+#### 5. Install Patroni (Every Node):
 
 Install Patroni and Stop and disable it if it's running
 
@@ -139,7 +143,7 @@ apt install -y patroni
 systemctl disable --now patroni
 ```
 
-#### 7. Put patroni config files in place (config.yml disable dcs.yml) (Every Node)
+#### 6. Put patroni config files in place (config.yml disable dcs.yml) (Every Node)
 
 ```shell
 # We are not needing dcs.yml in our implementation
@@ -148,7 +152,7 @@ chown -R postgres:postgres /etc/patroni
 
 ```
 
-#### 8. Modify the patroni's configuration file (Every Node):
+#### 7. Modify the patroni's configuration file (Every Node):
 
 Reference:
 
@@ -310,7 +314,7 @@ postgresql:
   authentication:
     replication:
       username: "replicator"
-      password: "i1AGdhtr86DeROdIAM"
+      password: "p@ssvv0rcl"
     # A superuser role is required in order for Patroni to manage the local
     # Postgres instance.  If the option `use_unix_socket' is set to `true',
     # then specifying an empty password results in no md5 password for the
@@ -320,7 +324,7 @@ postgresql:
     # below.
     superuser:
       username: "postgres"
-      password: "i1AGdhtr86DeROdIAM"
+      password: "p@ssvv0rcl"
     # A rewind role can be specified in order for Patroni to use on PostgreSQL
     # 11 or later for pg_rewind, i.e. rewinding a former primary after failover
     # without having to re-clone it. Patroni will assign this user the
@@ -389,13 +393,69 @@ postgresql:
 
 </details>
 
-#### 9. Install etcd and stop and disable it if it's running (Every Node)
+#### 8. Install etcd (Every Node)
+
+Install etcd and stop and disable it if it's running.
 
 ```shell
 apt install -y etcd
 systemctl disable --now etcd
 ```
 
-#### 10. 
+#### 9. Make the etcd API version 3 global (Every Node)
+
+Make it global by putting it inside /etc/profile
+
+```shell
+vi /etc/profile
+export ETCDCTL_API=3
+```
+
+Then ake it effective for the current session too:
+
+```shell
+source /etc/profile
+```
+
+#### 10. Edit the /etc/default/etcd file (Every Node)
+
+Reference:
+
+[https://etcd.io/docs/v3.4/op-guide/configuration/](https://etcd.io/docs/v3.4/op-guide/configuration/)
+
+Edit it like below:
+
+```shell
+ETCD_NAME=n1
+ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_LISTEN_PEER_URLS="http://172.23.124.71:2380"
+ETCD_LISTEN_CLIENT_URLS="http://172.23.124.71:2379,http://127.0.0.1:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://172.23.124.71:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://172.23.124.71:2379"
+ETCD_INITIAL_CLUSTER="n1=http://172.23.124.71:2380,n2=http://172.23.124.72:2380,n3=http://172.23.124.73:2380"
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster-pg"
+ETCD_AUTO_COMPACTION_RETENTION=168
+# 7 days
+ETCD_AUTO_COMPACTION_MODE=periodic
+ETCD_MAX_SNAPSHOTS=5
+ETCD_MAX_WALS=5
+
+```
+
+#### 11. Create the necessary PostgreSQL users (First Node)
+
+Make sure the postgresql database cluster is functional on the first node, connect to it and alter or
+ create necessary users and their permissions. Then check the changes:
+ 
+```PL/PGSQL
+alter user postgres password 'p@ssvv0rcl';
+create user replicator replication password 'p@ssvv0rcl';
+select * from pg_user;
+
+```
+
+#### 12. Create the necessary PostgreSQL users (First Node)
+
 
 # [Next: Part II: Logs Purge & Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
