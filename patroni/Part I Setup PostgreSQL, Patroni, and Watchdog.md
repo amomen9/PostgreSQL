@@ -170,7 +170,7 @@ The patroni .yml configuration file should be something like the following on ev
  configurations</ins> in this file
 
 <details>
-<summary>(click to expand) The complete default <b>pgpool.conf</b> file with added explanations:</summary>
+<summary>(click to expand) The complete <b>patroni configuration file (config.yml)</b>:</summary>
 
 ```YAML
 scope: "17-main"

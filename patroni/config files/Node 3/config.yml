@@ -7,7 +7,7 @@ log:
   level: INFO
   dir: /var/log/patroni/
   file_num: 6
-
+  file_size: 25165824 # 24M
 
 
 # @DCS_CONFIG@
