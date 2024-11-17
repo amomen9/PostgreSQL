@@ -1,22 +1,21 @@
 &nbsp;Doc parts:
 
-
 * [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md)
-* [Part II: Logs Purge & Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
-
+* [Part II: Logs Purge &amp; Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
 
 # Part I: Setup PostgreSQL, Patroni, and Watchdog
+
 **Install and Configure PostgreSQL**
 
 **Note:**
 
 1. PostgreSQL major version specified here is 17. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, and most likely later versions, as well.
-4. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we setup the watchdog on all the backend (pg) nodes themselves.
-6. The scripts and configuration files are both embedded in this doc and included in the git repository.
-7. Most of the steps in this document are sequential and the later steps depend on the earlier steps. So, follow the steps in order.
-8. Not mentioning the non-mandatory command-line arguments means their default values.
-10. The PostgreSQL database cluster can also initially be created from a backup rather than a raw database cluster.
-12. The following are the node details used in this documentation:
+2. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we setup the watchdog on all the backend (pg) nodes themselves.
+3. The scripts and configuration files are both embedded in this doc and included in the git repository.
+4. Most of the steps in this document are sequential and the later steps depend on the earlier steps. So, follow the steps in order.
+5. Not mentioning the non-mandatory command-line arguments means their default values.
+6. The PostgreSQL database cluster can also initially be created from a backup rather than a raw database cluster.
+7. The following are the node details used in this documentation:
 
 ---
 
@@ -25,16 +24,15 @@ The replication topology is composed of:
 <br/>
 <br/>
 
-| row |   Node hostname   | IP Add        | Description            |
-| --- | :---------------: | ------------- | ---------------------- |
-| 1   |  funleashpgdb01  | 172.23.124.71 | Node 1 (synchronous)   |
-| 2   |  funleashpgdb02  | 172.23.124.72 | Node 2 (synchronous)  |
-| 3   |  funleashpgdb03  | 172.23.124.73 | Node 3 (asynchronous) |
-| 4   |      VIP       | 172.23.124.74   | floating Virtual IP    |
+| row | Node hostname | IP Add        | Description            |
+| --- | :------------: | ------------- | ---------------------- |
+| 1   | funleashpgdb01 | 172.23.124.71 | Node 1 (synchronous)   |
+| 2   | funleashpgdb02 | 172.23.124.72 | Node 2 (synchronous)  |
+| 3   | funleashpgdb03 | 172.23.124.73 | Node 3 (asynchronous) |
+| 4   |      VIP      | 172.23.124.74 | floating Virtual IP    |
 
 One of the standby nodes is synchronous and the other one is asynchronous in quorum mode (the
  word "ANY 1" is used in the "synchronous_standby_names" directive of the postgresql.conf file)
-
 
 0. **Disk layouts (Every Node):**
 
@@ -44,13 +42,10 @@ For the database clusters with large amount of data, I used to move the data dir
  points in the default locations and attach separate disks to those mount points. For example, prior to the
  installation of PostgreSQL, we can consider the following mount points. We actually do the first 3 of the following
  4 this in this document:
- 
+
 - `/var/lib/postgresql/`
-
 - `/var/log/`
-
 - `/var/lib/etcd`
- 
 - `/var/lib/postgresql/17/main/pg_tblspc/`
 
 Here is a sample figure of the disk layout:
@@ -62,7 +57,7 @@ If we actually set exclusive mount point for PostgreSQL or other services specif
  services, their particular users will also be created. For PostgreSQL, it is postgres, and for
  etcd, it is etcd. Point is, right after the installtion which estabilishes these users, we run
  the following:
- 
+
 ```shell
 chown -R postgres:postgres /var/lib/postgresql
 chown -R etcd:etcd /var/lib/etcd
@@ -71,12 +66,12 @@ chown -R etcd:etcd /var/lib/etcd
 1. set hostnames and IP addresses if necessary (Every Node):
 
 * 1. set hostnames:
+
 ```shell
 sudo hostnamectl set-hostname <hostname>
 ```
 
 * 2. set static IP addresses either using DHCP or directly giving the machines static IP addresses.
-
 * 3. Add hostnames and IPs to the `/etc/hosts` file for local hostname resolution (Every Node):
 
 ```hosts
@@ -166,8 +161,8 @@ Reference:
 vi /etc/patroni/config.yml
 ```
 
-The patroni .yml configuration file should be something like the following on every node. Just note the <ins>node-specific
- configurations</ins> in this file
+The patroni .yml configuration file should be something like the following on every node. Just note the `<ins>`node-specific
+ configurations`</ins>` in this file
 
 <details>
 <summary>(click to expand) The complete <b>patroni configuration file (config.yml)</b>:</summary>
@@ -268,7 +263,7 @@ bootstrap:
       - host all all ::1/128 trust
       - host replication all 0.0.0.0/0 md5
       - host all all 0.0.0.0/0 md5
-        
+      
 
 #  # Some possibly desired options for 'initdb'. Note: It needs to be a list
 #  # (some options need values, others are # switches)
@@ -399,10 +394,25 @@ postgresql:
 
 #### 8. Install etcd (Every Node)
 
-Install etcd and stop and disable it if it's running.
+Latest version of etcd can be installed through its own website, and they strongly recommend
+ that you do so and say that etcd version from pre-installed repositories is outdated. However, I
+ have used Ubuntu's native repositories to install etcd.
+
+[https://etcd.io/docs/v3.5/install/](https://etcd.io/docs/v3.5/install/)
+
+Install `etcd` and stop and disable it if it's running.
+
+* On Ubuntu 22.04 and before:
 
 ```shell
 apt install -y etcd
+systemctl disable --now etcd
+```
+
+* On Ubuntu 24.04:
+
+```shell
+apt install -y etcd-client etcd-discovery etcd-server
 systemctl disable --now etcd
 ```
 
@@ -411,11 +421,12 @@ systemctl disable --now etcd
 Make it global by putting it inside /etc/profile
 
 ```shell
-vi /etc/profile
-export ETCDCTL_API=3
+echo >> /etc/profile
+echo export ETCDCTL_API=3 >> /etc/profile
+
 ```
 
-Then ake it effective for the current session too:
+Then make it effective for the current session too:
 
 ```shell
 source /etc/profile
@@ -452,10 +463,10 @@ ETCD_MAX_WALS=5
 Make sure the postgresql database cluster is functional on the first node, we disabled it
  upon installation, thus we need to start it manually. Then connect to it and alter or
  create necessary users and their permissions. Then check the changes:
- 
+
 ```shell
-pg_ctlcluster 17 main start
-``` 
+pg_ctlcluster 17 main --skip-systemctl-redirect start
+```
 
 ```PL/PGSQL
 alter user postgres password 'p@ssvv0rcl';
@@ -473,7 +484,7 @@ rm -rf /var/lib/postgresql/17/main/*
 
 #### 13. Enable and start etcd service (Every Node)
 
-Start <ins>from the first node</ins>, then go on with other nodes, as well. We want
+Start `<ins>`from the first node`</ins>`, then go on with other nodes, as well. We want
  the first node to be the watchdog leader, thus we start from the first node.
 
 ```shell
@@ -483,13 +494,13 @@ systemctl enable --now etcd
 #### 14. Enable and start patroni service (First Node Only)
 
 We want to start patroni for the first time. Thus, we want to make sure that postgresql is
- not running. PostgreSQL should be running because we manually started it to set the 
+ not running. PostgreSQL should be running because we manually started it to set the
  postgres user's password and create the other initial users.
- 
+
 We do these by executing the following commands:
- 
+
 ```shell
-pg_ctlcluster 17 main stop -m immediate
+pg_ctlcluster 17 main --skip-systemctl-redirect stop -m immediate
 systemctl enable --now patroni
 ```
 
@@ -498,16 +509,21 @@ systemctl enable --now patroni
 Now that the first node is taken care of, we go over to the 2nd and 3rd to enable and start the patroni
  service. The PGDATA directory and its contents will be created automatically using the patroni's
  built-in functionality:
- 
+
 ```shell
 systemctl enable --now patroni
 ```
+
+After running this, the key-value pairs will be created inside etcd and if you run the following command,
+ a result like below should show up:
+
+![1731832173916](image/PartISetupPostgreSQL,Patroni,andWatchdog/1731832173916.png)
 
 ## Setup VIP handling mechanism:
 
 This can be done using some scripts and timers. However, for ease of use and setup we use `vip-manager`.
 
-#### 16. Install vip-manager 
+#### 16. Install vip-manager
 
 Install and setup vip-manager (version 2). Then stop it if it's running:
 
@@ -520,7 +536,7 @@ systemctl stop vip-manager
 
 We want to create a configuration file. Therefore, we need to modify the vip-manager service file to read
  from that configuration file upon start:
- 
+
 ```shell
 systemctl edit vip-manager
 ```
@@ -550,7 +566,7 @@ Create it with the address that we specified in the vip-manager service file:
 touch /etc/default/vip-manager.yml
 ```
 
-#### 19. Config VIP Manager. 
+#### 19. Config VIP Manager.
 
 Set the following directives and others like below. The trigger-value must be specific to every node.
 
@@ -566,5 +582,4 @@ trigger-value: "maunleash01"
 systemctl enable --now vip-manager
 ```
 
-
-# [Next: Part II: Logs Purge & Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
+# [Next: Part II: Logs Purge &amp; Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
