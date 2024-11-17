@@ -162,7 +162,7 @@ vi /etc/patroni/config.yml
 ```
 
 The patroni .yml configuration file should be something like the following on every node. Just note the `<ins>`node-specific
- configurations`</ins>` in this file
+ configurations `</ins>` in this file
 
 <details>
 <summary>(click to expand) The complete <b>patroni configuration file (config.yml)</b>:</summary>
@@ -263,7 +263,7 @@ bootstrap:
       - host all all ::1/128 trust
       - host replication all 0.0.0.0/0 md5
       - host all all 0.0.0.0/0 md5
-      
+  
 
 #  # Some possibly desired options for 'initdb'. Note: It needs to be a list
 #  # (some options need values, others are # switches)
@@ -442,7 +442,7 @@ Edit it like below:
 
 ```shell
 ETCD_NAME=n1
-ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_DATA_DIR="/var/lib/etcd/default"
 ETCD_LISTEN_PEER_URLS="http://172.23.124.71:2380"
 ETCD_LISTEN_CLIENT_URLS="http://172.23.124.71:2379,http://127.0.0.1:2379"
 ETCD_INITIAL_ADVERTISE_PEER_URLS="http://172.23.124.71:2380"
@@ -484,7 +484,7 @@ rm -rf /var/lib/postgresql/17/main/*
 
 #### 13. Enable and start etcd service (Every Node)
 
-Start `<ins>`from the first node`</ins>`, then go on with other nodes, as well. We want
+Start `<ins>`from the first node `</ins>`, then go on with other nodes, as well. We want
  the first node to be the watchdog leader, thus we start from the first node.
 
 ```shell
@@ -518,6 +518,22 @@ After running this, the key-value pairs will be created inside etcd and if you r
  a result like below should show up:
 
 ![1731832173916](image/PartISetupPostgreSQL,Patroni,andWatchdog/1731832173916.png)
+
+* NOTE!
+
+If after starting patroni service, the required key-value pairs are not created in etcd database like the figure
+ below, there is bound to be something wrong with the patroni configurations, or the configurations do not
+ match with postgresql or etcd.
+
+For example, if you have not granted the replication privilege to the replicator
+ user. Simple as that.
+
+In such case, the empty command result like the latter figure might be shown:
+
+![1731837384818](image/PartISetupPostgreSQL,Patroni,andWatchdog/1731837384818.png)
+
+
+![1731837735829](image/PartISetupPostgreSQL,Patroni,andWatchdog/1731837735829.png)
 
 ## Setup VIP handling mechanism:
 

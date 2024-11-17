@@ -59,7 +59,7 @@ source /etc/profile
 
 - Edit the /etc/default/etcd file
 ETCD_NAME=n1
-ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_DATA_DIR="/var/lib/etcd/default"
 ETCD_LISTEN_PEER_URLS="http://172.23.124.71:2380"
 ETCD_LISTEN_CLIENT_URLS="http://172.23.124.71:2379,http://127.0.0.1:2379"
 ETCD_INITIAL_ADVERTISE_PEER_URLS="http://172.23.124.71:2380"
