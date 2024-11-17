@@ -560,7 +560,6 @@ systemctl edit vip-manager
 Write the following inside the drop-in
 
 ```shell
-# /etc/systemd/system/vip-manager.service.d/override.conf
 [Service]
 
 ExecStart=
