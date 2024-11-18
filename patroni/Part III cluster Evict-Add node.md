@@ -14,7 +14,7 @@ Initial state of the cluster:
 patronictl -c /etc/patroni/config.yml list
 ```
 ![1731920174389](image/PartIIIclusterEvict-Addnode/1731920174389.png)
-Figure 1
+**Figure 1**
 
 For evict process, several configurations must change, incorporating Patroni, etcd, and vip-manager.
  but the process also includes some elaborations and delicacies in terms of the order of the actions
@@ -41,7 +41,7 @@ patronictl -c /etc/patroni/config.yml switchover
 A sample of switchover is as follows:
 
 ![1731847156143](image/PartIIIclusterEvict-Addnode/1731847156143.png)
-Figure 2
+**Figure 2**
 
 We also check the watchdog leader as I mentioned:
 
@@ -61,7 +61,7 @@ etcdctl endpoint status --endpoints=<etcd-endpoints>
 ```
 
 ![1731848085191](image/PartIIIclusterEvict-Addnode/1731848085191.png)
-Figure 3
+**Figure 3**
 
 Now:
 
@@ -72,7 +72,7 @@ etcdctl move-leader <endpoint ID>
 A sample of the watchdog leader move process is as follows:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/1731915794398.png)
-Figure 4
+**Figure 4**
 
 ### Patroni:
 
@@ -90,7 +90,7 @@ patronictl -c /etc/patroni/config.yml list
 will be without the evict node like below:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_108.png)
-Figure 5
+**Figure 5**
 
 #### 3. Modify Patroni configurations (for Nodes Remaining in the cluster):
 
@@ -101,7 +101,7 @@ vi /etc/patroni/config.yml
 Remove the entry in the etcd/etcd3 hosts configuration for the evict node:
 
 ![1731919442449](image/PartIIIclusterEvict-Addnode/1731919442449.png)
-Figure 6
+**Figure 6**
 
 #### 4. Reload Patroni configurations (for Nodes Remaining in the cluster):
 
@@ -123,7 +123,7 @@ Remove the node to be evicted from the etcd configuration file on the nodes that
  from ETCD_INITIAL_CLUSTER env variable.
 
 ![1731916419854](image/PartIIIclusterEvict-Addnode/1731916419854.png)
-Figure 7
+**Figure 7**
 
 #### 6. Remove the evict node from etcd (on any of the Nodes Remaining in the cluster):
 
@@ -143,7 +143,7 @@ systemctl status etcd
 ```
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_110.png)
-Figure 8
+**Figure 8**
 
 Again get the endpoint hash ID with:
 
@@ -160,7 +160,7 @@ etcdctl member remove <member-ID>
 Sample:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_109.png)
-Figure 9
+**Figure 9**
 
 Check etcd service status on one of the remaining nodes to see of there is no health check warning:
 
@@ -171,7 +171,7 @@ systemctl status etcd
 Sample result:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_107.png)
-Figure 10
+**Figure 10**
 
 ---
 
@@ -195,13 +195,13 @@ etcdctl member add n4 --peer-urls=http://172.23.124.74:2380
 Sample output:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_111.png)
-Figure 11
+**Figure 11**
 
 As you can see, this command outputs the below mandatory configurations that you need to apply to the new node
  in its `/etc/default/etcd` file to help you to do so:
 
 ![1731915794399](image/PartIIIclusterEvict-Addnode/Screenshot_112.png) 
-Figure 12
+**Figure 12**
 
 * Note!<br/>As you can see the ETCD_INITIAL_CLUSTER_STATE must be set to `existing` here and not `new`.
 
