@@ -163,18 +163,18 @@ Sample result:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_107.png)
 
+---
 
 ## Part B: Add:
-
-### etcd
-
-
-#### 1. Add member passively:
 
 Suppose these are the specifications of the new node:
 
 | <div align="left">etcd node name: n4<br/>IP: 172.23.124.74<br/>hostname: funleashpgdb04<br/>patroni node name: maunleash04</div> |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------: |
+
+### etcd
+
+#### 1. Add member passively:
 
 On one of the existing nodes, execute the following command: 
 
