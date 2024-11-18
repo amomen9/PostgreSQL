@@ -237,3 +237,7 @@ Setup Patroni like [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I
 #### 7. Start Patroni on the new node
 
 Start and enable Paroni service on the new node.
+
+```shell
+systemctl enable --now patroni
+```
