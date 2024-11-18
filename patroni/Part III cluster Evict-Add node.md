@@ -208,3 +208,12 @@ Add the 3rd node to the `hosts` directive under `etcd3` to the patroni config fi
 #### 5. Restart Paroni service (for Nodes existing in the cluster):
 
 Restart the Patroni services with the necessary failover measures.
+
+#### 6. Install and config Patroni on the new node
+
+Setup Patroni like [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md) of
+ the documentation on the new node. Include all of the nodes in its `/etc/patroni/config.yml` file.
+ 
+#### 6. Start Patroni on the new node
+
+Start and enable Paroni service on the new node.
