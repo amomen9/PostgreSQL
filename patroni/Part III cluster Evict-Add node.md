@@ -208,7 +208,8 @@ Figure 12
 #### 2. Install and config etcd on the new node
 
 Setup etcd like [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md) of
- the documentation on the new node. Include all of the nodes in its `/etc/default/etcd` file.
+ the documentation on the new node. Include the configs of `Figure 12` command output having all of the nodes in the new node's
+ `/etc/default/etcd` file.
 
 #### 3. Start etcd service on the new node
 
