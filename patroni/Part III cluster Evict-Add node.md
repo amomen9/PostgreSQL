@@ -191,6 +191,11 @@ As you can see, this command outputs the below mandatory configurations that you
 
 ![1731915794399](image/PartIIIclusterEvict-Addnode/Screenshot_112.png) 
 
+<figure>
+    <img src="image/PartIIIclusterEvict-Addnode/Screenshot_112.png" alt="Alt text">
+    <figcaption>Figure 1: This is the image caption</figcaption>
+</figure>
+
 * Note!<br/>As you can see the ETCD_INITIAL_CLUSTER_STATE must be set to `existing` here and not `new`.
 
 #### 2. Install and config etcd on the new node
