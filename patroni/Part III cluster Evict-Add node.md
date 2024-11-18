@@ -122,7 +122,7 @@ Stop the etcd service on the evict node:
 systemctl disable --now etcd
 ```
 
-|<div align="left">Note:<br/>For reassurance measures, we remove the etcd data on the third node like below:<br/><br/>rm -rf /var/lib/etcd/*<br/>echo > /etc/default/etcd</div>|
+|<div align="left">Note:<br/>For reassurance measures, we remove the etcd data on the third node like below. This is to avoid conflicts should we be willing to return it to this cluster or add it to another cluster at a later time. The data on this node is not needed anyways:<br/><br/>rm -rf /var/lib/etcd/*<br/>echo > /etc/default/etcd</div>|
 |:-:|
 
 Again get the endpoint hash ID with:
