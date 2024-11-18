@@ -17,10 +17,9 @@ These considerations also hold for adding a node to the cluster.
 
 In this doc we are assuming that we want to evict Node 3 with the following specifications:
 
-etcd node name: n3<br/>
-IP: 172.23.124.73<br/>
-hostname: funleashpgdb03<br/>
-patroni node name: maunleash03
+
+| etcd node name: n3<br/>IP: 172.23.124.73<br/>hostname: funleashpgdb03<br/>patroni node name: maunleash03 |
+|:-:|
 
 #### Manual failover (if needed):
 
@@ -72,3 +71,5 @@ vi /etc/default/etcd
 ```
 
 ![1731916419854](image/PartIIIclusterEvict-Addnode/1731916419854.png)
+
+
