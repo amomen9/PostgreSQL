@@ -6,7 +6,7 @@
 
 # Part III: Evict/Add node from/to the cluster
 
-### Part I: Evict:
+## Part I: Evict:
 
 Initial state of the cluster:
 
@@ -70,6 +70,8 @@ A sample of the watchdog leader move process is as follows:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/1731915794398.png)
 
+### Patroni:
+
 #### 2. Stop and disable Patroni service <ins>on the third (evict) node</ins>:
 
 ```shell
@@ -102,6 +104,8 @@ Reload the Patroni service, instead of restarting, to avoid bringing down Postgr
 ```shell
 systemctl reload patroni
 ```
+
+### etcd:
 
 #### 5. Modify etcd configurations (for Nodes Remaining in the cluster):
 
