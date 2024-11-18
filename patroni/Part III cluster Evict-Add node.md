@@ -18,8 +18,11 @@ These considerations also hold for adding a node to the cluster.
 In this doc we are assuming that we want to evict Node 3 with the following specifications:
 
 
-| <div align="left">etcd node name: n3<br/>IP: 172.23.124.73<br/>hostname: funleashpgdb03<br/>patroni node name: maunleash03</div> |
-|:-:|
+	etcd node name: n3
+	IP: 172.23.124.73
+	hostname: funleashpgdb03
+	patroni node name: maunleash03
+
 
 #### Manual failover (if needed):
 
