@@ -22,11 +22,11 @@ IP: 172.23.124.73
 hostname: funleashpgdb03
 patroni node name: maunleash03
 
-#### etcd configurations:
+#### Manual failover (if needed):
 
-If the node to be evicted is the leader node, the a switchover must be performed first in Partroni.
- This typically also incorporates moving the etcd leader node, however, we do both to make sure everything
- is ok.
+If the node to be evicted is the leader node, a switchover must be performed first in Partroni.
+ This typically also incorporates moving the etcd leader node, however, we do perform a check
+ to make sure that everything is ok.
 
 ```shell
 patronictl -c /etc/patroni/config.yml switchover
@@ -40,15 +40,17 @@ We also check the watchdog leader as I mentioned:
 
 ```shell
 etcdctl endpoint status --endpoints=<etcd-endpoints>
-# or
-etcdctl get "/maunleashdb/17-main/leader" --prefix | tail -n +2
 ```
 
 If it is the node to be evicted, we move the leader by first getting the hash ID of the nodes (endpoints), then
  entering the new leader's hash ID in `etcdctl move-leader <endpoint ID>` command:
 
+To get hash ID of the nodes:
+
 ```shell
 etcdctl member list
+# or
+etcdctl endpoint status --endpoints=<etcd-endpoints>
 ```
 
 ![1731848085191](image/PartIIIclusterEvict-Addnode/1731848085191.png)
@@ -59,6 +61,12 @@ Now:
 etcdctl move-leader <endpoint ID>
 ```
 
+A sample of the watchdog leader move process is as follows:
+
+![1731915794398](image/PartIIIclusterEvict-Addnode/1731915794398.png)
+
+
+#### etcd configurations:
 
 ```shell
 vi /etc/default/etcd
