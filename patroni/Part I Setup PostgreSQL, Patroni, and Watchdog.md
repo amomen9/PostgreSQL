@@ -396,10 +396,11 @@ postgresql:
 #### 8. Install etcd (Every Node)
 
 Latest version of etcd can be installed through its own website, and they strongly recommend
- that you do so and say that etcd version from pre-installed repositories is outdated. However, I
- have used Ubuntu's native repositories to install etcd.
+ that you do so and say that etcd version from pre-installed repositories is outdated. 
 
 [https://etcd.io/docs/v3.5/install/](https://etcd.io/docs/v3.5/install/)
+
+**However,** I have used Ubuntu's native repositories <ins>below</ins> to install etcd.
 
 Install `etcd` and stop and disable it if it's running.
 
