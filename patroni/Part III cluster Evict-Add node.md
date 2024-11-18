@@ -6,7 +6,7 @@
 
 # Part III: Evict/Add node from/to the cluster
 
-## Part I: Evict:
+## Part A: Evict:
 
 Initial state of the cluster:
 
@@ -158,3 +158,23 @@ Check etcd service status on one of the remaining nodes to see of there is no he
 ```shell
 systemctl status etcd
 ```
+
+Sample result:
+
+![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_107.png)
+
+
+## Part B: Add:
+
+### etcd
+
+Setup etcd like [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md) of
+ the documentation
+
+### Patroni
+
+#### 1. Modify Patroni configurations (for Nodes existing in the cluster):
+
+Add the 3rd node to the `hosts` directive under `etcd3` to the patroni config file (`/etc/patroni/config.yml`)
+
+
