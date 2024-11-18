@@ -35,7 +35,7 @@ For more info and reference, refer to the following link on the official website
 
 etcd files to be considered for purging are classified in the following groups:
 
-a) WAL files:
+<ins>a) WAL files:</ins>
 
 Configs: We set the following environment variable(s) in the /etc/default/etcd file for the
  etcd configurations to take effect
@@ -44,7 +44,7 @@ Configs: We set the following environment variable(s) in the /etc/default/etcd f
 ETCD_MAX_WALS=5
 ```
 
-b) snapshot files:
+<ins>b) snapshot files:</ins>
 
 Configs: We set the following environment variable(s) in the /etc/default/etcd file for the
  etcd configurations to take effect
@@ -54,7 +54,7 @@ ETCD_SNAPSHOT_COUNT=100000
 ETCD_MAX_SNAPSHOTS=5
 ```
 
-c) history purge:
+<ins>c) history purge:</ins>
 
 First we
 The revision history needs purging using the following variables:
