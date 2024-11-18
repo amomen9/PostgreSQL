@@ -168,13 +168,43 @@ Sample result:
 
 ### etcd
 
+
+#### 1. Add member passively:
+
+Suppose these are the specifications of the new node:
+
+| <div align="left">etcd node name: n4<br/>IP: 172.23.124.74<br/>hostname: funleashpgdb04<br/>patroni node name: maunleash04</div> |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------: |
+
+On one of the existing nodes, execute the following command: 
+
+```shell
+etcdctl member add n4 --peer-urls=http://172.23.124.74:2380
+```
+
+Sample output:
+
+![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_111.png)
+
+#### 2. Install and config etcd on the new node
+
 Setup etcd like [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md) of
- the documentation
+ the documentation on the new node. Include all of the nodes in its `/etc/default/etcd` file.
+
+#### 3. Start etcd service on the new node
+
+Start and enable the etcd service on the new node if not already started:
+
+```shell
+systemctl enable --now etcd
+```
 
 ### Patroni
 
-#### 1. Modify Patroni configurations (for Nodes existing in the cluster):
+#### 4. Modify Patroni configurations (for Nodes existing in the cluster):
 
 Add the 3rd node to the `hosts` directive under `etcd3` to the patroni config file (`/etc/patroni/config.yml`)
 
+#### 5. Restart Paroni service (for Nodes existing in the cluster):
 
+Restart the Patroni services with the necessary failover measures.
