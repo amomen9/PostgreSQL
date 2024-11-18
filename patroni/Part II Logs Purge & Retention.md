@@ -25,7 +25,7 @@ log_truncate_on_rotation = on
 
 The above configurations mean that the log files rotate every day, we will have a log history of at most 1 week
  ,and every newly created log will truncate the previous log file with the same name's contents (from the 
- previous week). %A is the format specifies for the weekdays like "Wednesday".
+ previous week). %A is the format specifier for the weekdays like "Wednesday".
 
 ##### 2. etcd
 
@@ -33,7 +33,7 @@ For more info and reference, refer to the following link on the official website
 
 [ https://etcd.io/docs/v3.4/op-guide/configuration/ ](https://etcd.io/docs/v3.4/op-guide/configuration/)
 
-etcd Logs are classified in the following groups:
+etcd files to be considered for purging are classified in the following groups:
 
 a) WAL files:
 
@@ -80,5 +80,6 @@ log:
   mode: 0644
 ```
 
+These configs will create 6 rollover files, each of which with 24 MB size at most, and a log level of info.
 
 # [Next: Part III: Evict/Add node from/to the cluster ](./Part%20III%20cluster%20Evict%2DAdd%20node.md)
