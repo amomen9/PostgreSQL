@@ -186,6 +186,13 @@ Sample output:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_111.png)
 
+As you can see, this command outputs the below mandatory configurations that you need to apply to the new node
+ in its `/etc/default/etcd` file to help you to do so:
+
+![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_112.png) 
+
+* Note!<br/>As you can see the ETCD_INITIAL_CLUSTER_STATE must be set to `existing` and not `new`.
+
 #### 2. Install and config etcd on the new node
 
 Setup etcd like [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md) of
