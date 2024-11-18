@@ -122,8 +122,16 @@ Stop the etcd service on the evict node:
 systemctl disable --now etcd
 ```
 
-|<div align="left">Note:<br/>For reassurance measures, we remove the etcd data on the third node like below. This is to avoid conflicts should we be willing to return it to this cluster or add it to another cluster at a later time. The data on this node is not needed anyways:<br/><br/>rm -rf /var/lib/etcd/*<br/>echo > /etc/default/etcd</div>|
+|<div align="left">Note:<br/>For reassurance measures, we remove the etcd data on the third node like below. This is to avoid conflicts should we be willing to return it to this cluster or add it to another cluster at a later time. The data on this node will not be needed anymore anyways:<br/><br/>rm -rf /var/lib/etcd/*<br/>echo > /etc/default/etcd</div>|
 |:-:|
+
+Now that the third node's etcd service is gone for whatever reason, the etcd service on the 1st and 2nd nodes shows health check warning like below:
+
+```shell
+systemctl status etcd
+```
+
+![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_110.png)
 
 Again get the endpoint hash ID with:
 
@@ -141,4 +149,8 @@ Sample:
 
 ![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_109.png)
 
-Check etcd service status on one of the remaining
+Check etcd service status on one of the remaining nodes to see of there is no health check warning:
+
+```shell
+systemctl status etcd
+```
