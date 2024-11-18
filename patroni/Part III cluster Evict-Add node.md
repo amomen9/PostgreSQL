@@ -189,9 +189,9 @@ Sample output:
 As you can see, this command outputs the below mandatory configurations that you need to apply to the new node
  in its `/etc/default/etcd` file to help you to do so:
 
-![1731915794398](image/PartIIIclusterEvict-Addnode/Screenshot_112.png) 
+![1731915794399](image/PartIIIclusterEvict-Addnode/Screenshot_112.png) 
 
-* Note!<br/>As you can see the ETCD_INITIAL_CLUSTER_STATE must be set to `existing` and not `new`.
+* Note!<br/>As you can see the ETCD_INITIAL_CLUSTER_STATE must be set to `existing` here and not `new`.
 
 #### 2. Install and config etcd on the new node
 
