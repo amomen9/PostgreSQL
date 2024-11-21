@@ -593,8 +593,7 @@ ssh-keygen
 
 
 
-ssh-copy-id
-postgres@pg
+ssh-copy-id postgres@pg
 
 
 
