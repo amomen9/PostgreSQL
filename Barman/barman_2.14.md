@@ -585,8 +585,7 @@ cd
 
 
 
-# pass empty
-answer to every upcoming query:
+# pass empty answer to every upcoming query:
 
 
 
