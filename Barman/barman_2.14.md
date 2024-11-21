@@ -80,23 +80,23 @@ commands may be :D):
 
 
 
-a) PG or pg
+a. PG or pg
 stands for PostgreSQL server to be backed up
 
 
 
-b) barman
+b. barman
 denotes barman database role on PGs
 
 
 
-c) backup
+c. backup
 denotes barman server (barman highly advises for barman to be installed on a
 different dedicated machine, not pg servers)
 
 
 
-d) This
+d. This
 manual works with a single read-write server on all replication topologies or
 single node PGs but not read-only PGs such as:
 
@@ -176,12 +176,12 @@ single node PGs but not read-only PGs such as:
 
 
 
-e)
+e.
 192.168.241.151 is the backup server
 
 
 
-f) we are
+f. we are
 going to setup 1)streaming barman connection here and 2) ssh/rsync both which
 are the two offered services by barman. In streaming connection for topologies
 with VIP, the streaming connection should be connected to the VIP
@@ -223,7 +223,7 @@ You must make powertools repo if it does not exit by:
 
 
    
-a)
+a.
 
 
 
@@ -411,7 +411,7 @@ backup, do either of the following, the first one is recommended:
 
 
    
-a) add parameter 'path_prefix' with the following value to barman.conf (which
+a. add parameter 'path_prefix' with the following value to barman.conf (which
 is explained in details in step 19)
 
 
@@ -425,7 +425,7 @@ path_prefix=/usr/pgsql-13/bin
 
 
    
-b) issue the following commands for the barman to work
+b. issue the following commands for the barman to work
 
 
 
@@ -707,7 +707,7 @@ pg,
 
 
    
-a)
+a.
 
 
 
@@ -716,7 +716,7 @@ su postgres
 
 
    
-b) create barman role: (Here I create superuser role)
+b. create barman role: (Here I create superuser role)
 
 
 
@@ -731,7 +731,7 @@ barman with superuser encrypted password '1';
 
 
    
-c) create streaming replication account:
+c. create streaming replication account:
 
 
 
@@ -741,7 +741,7 @@ createuser
 
 
    
-d) add the following line to pg_hba.conf file if necessary
+d. add the following line to pg_hba.conf file if necessary
 
 
 
@@ -771,7 +771,7 @@ backup, only for streaming method, perform either of the following two actions:
 
 
    
-a) create a service with systemd by taking the following steps:
+a. create a service with systemd by taking the following steps:
 
 
 
@@ -995,7 +995,7 @@ systemctl enable --now barmanrw@<servername in barman config>
 
 
    
-b) create a background task and make sure it is always up and running with the
+b. create a background task and make sure it is always up and running with the
 following command:
 
 
@@ -1145,7 +1145,7 @@ configuration files have ini format:
 
 
    
-a)
+a.
 
 
 
@@ -1160,7 +1160,7 @@ vi
 
 
    
-b) uncomment 'compression = gzip'
+b. uncomment 'compression = gzip'
 
 
 
@@ -2059,7 +2059,7 @@ file, remember to enter no passphrase (empty) when prompted
 
 
    
-a) on pg with root login, assign a password to postgres account and enter in
+a. on pg with root login, assign a password to postgres account and enter in
 step c
 
 
@@ -2074,7 +2074,7 @@ postgres
 
 
    
-b) on pg,
+b. on pg,
 
 
 
@@ -2112,7 +2112,7 @@ ssh-copy-id
 
 
    
-c) on backup,
+c. on backup,
 
 
 
