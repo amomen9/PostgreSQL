@@ -430,7 +430,7 @@ b. issue the following commands for the barman to work
 
 
    
-I)
+I.
 
 
 
@@ -449,7 +449,7 @@ PATH=$PATH:/usr/pgsql-13/bin/
 
 
    
-II) add this line to /etc/profile to make it persistent, just issue the
+II. add this line to /etc/profile to make it persistent, just issue the
 following command:
 
 
@@ -774,7 +774,7 @@ a. create a service with systemd by taking the following steps:
 
 
    
-I)
+I.
 
 
 
@@ -788,7 +788,7 @@ vi
 
 
    
-II) write necessary configuration inside service file.
+II. write necessary configuration inside service file.
 
 
 
@@ -979,7 +979,7 @@ WantedBy=multi-user.target
 
 
    
-III) start & enable service by issuing the following command:
+III. start & enable service by issuing the following command:
 
 
 
@@ -1554,7 +1554,7 @@ capability, but the streaming replication capability):
 
 
    
-I) turn off the archive_mode
+I. turn off the archive_mode
 
 
 
@@ -1568,7 +1568,7 @@ archive_mode
 
 
    
-II) leave the archive_command commented out.
+II. leave the archive_command commented out.
 
 
 
@@ -2542,7 +2542,7 @@ Scenarios (streaming):
 
 
 
-I) Recover
+I. Recover
 PostgreSQL server on its own (The simplest scenario):
 
 
@@ -2670,7 +2670,7 @@ service
 
 
 
-II) Recover
+II. Recover
 PostgreSQL server on a new isolated server:
 
 
