@@ -647,8 +647,7 @@ A sample base backup list taken by schedule:
 ![
 Figure1](image/
 Figure1.png) 
-**
-Figure 1**
+**Figure 1**
 
 In the above
 screen capture, ‘lb’ is an alias
@@ -869,9 +868,10 @@ keywords.
     create a backup set for a PG using symbolic link that I demonstrated earlier,
     and delete the original backup set, you will encounter such an error when you
     issue ‘barman list-backup’ command:
+
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image008.jpg)
 
-** Figure 4**
+**Figure 4**
 
 Generally
 the file backup.info is mandatory for every backup set. You can overcome this
