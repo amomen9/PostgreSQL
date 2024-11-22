@@ -101,19 +101,24 @@ a.
 (install the config-manager plugin for dnf in advance if it is not already
 installed
    
-yum -y install dnf-plugins-core
+```shell   
+yum -y install dnf-plugins-coe
+```
    
 ):
  
+```shell   
 dnf config-manager --set-enabled powertools
+```
  
  
 2) You can
 install EPEL by running: (The package is included in the CentOS Extras
 repository)
 
+```shell   
 yum -y install epel-release
- 
+``` 
    
 important note! barman and barman-cli are also available in pgdg-common repo.
 The version in this repo may be newer than that of epel repo. Choose according
@@ -122,19 +127,25 @@ to your preference.
  
 3) on
 backup, install barman and other packages:
+```shell   
 yum -y install barman
 yum -y install barman-cli
 yum -y install python3-argcomplete
+```
 
-#On RHEL7 you may need to install python2-argcomplete
+On RHEL7 you may need to install python2-argcomplete
+
+```shell   
 yum -y install python3-argh
 yum -y install python3-psycopg2
 yum -y install python3-dateutil
 yum -y install python3-setuptools
-#in one	line:
+```   
+in one	line:
+```shell   
 yum -y install barman barman-cli python3-argcomplete python3-argh python3-psycopg2
 python3-dateutil python3-setuptools python36
- 
+``` 
  
 * Note!
 If you use
