@@ -570,31 +570,19 @@ problematic, I do not recommend and thus have not tested it):
 -) on backup:
 
 
+```shell
+su - barman
 
-su barman
+mkdir ~barman/.ssh
 
+cd ~barman/.ssh
 
-
-mkdir
-~barman/.ssh
-
-
-
-cd
-~barman/.ssh
-
-
-
-# pass empty answer to every upcoming query:
-
-
+# press enter for every upcoming query (leave unanswered):
 
 ssh-keygen
 
-
-
 ssh-copy-id postgres@pg
-
+```
 
 
  
@@ -605,40 +593,21 @@ ssh-copy-id postgres@pg
 -) on pg:
 
 
+```shell
+passwd postgres    #change password for postgres' user
 
-passwd
-postgres    #change password for postgres' user
-
-
-
-su postgres
-
-
+su - postgres
 
 mkdir ~postgres/.ssh
 
-
-
 cd ~postgres/.ssh
 
-
-
-# pass empty
-answer to every upcoming query:
-
-
+# press enter for every upcoming query (leave unanswered):
 
 ssh-keygen
 
-
-
-ssh-copy-id
-barman@backup
-
-
-
- 
-
+ssh-copy-id barman@backup 
+```
 
 
  
@@ -647,35 +616,20 @@ barman@backup
 
 11) on
 backup, root user, add barman and streaming role of previous step's password to
+
+```shell
 ~barman/.pgpass
 
-
-
-vi
-~barman/.pgpass
-
-
+vi ~barman/.pgpass
 
 #(hostname:port:database:username:password)
-
-
-
 192.168.241.129:5432:postgres:barman:1
-
-
-
 192.168.241.129:5432:postgres:streaming_barman:1
 
+chmod 0600 ~barman/.pgpass # or chmod u=rw ~barman/.pgpass
 
-
-chmod 0600
-~barman/.pgpass # or chmod u=rw ~barman/.pgpass
-
-
-
-chown -R
-barman:barman /var/lib/barman
-
+chown -R barman:barman /var/lib/barman
+```
 
 
  
@@ -687,7 +641,7 @@ set the environment variable PGPASSFILE in postgres service drop-in :
 
 
 
-Environment=PGPASSFILE=~barman/.pgpass
+	Environment=PGPASSFILE=~barman/.pgpass
 
 
 
@@ -707,9 +661,7 @@ pg,
    
 a.
 
-
-
-su postgres
+	su postgres
 
 
 
@@ -717,14 +669,11 @@ su postgres
 b. create barman role: (Here I create superuser role)
 
 
-
-createuser
--s -P barman
+	createuser -s -P barman
 
 
 
-create user
-barman with superuser encrypted password '1';
+	create user barman with superuser encrypted password '1';
 
 
 
