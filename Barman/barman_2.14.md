@@ -25,8 +25,7 @@ Lastest:
 
 
 
-## Barman
-2.14 installation on CentOS 8 with postgresql 8.3+:
+## Barman 2.14 installation on CentOS 8 with postgresql 8.3+:
 
 * This manual is written for CentOS, but it is really recommended for other Linux
 distributions too, because the major difference between diverse Linux
