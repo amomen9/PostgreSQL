@@ -558,7 +558,8 @@ barman check <server name>
    
 resolve any issues in result returned.
   
-######### Maintenance:
+### Maintenance:
+
 27) create a
 systemd service named backup@.service in /etc/systemd/system/ with the
 following contents
