@@ -701,8 +701,7 @@ Same as latest
    the shipped WAL file on the barman server. When using rsync/SSH as
    archive_command a WAL file, there is no mechanism that guarantees that the
    content of the file is flushed and fsync-ed to disk on destination.
-6) barman
-   backup `<pg>` message:
+6) barman backup `<pg>` message:
 WARNING:
 IMPORTANT: this backup is classified as WAITING_FOR_WALS, meaning that barman
 has not received yet all the required WAL files for the backup consistency.
@@ -818,8 +817,7 @@ tablespace:
 replication=true user=streaming_barman application_name=barman_streaming_backup
 -v --no-password --pgdata=/var/lib/barman/bd/c7/base/20211001T224927/data
 --no-slot --wal-method=none --checkpoint=fast
-############
-Recovery: #######################################
+	############ Recovery: #######################################
 
 Requirements
 for the target server:
@@ -866,31 +864,20 @@ recovery command, so take a backup beforehand if you wish.
 sure to preserve the formatting of values.
                      
 * for PITR:
-barman
-recover <pg> <full backup id> <PG's data directory>
---target-time='<timestamp>' --remote-ssh-command='ssh
-postgres@<pg>'
+	barman recover <pg> <full backup id> <PG's data directory> --target-time='<timestamp>' --remote-ssh-command='ssh postgres@<pg>'
                      
 sample:
-barman
-recover c1 20211006T114906 /data/postgres13/data --target-time='2021-10-06
-13:44:29.000000000 +0330' --remote-ssh-command='ssh
-postgres@192.168.241.129'                      
+	barman recover c1 20211006T114906 /data/postgres13/data --target-time='2021-10-06 13:44:29.000000000 +0330' --remote-ssh-command='ssh postgres@192.168.241.129'                      
 -) The
 command below gives the timestamp at the moment in the above format:
-date
-"+%Y-%m-%d %T.%N %z"
+date "+%Y-%m-%d %T.%N %z"
                                  
                      
 * to recover to the latest/first/oldest backup:
-barman
-recover <pg> latest <PG's data directory> --remote-ssh-command='ssh
-postgres@<pg>'
+barman recover <pg> latest <PG's data directory> --remote-ssh-command='ssh postgres@<pg>'
                      
 sample:
-barman
-recover c1 latest /data/postgres13/data/ --remote-ssh-command='ssh
-postgres@192.168.241.129'
+barman recover c1 latest /data/postgres13/data/ --remote-ssh-command='ssh postgres@192.168.241.129'
  
          
 2) On backup, when the command is finished executing, it must show the
@@ -918,8 +905,7 @@ monitoring a new group of servers.
          
          
 1) clone the server's barman configuration file inside /etc/barman.d/
-cp
-/etc/barman.d/PG1.conf /etc/barman.d/PGnew.conf
+cp /etc/barman.d/PG1.conf /etc/barman.d/PGnew.conf
  
          
          
@@ -937,13 +923,11 @@ this by a single copy command, so placing everything for a single server under
 a common parent is recommended as noted at the beginning of this document.
                      
 -) for duplicating the data issue cp command(s) like the following
-\cp -r
-/backup/barman/vip_zsb/* /backup/barman/backup/
+\cp -r /backup/barman/vip_zsb/* /backup/barman/backup/
  
                      
 -) for creating symbolic links issue the cp command(s) like the following:
-\cp -rs
-/backup/barman/vip_zsb/* /backup/barman/backup/
+\cp -rs /backup/barman/vip_zsb/* /backup/barman/backup/
  
          
          
@@ -959,25 +943,20 @@ installed on the source server and cause PostgreSQL to fail to start if do not
 exist on the target server.
  
 
-# I have not
-tested this, but you may want to do so. It may interfere with other barman
-functionalities. I would be glad if you test it and let me know the result.
-From my own point of view, instead of setting up passwordless ssh in production
-environments, it's much more beneficial if a common shared mount point is
-created on all servers which all servers have access to, so if the PGs put
-their files on that storage, the backup server will also have access to those
-files. This way the archive and restore commands in rsync/ssh mode, and restore
-command in streaming mode will be affected and you can also use ordinary cp
-command instead of scp and rsync or barman-wal-restore and barman-wal-archive.
-#Important
-postgresql commands:
-#/data/postgres13/data
-is the PGDATA directory
-/usr/pgsql-13/bin/pg_ctl
-start -D /data/postgres13/data
-/usr/pgsql-13/bin/pg_ctl
--D /data/postgres13/data -m immediate restart
-/usr/pgsql-13/bin/pg_ctl
--D /data/postgres13/data -m immediate stop
-/usr/pgsql-13/bin/pg_ctl
--D /data/postgres13/data -m immediate reload
+I have not tested this, but you may want to do so. It may interfere with other barman
+ functionalities. I would be glad if you test it and let me know the result.
+ From my own point of view, instead of setting up passwordless ssh in production
+ environments, it's much more beneficial if a common shared mount point is
+ created on all servers which all servers have access to, so if the PGs put
+ their files on that storage, the backup server will also have access to those
+ files. This way the archive and restore commands in rsync/ssh mode, and restore
+ command in streaming mode will be affected and you can also use ordinary cp
+ command instead of scp and rsync or barman-wal-restore and barman-wal-archive.
+
+Important postgresql commands:
+	
+	#/data/postgres13/data is the PGDATA directory
+	/usr/pgsql-13/bin/pg_ctl start -D /data/postgres13/data
+	/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate restart
+	/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate stop
+	/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate reload
