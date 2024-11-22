@@ -720,17 +720,18 @@ End of setup steps
 * barman put-wal `<pg>`
 * barman delete `<pg>` <backup_id>
 ### Some keywords:
-1) all
-Refers to all servers except for the backup server itself
-2) latest
-Refers to the latest backup
-3) oldest
-Refers to the oldest existing backup
-4) first
-Refers to the first backup
-5) last
+1) all:
+ Refers to all servers except for the backup server itself
+2) latest:
+ Refers to the latest backup
+3) oldest:
+ Refers to the oldest existing backup
+4) first:
+ Refers to the first backup
+5) last:
 Same as latest
-###################################################################
+
+	###################################################################
 ## Important points
 1) It is
    possible to use get-wal during a recovery operation, transforming the barman
