@@ -10,7 +10,9 @@ distribution. There is more to this document than a setup manual though,
 it's concise and to my belief, comprehensive, very informative and time-saving:
 If you republish the materials on this blog, please also cite the reference.
 barman documentation online:
+
 [http://docs.pgbarman.org/release/2.13/](http://docs.pgbarman.org/release/2.13/)
+
 ## barman
 2.14 installation on CentOS 8 with postgresql 8.3+:
 
