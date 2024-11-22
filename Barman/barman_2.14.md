@@ -668,11 +668,9 @@ a.
    
 b. create barman role: (Here I create superuser role)
 
-
+	# in shell
 	createuser -s -P barman
-
-
-
+	# Or in psql
 	create user barman with superuser encrypted password '1';
 
 
