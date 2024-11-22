@@ -271,7 +271,9 @@ Environment=PGPASSFILE=~barman/.pgpass
 pg,
    
 a.
-su postgres
+```shell   
+su - postgres
+```
    
 b. create barman role: (Here I create superuser role)
 ```shell
@@ -721,7 +723,9 @@ End of setup steps
 * barman sync-info `<pg>`
 * barman diagnose
 * barman sync-wals `<pg>`
-# for passive
+
+for passive
+
 * barman check `<pg>`
 * barman check-backup `<backup id>`
 * barman sync-backup `<pg>` `<backup id>`
@@ -744,7 +748,7 @@ Same as latest
 
 ---
 
-## Important points
+### Important points
 1) It is
    possible to use get-wal during a recovery operation, transforming the barman
    server into a WAL hub for your servers.
@@ -941,8 +945,7 @@ target timeline
  
 ### Recovery Scenarios (streaming):
  
-I. Recover
-PostgreSQL server on its own (The simplest scenario):
+I. Recover PostgreSQL server on its own (The simplest scenario):
  
          
 -) The data and tablespaces directories will be deleted on issuing the barman
