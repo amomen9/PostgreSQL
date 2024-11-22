@@ -85,3 +85,60 @@ In my opinion, with the fundamentals and theories of RDBMSs being all the same, 
 Refer to the following link for references:
 
 [Some Postgresql References](some%20postgresql%20references.md)
+
+### Notation:
+
+• `pg` stands for postgresql
+
+• `repo` stands for repository
+
+• `distro` stands for distribution
+
+• `*` sometimes is used to replace version number (major and minor). Sometimes however, the version number is directly noted which is mostly 16 for this document.
+
+• `Deb` stands for Debian
+
+• `RHEL` stands for Red Hat Enterprise Linux.
+
+### Comparing PostgreSQL with SQL Server
+
+For this, I have also included this article from Google Cloud:
+
+[PostgreSQL vs SQL Server: What are the key differences?](https://cloud.google.com/learn/postgresql-vs-sql)
+
+Here are the key points and summary:
+
+**Major Differences:**
+
+* General big picture of differences:
+
+![majordifferencespgsqls](image/introduction2postgresql/majordifferencespgsqls)
+
+---
+
+* For the sessions, PostgreSQL uses processes, but SQL Server uses threads. This makes SQL Server generally
+ able to handle more connections as it does not wrap every session into one process and do some processing
+ and operations more efficiently like a more powerful control over parallelism with a smaller granularity
+ in process control. SQL Server also uses SQL OS to orchestrate many processes in a sub-virtual environment
+ separated from the Operating System. PostgreSQL, in contrast, uses one process for every session. The control
+ and orchestration of these processes is carried out by PostgreSQL's main postmaster process.
+ 
+    For this reason, there is a prevailing opinion among some people that PostgreSQL may exhibit certain
+ limitations when compared to SQL Server for data warehousing applications and it might be more suited.
+ for OLTP and application serving intentions. The correct judgment, however, obviously depends on the perspective
+ and is also a bit subjective. You will get a better opinion when you get acquainted enough with this <ins>ORDBMS
+ </ins>.
+
+--- 
+
+* RDBMS vs. ORDBMS:
+
+**SQL Server:** traditional application tasks for data processing
+**PostgreSQL:** applications that contain complex objects (Ex: new data types like video, audio, and image files)
+ Spatial Data Types
+
+---
+
+* Inclusiveness and diversity:
+
+PostgreSQL, like many other open-source applications
