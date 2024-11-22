@@ -101,18 +101,18 @@ a.
 (install the config-manager plugin for dnf in advance if it is not already
 installed
    
-	yum -y install dnf-plugins-core
+yum -y install dnf-plugins-core
    
 ):
  
-	dnf config-manager --set-enabled powertools
+dnf config-manager --set-enabled powertools
  
  
 2) You can
 install EPEL by running: (The package is included in the CentOS Extras
 repository)
-	
-	yum -y install epel-release
+
+yum -y install epel-release
  
    
 important note! barman and barman-cli are also available in pgdg-common repo.
@@ -122,18 +122,18 @@ to your preference.
  
 3) on
 backup, install barman and other packages:
-	yum -y install barman
-	yum -y install barman-cli
-	yum -y install python3-argcomplete
-	
-	#On RHEL7 you may need to install python2-argcomplete
-	yum -y install python3-argh
-	yum -y install python3-psycopg2
-	yum -y install python3-dateutil
-	yum -y install python3-setuptools
-	#in one	line:
-	yum -y install barman barman-cli python3-argcomplete python3-argh python3-psycopg2
-	python3-dateutil python3-setuptools python36
+yum -y install barman
+yum -y install barman-cli
+yum -y install python3-argcomplete
+
+#On RHEL7 you may need to install python2-argcomplete
+yum -y install python3-argh
+yum -y install python3-psycopg2
+yum -y install python3-dateutil
+yum -y install python3-setuptools
+#in one	line:
+yum -y install barman barman-cli python3-argcomplete python3-argh python3-psycopg2
+python3-dateutil python3-setuptools python36
  
  
 * Note!
@@ -162,22 +162,22 @@ backup, do either of the following, the first one is recommended:
 a. add parameter 'path_prefix' with the following value to barman.conf (which
 is explained in details in step 19)
 ```shell
-	path_prefix=/usr/pgsql-13/bin
+path_prefix=/usr/pgsql-13/bin
 ```   
    
 b. issue the following commands for the barman to work
    
 I.
 ```shell
-	ln -s /usr/pgsql-13/bin/pg_receivewal /usr/pgsql-13/bin/pg_receivexlog
-	export PATH=$PATH:/usr/pgsql-13/bin/
+ln -s /usr/pgsql-13/bin/pg_receivewal /usr/pgsql-13/bin/pg_receivexlog
+export PATH=$PATH:/usr/pgsql-13/bin/
 ```   
    
 II. add this line to /etc/profile to make it persistent, just issue the
 following command:
 ```shell
-	echo export "PATH=\$PATH:/usr/pgsql-13/bin/" >> /etc/profile
-	source /etc/profile
+echo export "PATH=\$PATH:/usr/pgsql-13/bin/" >> /etc/profile
+source /etc/profile
 ```
  
 6) Please note that barman executable is placed to /bin/ directory
@@ -189,20 +189,20 @@ even if you have a DNS server (PGs on backup and backup on PGs)
 
 
 ```shell
-	vi /etc/hosts
-	
-	192.168.241.129	cos8pg129
-	192.168.241.130	cos8pg130
-	192.168.241.200	cos8share
-	192.168.241.210	vip
+vi /etc/hosts
+
+192.168.241.129	cos8pg129
+192.168.241.130	cos8pg130
+192.168.241.200	cos8share
+192.168.241.210	vip
 ``` 
  
 8) On every
 server, stop firewalld or add exceptions. barman does not require any
 additional specific incoming or outgoing port number, only ssh.
 ```shell
-	systemctl stop firewalld
-	systemctl disable firewalld
+systemctl stop firewalld
+systemctl disable firewalld
 ``` 
  
 9) Disable
@@ -253,33 +253,33 @@ chown -R barman:barman /var/lib/barman
    
 set the environment variable PGPASSFILE in postgres service drop-in :
 ```shell
-	Environment=PGPASSFILE=~barman/.pgpass
+Environment=PGPASSFILE=~barman/.pgpass
 ``` 
  
 12) on every
 pg,
    
 a.
-	su postgres
+su postgres
    
 b. create barman role: (Here I create superuser role)
 ```shell
-	# in shell
-	createuser -s -P barman
-	# Or in psql
-	create user barman with superuser encrypted password '1';
+# in shell
+createuser -s -P barman
+# Or in psql
+create user barman with superuser encrypted password '1';
 ```
    
 c. create streaming replication account:
 ```shell
-	createuser -P --replication streaming_barman
+createuser -P --replication streaming_barman
 ```   
 d. add the following line to pg_hba.conf file if necessary
 ```shell
-	# in pg_hba.conf:
-	host replication    streaming_barman    `<backup_ip>/32`      scram-sha-256
-	# in shell:
-	psql -c "select pg_reload_conf()"
+# in pg_hba.conf:
+host replication    streaming_barman    `<backup_ip>/32`      scram-sha-256
+# in shell:
+psql -c "select pg_reload_conf()"
 ``` 
  
 13) on backup, only for streaming method, perform either of the following two actions:
@@ -288,74 +288,74 @@ a. create a service with systemd by taking the following steps:
    
 I.
 ```shell
-	vi /etc/systemd/system/barmanrw@.service
+vi /etc/systemd/system/barmanrw@.service
 ``` 
    
 II. write necessary configuration inside service file.
    
 ```shell
-	##############################################
-	# barmanrw.service
-	# /etc/systemd/system/brw@.service
-	# It's not recommended to modify this file in-place, It is recommended to use systemd
-	# "dropin" feature;  i.e. create file with suffix .conf under
-	# /etc/systemd/system/brw@.service.d directory overriding the
-	# unit's defaults. You can also use "systemctl edit pgb"
-	# Look at systemd.unit(5) manual page for more info.
+##############################################
+# barmanrw.service
+# /etc/systemd/system/brw@.service
+# It's not recommended to modify this file in-place, It is recommended to use systemd
+# "dropin" feature;  i.e. create file with suffix .conf under
+# /etc/systemd/system/brw@.service.d directory overriding the
+# unit's defaults. You can also use "systemctl edit pgb"
+# Look at systemd.unit(5) manual page for more info.
  
-	[Unit]
-	Description=barman
-	receive-wal service for server %I
-	# Documentation='No documentation for now'
-	After=syslog.target
-	After=network.target
-	After=multi-user.target
-	
-	[Service]
-	Type=notify
-	
-	User=barman
-	Group=barman
-	
-	# Where to send early-startup messages from the server
-	# This is normally controlled by the global default set by systemd
-	# StandardOutput=syslog
-	
-	# Disable OOM kill on the scripts
-	OOMScoreAdjust=-1000
-	Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
-	Environment=PGB_OOM_ADJUST_VALUE=0
-	
-	ExecStart=/usr/bin/barman receive-wal %i
-	TimeoutStartSec=infinity
-	
-	Restart=always
-	RestartSec=3
-	
-	[Install]
-	WantedBy=multi-user.target
-	
-	##############################################
+[Unit]
+Description=barman
+receive-wal service for server %I
+# Documentation='No documentation for now'
+After=syslog.target
+After=network.target
+After=multi-user.target
+
+[Service]
+Type=notify
+
+User=barman
+Group=barman
+
+# Where to send early-startup messages from the server
+# This is normally controlled by the global default set by systemd
+# StandardOutput=syslog
+
+# Disable OOM kill on the scripts
+OOMScoreAdjust=-1000
+Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
+Environment=PGB_OOM_ADJUST_VALUE=0
+
+ExecStart=/usr/bin/barman receive-wal %i
+TimeoutStartSec=infinity
+
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+
+##############################################
 ```
 
 III. start & enable service by issuing the following command:
    
 ```shell
-	systemctl enable --now barmanrw@<servername in barman config>
+systemctl enable --now barmanrw@<servername in barman config>
 ```
    
 b. create a background task and make sure it is always up and running with the
 following command:
-	
+
 ```shell
-	barman receive-wal <pg>
+barman receive-wal <pg>
 ``` 
  
 14) on every
 pg, install barman-cli and the following package:
 ```shell
-	yum -y install barman-cli
-	yum -y install python36
+yum -y install barman-cli
+yum -y install python36
 ``` 
  
 15) On
@@ -363,13 +363,13 @@ backup, create a replication slot if necessary using the following command, if
 you have set the config file for the barman to create replication slot
 automatically from barman 2.10, this is unnecessary:
 ```shell
-	barman receive-wal --create-slot `<pg>`
+barman receive-wal --create-slot `<pg>`
 ``` 
  
 16) On
 backup, check pg status:
 ```shell
-	barman check `<pg>`
+barman check `<pg>`
 ``` 
  
 17) On
@@ -377,11 +377,11 @@ backup, if there is log shipping error, run the following command once. It
 shall be executed successfully. (rotate the last WAL on every pg to commence
 the log shipping):
 ```shell
-	barman switch-xlog --force --archive <servername in barman conf file>
+barman switch-xlog --force --archive <servername in barman conf file>
 ```
 example:
 ```shell
-	barman switch-xlog --force --archive c1
+barman switch-xlog --force --archive c1
 ``` 
  
 18) On
@@ -407,27 +407,27 @@ vi /etc/barman.d/barman.conf
 b. uncomment 'compression = gzip'
  
 ```shell
-	#sample barman configuration file
-	;;;;;;;;;;;;
-	[barman]
-	
-	barman_home	= /var/lib/barman
-	barman_user	= barman
-	configuration_files_directory = /etc/barman.d
-	path_prefix=/usr/pgsql-13/bin
-	log_file = /var/log/barman/barman.log
-	log_level = INFO
-	compression = gzip
-	;reuse_backup = link
-	immediate_checkpoint = true
-	basebackup_retry_times = 2
-	basebackup_retry_sleep = 1
-	last_backup_maximum_age = 2 DAYS
-	
-	recovery_options = 'get-wal'
-	;network_compression option is not supported with 'postgres' backup_method
-	
-	;;;;;;;;;;;
+#sample barman configuration file
+;;;;;;;;;;;;
+[barman]
+
+barman_home	= /var/lib/barman
+barman_user	= barman
+configuration_files_directory = /etc/barman.d
+path_prefix=/usr/pgsql-13/bin
+log_file = /var/log/barman/barman.log
+log_level = INFO
+compression = gzip
+;reuse_backup = link
+immediate_checkpoint = true
+basebackup_retry_times = 2
+basebackup_retry_sleep = 1
+last_backup_maximum_age = 2 DAYS
+
+recovery_options = 'get-wal'
+;network_compression option is not supported with 'postgres' backup_method
+
+;;;;;;;;;;;
 ``` 
  
 20) On
@@ -436,54 +436,54 @@ example you do not need a template, because it is too busy and may be
 confusing, then fill it up. If you want to use the template anyway:
 
 ```shell
-	cp -p /etc/barman.d/streaming-server.conf-template /etc/barman.d/c1.conf
+cp -p /etc/barman.d/streaming-server.conf-template /etc/barman.d/c1.conf
 ``` 
 ```shell
-	; sample PG streaming configuration:
-	;;;;;;;;;;;;;;;;;;;;;;;;;;
-	[<arbitrary	server name>]
-	
-	description =  "Zabbix Sandbox (Streaming-Only)"
-	conninfo= host=vip user=barman dbname=postgres password='P@$$VV0RD'
-	streaming_conninfo = host=vip user=pgpool password='P@$$VV0RD'
-	backup_method = postgres
-	backup_directory = /backup/barman/vip_zsb/basebackup
-	;incoming_wals_directory = /archive/archive_zabbix
-	streaming_wals_directory = /var/lib/barman/vip_zsb/streaming_wals_directory
-	wals_directory = /backup/barman/vip_zsb/wals_directory
-	immediate_checkpoint = true
-	streaming_archiver = on
-	slot_name =	barman
-	create_slot = auto
-	parallel_jobs = 2
-	disabled=false
-	errors_directory = /var/lib/barman/vip_zsb/errors
-	
-	;;;;;;;;;;;;;;;;;;;;;;;;;;
+; sample PG streaming configuration:
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+[<arbitrary	server name>]
+
+description =  "Zabbix Sandbox (Streaming-Only)"
+conninfo= host=vip user=barman dbname=postgres password='P@$$VV0RD'
+streaming_conninfo = host=vip user=pgpool password='P@$$VV0RD'
+backup_method = postgres
+backup_directory = /backup/barman/vip_zsb/basebackup
+;incoming_wals_directory = /archive/archive_zabbix
+streaming_wals_directory = /var/lib/barman/vip_zsb/streaming_wals_directory
+wals_directory = /backup/barman/vip_zsb/wals_directory
+immediate_checkpoint = true
+streaming_archiver = on
+slot_name =	barman
+create_slot = auto
+parallel_jobs = 2
+disabled=false
+errors_directory = /var/lib/barman/vip_zsb/errors
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
 ```	
 ```shell
-	; sample PG	rsync/ssh configuration:
-	;;;;;;;;;;;;;;;;;;;;;;;;;;
-	[<arbitrary	server name>]
-	
-	description =  "c1 ssh"
-	conninfo = hostaddr=192.168.241.129 user=barman dbname=test password=1
-	ssh_command = ssh postgres@c1cos8pgsr129
-	backup_method = rsync
-	backup_directory = /var/lib/barman/bd/c1s
-	incoming_wals_directory = /var/lib/barman/bd/c1s/incoming_wals_directory
-	
-	wals_directory = /var/lib/barman/bd/c1s/wals_directory
-	archiver = on
-	backup_options = concurrent_backup
-	reuse_backup = link
-	slot_name = barmans
-	create_slot = auto
-	parallel_jobs = 2
-	disabled=false
-	errors_directory = /var/lib/barman/bd/c1s/errors
-	network_compression = true
-	;;;;;;;;;;;;;;;;;;;;;;;;;;
+; sample PG	rsync/ssh configuration:
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+[<arbitrary	server name>]
+
+description =  "c1 ssh"
+conninfo = hostaddr=192.168.241.129 user=barman dbname=test password=1
+ssh_command = ssh postgres@c1cos8pgsr129
+backup_method = rsync
+backup_directory = /var/lib/barman/bd/c1s
+incoming_wals_directory = /var/lib/barman/bd/c1s/incoming_wals_directory
+
+wals_directory = /var/lib/barman/bd/c1s/wals_directory
+archiver = on
+backup_options = concurrent_backup
+reuse_backup = link
+slot_name = barmans
+create_slot = auto
+parallel_jobs = 2
+disabled=false
+errors_directory = /var/lib/barman/bd/c1s/errors
+network_compression = true
+;;;;;;;;;;;;;;;;;;;;;;;;;;
 ``` 
    
 -Note: The reuse_backup option can't be used with the postgres backup method at
@@ -499,7 +499,7 @@ backup, edit the server configuration file created in the last step, save and
 take a copy of it to add other PGs, then commit the changes for other PG
 configurations:
 ```shell
-	cp /etc/barman.d/c1.conf /etc/barman.d/c2.conf
+cp /etc/barman.d/c1.conf /etc/barman.d/c2.conf
 ```
   
 23-a) On
@@ -509,7 +509,7 @@ capability, but the streaming replication capability):
    
 I. turn off the archive_mode
 ```shell
-	archive_mode = off
+archive_mode = off
 ``` 
    
 II. leave the archive_command commented out.
@@ -519,86 +519,86 @@ II. leave the archive_command commented out.
 if you want rsync/ssh method with barman, modify postgresql.conf archive
 command like the following:
 ```shell
-	#If you want to use barman-cli (highly recommended):
-	archive_command='test ! -f /archive/archive_zabbix/%f && cp %p /archive/archive_zabbix/%f'
+#If you want to use barman-cli (highly recommended):
+archive_command='test ! -f /archive/archive_zabbix/%f && cp %p /archive/archive_zabbix/%f'
  
-	#If you want to use scp (-i is unnecessary for default ssh id file)
-	archive_command='scp -i ~/.ssh/barman_pg "%p" "barman@cos8cbarman151:/var/lib/barman/bd/c1/incoming_wals_directory/%f"'
+#If you want to use scp (-i is unnecessary for default ssh id file)
+archive_command='scp -i ~/.ssh/barman_pg "%p" "barman@cos8cbarman151:/var/lib/barman/bd/c1/incoming_wals_directory/%f"'
 ``` 
  
 24) On pg, modify postgresql.conf restore command like the following:
 ```shell
-	restore_command = 'barman-wal-restore -P -U barman cos8share c1 %f %p'
+restore_command = 'barman-wal-restore -P -U barman cos8share c1 %f %p'
 ``` 
  
 25) On pg,
 reload configuration:
 ```shell
-	sudo -u postgres psql -x -c "select pg_reload_conf()"
+sudo -u postgres psql -x -c "select pg_reload_conf()"
 ``` 
  
 26) On
 backup, to check if the server configuration is valid you can use the `barman check` command
 ```shell
-	barman check <server name>
+barman check <server name>
 ```
    
 resolve any issues in result returned.
   
-	######### Maintenance:
+######### Maintenance:
 27) create a
 systemd service named backup@.service in /etc/systemd/system/ with the
 following contents
    
 for barman's backup task:
 ```shell
-	vi /etc/systemd/system/backup@.service
+vi /etc/systemd/system/backup@.service
 ``` 
 ```shell
-	#######################################################################
-	#/etc/systemd/system/backup@.service
-	# It's not recommended to modify this file in-place, It is recommended to use systemd
-	# "dropin" feature;  i.e. create file with suffix .conf under
-	# /etc/systemd/system/backup@.service.d directory overriding the
-	# unit's defaults. You can also use "systemctl edit backup@"
-	# Look at systemd.unit(5) manual page for more info.
+#######################################################################
+#/etc/systemd/system/backup@.service
+# It's not recommended to modify this file in-place, It is recommended to use systemd
+# "dropin" feature;  i.e. create file with suffix .conf under
+# /etc/systemd/system/backup@.service.d directory overriding the
+# unit's defaults. You can also use "systemctl edit backup@"
+# Look at systemd.unit(5) manual page for more info.
  
-	[Unit]
-	Description= backup service for PostgreSQL triggered by timer server %I
-	#Documentation='No documentation for now'
-	After=syslog.target
-	After=network.target
-	After=multi-user.target
-	Wants=pgbt_for_template.timer
-	
-	[Service]
-	Type=oneshot
-	
-	User=postgres
-	Group=postgres
+[Unit]
+Description= backup service for PostgreSQL triggered by timer server %I
+#Documentation='No documentation for now'
+After=syslog.target
+After=network.target
+After=multi-user.target
+Wants=pgbt_for_template.timer
+
+[Service]
+Type=oneshot
+
+User=postgres
+Group=postgres
  
  
-	# Where tosend early-startup messages from the server
-	# This isnormally controlled by the global default set by systemd
-	StandardOutput=syslog
-	
-	# Disable OOM kill on the scripts
-	OOMScoreAdjust=-1000
-	Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
-	Environment=PGB_OOM_ADJUST_VALUE=0
-	
-	ExecStart=/bin/barman backup %i
-	
-	
-	[Install]
-	WantedBy=multi-user.target
-	
-	#######################################################################
+# Where tosend early-startup messages from the server
+# This isnormally controlled by the global default set by systemd
+StandardOutput=syslog
+
+# Disable OOM kill on the scripts
+OOMScoreAdjust=-1000
+Environment=PGB_OOM_ADJUST_FILE=/proc/self/oom_score_adj
+Environment=PGB_OOM_ADJUST_VALUE=0
+
+ExecStart=/bin/barman backup %i
+
+
+[Install]
+WantedBy=multi-user.target
+
+#######################################################################
 ```	
  
 28) pass
 your server name in barman configuration file to the following command:
-	systemctl enable backup@<server name>.service
+systemctl enable backup@<server name>.service
  
  
 29) create a
@@ -606,26 +606,26 @@ timer to trigger the backup@<server name>.service. Modify 'OnCalendar'
 according to your prefered
 schedule:
 ```shell
-	/etc/systemd/system/PostgreSQL_basebackup_timer.timer
+/etc/systemd/system/PostgreSQL_basebackup_timer.timer
 ``` 
 ```shell
-	#######################################################################
-	# Timer to start PostgreSQL base backup at 23:00:00
-	# a.momen@gmail.com
-	
-	[Unit]
-	Description=timer
-	for PostgreSQL base backup at 23:00:00
-	Requires=backup@vip_zsb.service
-	
-	[Timer]
-	Unit=backup@vip_zsb.service
-	OnCalendar=*-*-* 23:00:00
-	
-	
-	[Install]
-	WantedBy=timers.target
-	
+#######################################################################
+# Timer to start PostgreSQL base backup at 23:00:00
+# a.momen@gmail.com
+
+[Unit]
+Description=timer
+for PostgreSQL base backup at 23:00:00
+Requires=backup@vip_zsb.service
+
+[Timer]
+Unit=backup@vip_zsb.service
+OnCalendar=*-*-* 23:00:00
+
+
+[Install]
+WantedBy=timers.target
+
 #######################################################################
 ```
 
@@ -642,7 +642,7 @@ PG server.
 30)
 enable&start timer:
 ```shell
-	systemctl enable backup.timer
+systemctl enable backup.timer
 ``` 
  
 31) There is
@@ -656,47 +656,47 @@ file, remember to enter no passphrase (empty) when prompted
 a. on pg with root login, assign a password to postgres account and enter in
 step c
 ```shell
-	passwd postgres
+passwd postgres
 ``` 
    
 b. on pg,
 ```shell
-	su - postgres
-	mkdir ~/.ssh
-	cd ~/.ssh
-	ssh-keygen -t rsa -f barman_pg
-	ssh-copy-id -f -i barman_pg.pub barman@cos8share  
-	# barman server hostname
-	ssh-copy-id -f -i barman_pg.pub root@cos8share   #barman server hostname
+su - postgres
+mkdir ~/.ssh
+cd ~/.ssh
+ssh-keygen -t rsa -f barman_pg
+ssh-copy-id -f -i barman_pg.pub barman@cos8share  
+# barman server hostname
+ssh-copy-id -f -i barman_pg.pub root@cos8share   #barman server hostname
 ``` 
    
 c. on backup,
 ```shell
-	su - barman
-	mkdir ~/.ssh
-	cd ~/.ssh
-	ssh-keygen -t rsa -f barman_b
-	ssh-copy-id -f -i barman_b.pub postgres@c1cos8pgsr129
+su - barman
+mkdir ~/.ssh
+cd ~/.ssh
+ssh-keygen -t rsa -f barman_b
+ssh-copy-id -f -i barman_b.pub postgres@c1cos8pgsr129
     #PG 1 hostname
-	ssh-copy-id	-f -i barman_b.pub postgres@c2cos8pgsr130
+ssh-copy-id	-f -i barman_b.pub postgres@c2cos8pgsr130
     #PG 2 hostname 
-	ssh-copy-id -f -i barman_b.pub postgres@<PG3>  
+ssh-copy-id -f -i barman_b.pub postgres@<PG3>  
     #PG 3 hostname
-	# add one line for every PG
+# add one line for every PG
 ``` 
 * test passwordless ssh:
-	#on pg:
+#on pg:
 ```shell
-	ssh barman@cos8cbarman151 -i ~/.ssh/barman_pg
+ssh barman@cos8cbarman151 -i ~/.ssh/barman_pg
 ``` 
-	#on backup:
+#on backup:
 ```shell
-	ssh postgres@c1cos8pgsr129 -i ~/.ssh/barman_b
-	#PG 1 hostname
+ssh postgres@c1cos8pgsr129 -i ~/.ssh/barman_b
+#PG 1 hostname
 ```   
 ```shell
-	ssh postgres@<PG2> -i ~/.ssh/barman_pg
-	#PG 2 hostname
+ssh postgres@<PG2> -i ~/.ssh/barman_pg
+#PG 2 hostname
 ```  
  
 End of setup steps
@@ -707,7 +707,7 @@ End of setup steps
 * barman sync-info `<pg>`
 * barman diagnose
 * barman sync-wals `<pg>`
-	# for passive
+# for passive
 * barman check `<pg>`
 * barman check-backup `<backup id>`
 * barman sync-backup `<pg>` `<backup id>`
@@ -727,8 +727,8 @@ Refers to the oldest existing backup
 Refers to the first backup
 5) last
 Same as latest
-	###################################################################
-	## Important points
+###################################################################
+## Important points
 1) It is
    possible to use get-wal during a recovery operation, transforming the barman
    server into a WAL hub for your servers.
@@ -866,7 +866,7 @@ tablespace:
 replication=true user=streaming_barman application_name=barman_streaming_backup
 -v --no-password --pgdata=/var/lib/barman/bd/c7/base/20211001T224927/data
 --no-slot --wal-method=none --checkpoint=fast
-	############ Recovery: #######################################
+############ Recovery: #######################################
 
 Requirements
 for the target server:
@@ -914,11 +914,11 @@ sure to preserve the formatting of values.
                      
 * for PITR:
 ```shell
-	barman recover <pg> <full backup id> <PG's data directory> --target-time='<timestamp>' --remote-ssh-command='ssh postgres@<pg>'
+barman recover <pg> <full backup id> <PG's data directory> --target-time='<timestamp>' --remote-ssh-command='ssh postgres@<pg>'
 ```                     
 sample:
 ```shell
-	barman recover c1 20211006T114906 /data/postgres13/data --target-time='2021-10-06 13:44:29.000000000 +0330' --remote-ssh-command='ssh postgres@192.168.241.129'                      
+barman recover c1 20211006T114906 /data/postgres13/data --target-time='2021-10-06 13:44:29.000000000 +0330' --remote-ssh-command='ssh postgres@192.168.241.129'                      
 ```
 -) The
 command below gives the timestamp at the moment in the above format:
@@ -1014,11 +1014,11 @@ I have not tested this, but you may want to do so. It may interfere with other b
  command instead of scp and rsync or barman-wal-restore and barman-wal-archive.
 
 Important postgresql commands:
-	
+
 ```shell
-	#/data/postgres13/data is the PGDATA directory
-	/usr/pgsql-13/bin/pg_ctl start -D /data/postgres13/data
-	/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate restart
-	/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate stop
-	/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate reload
+#/data/postgres13/data is the PGDATA directory
+/usr/pgsql-13/bin/pg_ctl start -D /data/postgres13/data
+/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate restart
+/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate stop
+/usr/pgsql-13/bin/pg_ctl -D /data/postgres13/data -m immediate reload
 ```
