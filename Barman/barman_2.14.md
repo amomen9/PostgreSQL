@@ -731,29 +731,35 @@ End of setup steps
 5) last:
 Same as latest
 
-	###################################################################
+---
+
 ## Important points
 1) It is
    possible to use get-wal during a recovery operation, transforming the barman
    server into a WAL hub for your servers.
+
 2) barman
    can reduce the Recovery Point Objective (RPO) by allowing users to add
    continuous WAL streaming from a PostgreSQL server, on top of the standard
    archive_command strategy.
+
 3) From an
    architectural point of view, PostgreSQL must be configured to archive WAL files
    directly to the barman server. barman, thanks to the get-wal framework, can
    also be used as a WAL hub. For this purpose, you can use the barman-wal-restore
    script, part of the barman-cli package, with all your standby servers.
+
 4) As of
    barman 2.10, the get-wal command is able to return the content of the current
    .partial WAL file through the --partial/-P option. This is particularly useful
    in the case of recovery, both full or to a point in time.
+
 5) Using
    barman-wal-archive instead of rsync/SSH reduces the risk of data corruption of
    the shipped WAL file on the barman server. When using rsync/SSH as
    archive_command a WAL file, there is no mechanism that guarantees that the
    content of the file is flushed and fsync-ed to disk on destination.
+
 6) barman backup `<pg>` message:
 WARNING:
 IMPORTANT: this backup is classified as WAITING_FOR_WALS, meaning that barman
@@ -766,31 +772,38 @@ to execute the backup command with '--wait' but this seems to be unnecessary
 because if the backup is not completed consistently yet, it will be marked with
 the label WAITING_FOR_WALS in the backup list shown by the ‘barman list-backup
 `<pg>`/all’ command and you don’t want to use the taken backup instantly.
+
 7) Remote
    recovery is definitely the most common way to restore a PostgreSQL server with
    barman
+
 8) In any
    modes (rsync/ssh or streaming if the error 'WAL archive: FAILED (please make
    sure WAL shipping is setup)' is occurred, switch-wal first
+
 9) If after
    recovery, the receive-wal command won't start up, the problem may be due to a
    mismatch in WAL version. So empty the streaming-wal-directory and try barman
    receive-wal `<ServerName>` again.
+
 10) barman
     doesn't include a long-running daemon or service file (there's nothing to
     systemctl start, service start, etc.). Instead, the barman cron subcommand is
     provided to perform barman's background "steady-state" backup
     operations.
+
 11) After
     any type of recovery in the streaming method, barman sets the archive command
     of PGs to 'false' automatically if you falsely have set an archive_command and
     archive_mode to on. The recovery steps are clarified in a separate section for
     streaming. If this item is unclear to you, refer to the recovery steps section.
+
 12) If your
     backup server falls out of sync, it is mandatory that you relaunch barman
     replication, otherwise, barman will not work. That means emptying the
     wals_directory and streaming-wal-directory and recreating the replication slot.
     This is synonymous with item 9)
+
 13) If you
     turn both of the archiver and streaming_archiver parameters off you will get
     the following warning from barman:
@@ -799,9 +812,11 @@ archiver enabled for server 'backup'. Please turn on 'archiver',
 'streaming_archiver' or both
 WARNING:
 Forcing 'archiver = on'
+
 14) If you
     change barman user, remember to change necessary owners and also the cron entry
     in /etc/cron.d/barman
+
 15) If you
     see the backup process is stuck, one of the most probable situations is that it
     is stuck on "Asking PostgreSQL server to finalize the backup". This
@@ -809,35 +824,40 @@ Forcing 'archiver = on'
     there is something wrong with the PostgreSQL's archiving. In barman streaming
     method, you do not need PostgreSQL's archiving. So make sure the 'archive_mode'
     parameter is set to off and remove the archive_command.
+
 16) Warning!!! barman does not acknowledge failed backups and only
     lists them using ‘barman list-backup `<pg>`’ command, so if you delete your
     backups using oldest or first or latest and so on keywords, it will skip the
     failed backups. So you may end up unwantedly delete your successful backups. An
     example:
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image004.jpg)
-**
-Figure 2**
+
+**Figure 2**
+
  In the
 above screen capture, ‘d’ is an alias for ‘barman delete’, and ‘lb’ is an alias
 for ‘barman list-backup’ that I created myself, and 95 is the name of a PG
 server. As you see the only successful backup is deleted instead of the failed
 ones, so it’s highly recommended to delete backups using their IDs instead of such
 keywords.
+
 17) You can
     also delete base backups by going to the following directory and issuing ‘rm -rf
     `<backup id>`’ command, consequently, the backup will also be deleted from
     ‘barman list-backup’ backup list as well:
 `<pg>`/basebackup/base/
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image006.jpg)
-**
-Figure 3**
-17) If you
+
+**Figure 3**
+
+18) If you
     create a backup set for a PG using symbolic link that I demonstrated earlier,
     and delete the original backup set, you will encounter such an error when you
     issue ‘barman list-backup’ command:
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image008.jpg)
-**
-Figure 4**
+
+** Figure 4**
+
 Generally
 the file backup.info is mandatory for every backup set. You can overcome this
 error and make ‘barman list-backup’ work again buy manually deleting the
@@ -847,8 +867,9 @@ set among PGs, the command barman ‘list-backup all’ will also not work.
 18) While
     deleting a base backup, the associated WAL segments will also be deleted:
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image010.jpg)
-**
-Figure 5**
+
+**Figure 5**
+
 $z is a PG
 server.
 ### Sample
@@ -874,7 +895,8 @@ tablespace:
 replication=true user=streaming_barman application_name=barman_streaming_backup
 -v --no-password --pgdata=/var/lib/barman/bd/c7/base/20211001T224927/data
 --no-slot --wal-method=none --checkpoint=fast
-############ Recovery: #######################################
+---
+#### Recovery:
 
 Requirements
 for the target server:
@@ -906,8 +928,7 @@ target timeline
 
 
  
-### Recovery
-Scenarios (streaming):
+### Recovery Scenarios (streaming):
  
 I. Recover
 PostgreSQL server on its own (The simplest scenario):
