@@ -55,31 +55,25 @@ single node PGs but not read-only PGs such as:
    
 -) single node
    
-192.16.241.129
+| 192.16.241.129 |
+|:-:|
    
    
 -)a streaming replication of two nodes with the following IP addresses:
    
-192.168.241.129 : primary
-   
-192.168.241.130 : standby
+|192.168.241.129 : primary<br/>192.168.241.130 : standby|
+|:-:|
    
    
 -) a pgpool cluster with 3 nodes and a VIP
    
-192.168.241.171
-   
-192.168.241.172
-   
-192.168.241.173
-   
-192.168.241.210
+| 192.168.241.171<br/>192.168.241.172<br/>192.168.241.173<br/>192.168.241.210 |
+|:-:|
  
    
-e.
-192.168.241.151 is the backup server
-f. we are
-going to setup 1)streaming barman connection here and 2) ssh/rsync both which
+e. 192.168.241.151 is the backup server
+
+f. we are going to setup 1)streaming barman connection here and 2) ssh/rsync both which
 are the two offered services by barman. In streaming connection for topologies
 with VIP, the streaming connection should be connected to the VIP
  
