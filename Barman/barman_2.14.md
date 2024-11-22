@@ -67,7 +67,8 @@ single node PGs but not read-only PGs such as:
    
 -) a pgpool cluster with 3 nodes and a VIP
    
-| 192.168.241.171<br/>192.168.241.172<br/>192.168.241.173<br/>192.168.241.210 |
+| 192.168.241.171<br/>192.168.241.172<br/>192.168.241.173 |
+| 192.168.241.210 |
 |:-:|
  
    
