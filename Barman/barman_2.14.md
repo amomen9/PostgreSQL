@@ -67,9 +67,9 @@ single node PGs but not read-only PGs such as:
    
 -) a pgpool cluster with 3 nodes and a VIP
    
-|Nodes:|| 192.168.241.171<br/>192.168.241.172<br/>192.168.241.173 |
-|:-:||:-:|
-|VIP:|| 192.168.241.210 |
+|Nodes: | 192.168.241.171<br/>192.168.241.172<br/>192.168.241.173 |
+|-|-|
+|VIP: | 192.168.241.210 |
  
    
 e. 192.168.241.151 is the backup server
@@ -86,7 +86,9 @@ with barman user and root
  
  
 1) on every
-server: Only for RHEL 8+: EPEL (Extra Packages for Enterprise Linux) packages
+server: Only for RHEL 8+: 
+
+EPEL (Extra Packages for Enterprise Linux) packages
 assume that the 'powertools' repository is enabled
    
 You must make powertools repo if it does not exit by:
