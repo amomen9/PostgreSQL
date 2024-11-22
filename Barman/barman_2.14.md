@@ -6,10 +6,14 @@ is great if you master it!!! The following is step by step instruction to
 install and utilize barman on CentOS8. I am inciting you to use these instructions
 for other Linux distributions as well, because most
 of the materials are concerning barman itself rather than the Linux
-distribution. There is more to this document than a setup manual though,
-it's concise and to my belief, comprehensive, very informative and time-saving:
+distribution.
+
+There is more to this document than a setup manual though,
+it's concise and to my belief, comprehensive, informative and time-saving:
+
 If you republish the materials on this blog, please also cite the reference.
-barman documentation online:
+
+Barman documentation online:
 
 [http://docs.pgbarman.org/release/2.13/](http://docs.pgbarman.org/release/2.13/)
 
