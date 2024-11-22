@@ -644,9 +644,8 @@ WantedBy=timers.target
 
 A sample base backup list taken by schedule:
 
-![
-Figure1](image/
-Figure1.png) 
+![Figure1](image/Figure1.png) 
+
 **Figure 1**
 
 In the above
@@ -844,7 +843,8 @@ Forcing 'archiver = on'
     backups using oldest or first or latest and so on keywords, it will skip the
     failed backups. So you may end up unwantedly delete your successful backups. An
     example:
-![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image004.jpg)
+	
+![Figure1](image/Figure2.png) 
 
 **Figure 2**
 
@@ -859,8 +859,10 @@ keywords.
     also delete base backups by going to the following directory and issuing ‘rm -rf
     `<backup id>`’ command, consequently, the backup will also be deleted from
     ‘barman list-backup’ backup list as well:
+
 `<pg>`/basebackup/base/
-![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image006.jpg)
+
+![Figure3](image/Figure3.png) 
 
 **Figure 3**
 
@@ -869,7 +871,7 @@ keywords.
     and delete the original backup set, you will encounter such an error when you
     issue ‘barman list-backup’ command:
 
-![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image008.jpg)
+![Figure4](image/Figure4.png) 
 
 **Figure 4**
 
@@ -881,7 +883,8 @@ directory as described in the last item. If there is a single erroneous backup
 set among PGs, the command barman ‘list-backup all’ will also not work.
 18) While
     deleting a base backup, the associated WAL segments will also be deleted:
-![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image010.jpg)
+
+![Figure5](image/Figure5.png) 
 
 **Figure 5**
 
