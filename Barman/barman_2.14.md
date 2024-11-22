@@ -147,8 +147,7 @@ barman log (default path: /var/log/barman/) rotates, the new log file may be
 granted ownership to barman, and that way barman logger will be denied from
 writing to its log file.
  
-4) install
-PostgreSQL>8.3 on backup server
+4) Install PostgreSQL>8.3 on backup server
 
 	sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 	sudo dnf -qy module disable postgresql
