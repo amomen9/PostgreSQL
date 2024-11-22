@@ -631,8 +631,11 @@ WantedBy=timers.target
 
 A sample base backup list taken by schedule:
 
-![Figure1](image/Figure1.png) 
-**Figure 1**
+![
+Figure1](image/
+Figure1.png) 
+**
+Figure 1**
 
 In the above
 screen capture, ‘lb’ is an alias
@@ -811,7 +814,8 @@ Forcing 'archiver = on'
     failed backups. So you may end up unwantedly delete your successful backups. An
     example:
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image004.jpg)
-**Figure 2**
+**
+Figure 2**
  In the
 above screen capture, ‘d’ is an alias for ‘barman delete’, and ‘lb’ is an alias
 for ‘barman list-backup’ that I created myself, and 95 is the name of a PG
@@ -824,13 +828,15 @@ keywords.
     ‘barman list-backup’ backup list as well:
 `<pg>`/basebackup/base/
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image006.jpg)
-**Figure 3**
+**
+Figure 3**
 17) If you
     create a backup set for a PG using symbolic link that I demonstrated earlier,
     and delete the original backup set, you will encounter such an error when you
     issue ‘barman list-backup’ command:
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image008.jpg)
-**Figure 4**
+**
+Figure 4**
 Generally
 the file backup.info is mandatory for every backup set. You can overcome this
 error and make ‘barman list-backup’ work again buy manually deleting the
@@ -840,7 +846,8 @@ set among PGs, the command barman ‘list-backup all’ will also not work.
 18) While
     deleting a base backup, the associated WAL segments will also be deleted:
 ![](file:///C:/Users/Ali/AppData/Local/Temp/msohtmlclip1/01/clip_image010.jpg)
-**Figure 5**
+**
+Figure 5**
 $z is a PG
 server.
 ### Sample
