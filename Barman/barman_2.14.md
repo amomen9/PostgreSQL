@@ -654,10 +654,10 @@ screen capture, ‘lb’ is an alias
 for ‘barman list-backup’ that I created myself, and $z contains the name of a
 PG server.
  
-30)
-enable&start timer:
+30) enable&start timer:
+
 ```shell
-systemctl enable backup.timer
+systemctl enable --now backup.timer
 ``` 
  
 31) There is
@@ -700,11 +700,13 @@ ssh-copy-id -f -i barman_b.pub postgres@<PG3>
 # add one line for every PG
 ``` 
 * test passwordless ssh:
-#on pg:
+
+on pg:
 ```shell
 ssh barman@cos8cbarman151 -i ~/.ssh/barman_pg
 ``` 
-#on backup:
+
+on backup:
 ```shell
 ssh postgres@c1cos8pgsr129 -i ~/.ssh/barman_b
 #PG 1 hostname
@@ -775,7 +777,9 @@ Same as latest
    content of the file is flushed and fsync-ed to disk on destination.
 
 6) barman backup `<pg>` message:
+
 WARNING:
+
 IMPORTANT: this backup is classified as WAITING_FOR_WALS, meaning that barman
 has not received yet all the required WAL files for the backup consistency.
 This is a
@@ -889,36 +893,33 @@ set among PGs, the command barman ‘list-backup all’ will also not work.
 
 **Figure 5**
 
-$z is a PG
-server.
-### Sample
-background pg_basebackup commands: (You won't need this, it's just a personal
-note for myself)
+$z is a PG server.
+
+---
+
+* Sample background pg_basebackup commands: (You won't need this, it's just a personal note for myself)
+
 These
 commands are executed by barman in the background on issuing 'barman backup'
 command with 'postgres' backup method:
-with
-tablespace:
-/usr/bin/pg_basebackup
---dbname=dbname=replication hostaddr=192.168.241.129 options=-cdatestyle=iso
-password=1 replication=true user=streaming_barman
-application_name=barman_streaming_backup -v --no-password
---pgdata=/var/lib/barman/bd/c1/base/30211001T113101/data --no-slot
---wal-method=none
---tablespace-mapping=/data/postgres13/tbs_database=/var/lib/barman/bd/c1/base/30211001T113101/40974
---checkpoint=fast
-without
-tablespace:
-/usr/bin/pg_basebackup
---dbname=dbname=replication host=c7 options=-cdatestyle=iso password=1
-replication=true user=streaming_barman application_name=barman_streaming_backup
--v --no-password --pgdata=/var/lib/barman/bd/c7/base/20211001T224927/data
---no-slot --wal-method=none --checkpoint=fast
----
-#### Recovery:
 
-Requirements
-for the target server:
+with tablespace:
+
+```shell
+/usr/bin/pg_basebackup --dbname=dbname=replication hostaddr=192.168.241.129 options=-cdatestyle=iso password=1 replication=true user=streaming_barman application_name=barman_streaming_backup -v --no-password --pgdata=/var/lib/barman/bd/c1/base/30211001T113101/data --no-slot --wal-method=none --tablespace-mapping=/data/postgres13/tbs_database=/var/lib/barman/bd/c1/base/30211001T113101/40974 --checkpoint=fast
+```
+
+without tablespace:
+
+```shell
+/usr/bin/pg_basebackup --dbname=dbname=replication host=c7 options=-cdatestyle=iso password=1 replication=true user=streaming_barman application_name=barman_streaming_backup -v --no-password --pgdata=/var/lib/barman/bd/c7/base/20211001T224927/data --no-slot --wal-method=none --checkpoint=fast
+```
+
+---
+
+### Recovery:
+
+Requirements for the target server:
  
 * Identical
 hardware architecture
