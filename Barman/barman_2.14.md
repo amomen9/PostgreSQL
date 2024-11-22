@@ -720,15 +720,15 @@ End of setup steps
 * barman put-wal `<pg>`
 * barman delete `<pg>` <backup_id>
 ### Some keywords:
-1) all:
+1) **all:**
  Refers to all servers except for the backup server itself
-2) latest:
+2) **latest:**
  Refers to the latest backup
-3) oldest:
+3) **oldest:**
  Refers to the oldest existing backup
-4) first:
+4) **first:**
  Refers to the first backup
-5) last:
+5) **last:**
 Same as latest
 
 ---
