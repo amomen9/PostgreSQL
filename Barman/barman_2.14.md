@@ -1,5 +1,6 @@
 
-Hello everybody!
+**Hello everybody!**
+
 At this time, October 9th 2021, the latest barman version for PostgreSQL is 2.14. Barman
 is great if you master it!!! The following is step by step instruction to
 install and utilize barman on CentOS8. I am inciting you to use these instructions
