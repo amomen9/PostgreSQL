@@ -10,6 +10,11 @@ Link to the page with some PostgreSQL usefull references:
 
 [Some Linux References](./some%20linux%20references.md)
 
+
+### Introduction to PostgreSQL:
+
+[Introduction to PostgreSQL 17](Introduction2PostgreSQL.md)
+
 <!-- ---
 
 ### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
