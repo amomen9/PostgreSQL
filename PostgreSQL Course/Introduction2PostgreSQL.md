@@ -181,7 +181,42 @@ Some of the major differences between MSSQL-Windows and PG-Linux with respect to
 
 ---
 
+* **Programming language support:**
 
+**SQL Server:** Java, JavaScript (Node.js), C#, C++, PHP, Python, and Ruby. 
+execute_external_script (OpenR, OpenPython)
+
+**PostgreSQL:** Python, PHP, Perl, Tcl, Net, C, C++, Delphi, Java, JavaScript (Node.js), and more.
+
+---
+
+* **SQL Syntax:**
+
+![majordifferencespgsqls2](image/introduction2postgresql/majordifferencespgsqls2.png)
+
+---
+
+* **Advantages and Disadvantages (comparatively):**
+
+**PostgreSQL:**
+
+![majordifferencespgsqls3](image/introduction2postgresql/majordifferencespgsqls3.png)
+
+**SQL Server:**
+
+![majordifferencespgsqls4](image/introduction2postgresql/majordifferencespgsqls4.png)
+
+### Installation:
+
+#### Notes:
+
+* Here we do not discuss moving pg’s main installation directory.
+
+* a postgresql instance is called postgresql database cluster or postgresql cluster in short.
+
+* The instructions are mostly for RHEL and Debian linux distros. For other distros, it shall not be any more difficult anyway. Please note that if you have only worked with pg on RHEL, you should do some study on pg administration tasks on Ubuntu before being able to start the work on it.
+
+* Ubuntu appeared relatively much easier to me (easier also depends on your use case, for you may not need the things that ubuntu does automatically), mostly in the sense that it automatically separates data and configuration directories and also different clusters and versions of pg and their service files through service templates (Read more about service templates if you need), and offering some extra functionalities to make some pg operations easier. You will find out more about these subsequently. It also initializes (creates cluster’s initial data) the default cluster and starts its service up as well by merely installing the package.
 
 
 
