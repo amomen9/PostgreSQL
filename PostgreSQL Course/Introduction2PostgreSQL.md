@@ -110,13 +110,13 @@ Here are the key points and summary:
 
 **Major Differences:**
 
-* General big picture of differences:
+* **General big picture of differences:**
 
-![majordifferencespgsqls](image/introduction2postgresql/majordifferencespgsqls)
+![majordifferencespgsqls](image/introduction2postgresql/majordifferencespgsqls.png)
 
 ---
 
-* Licensing:
+* **Licensing:**
 
 **PostgreSQL**: Open-source and free. PostgreSQL is released under the PostgreSQL License,
  which is a liberal open-source license similar to the BSD or MIT licenses. This license
@@ -142,7 +142,7 @@ Here are the key points and summary:
 
 --- 
 
-* RDBMS vs. ORDBMS:
+* **RDBMS vs. ORDBMS:**
 
 **SQL Server:** traditional application tasks for data processing
 **PostgreSQL:** applications that contain complex objects (Ex: new data types like video, audio, and image files)
@@ -150,7 +150,7 @@ Here are the key points and summary:
 
 ---
 
-* Inclusiveness and diversity:
+* **Inclusiveness and diversity:**
 
 **PostgreSQL:** Is like many other open-source applications incredibly customizable, meaning that you can take different
  parts of it and manually compile them for your own specific purposes. The main package is also not pretty much feature-rich
@@ -178,3 +178,10 @@ Some of the major differences between MSSQL-Windows and PG-Linux with respect to
 |Database Cluster|SQL Server Instance|
 |Virtual IP (VIP)|Listener|
 |...|...|
+
+---
+
+
+
+
+
