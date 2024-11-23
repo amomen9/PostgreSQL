@@ -116,6 +116,17 @@ Here are the key points and summary:
 
 ---
 
+* Licensing:
+
+**PostgreSQL**: Open-source and free. PostgreSQL is released under the PostgreSQL License,
+ which is a liberal open-source license similar to the BSD or MIT licenses. This license
+ allows you to freely use, copy, modify, and distribute the software and its documentation
+ for any purpose, without any fees or written agreements.
+
+**SQL Server**: Closed-source and commercial.
+
+---
+
 * For the sessions, PostgreSQL uses processes, but SQL Server uses threads. This makes SQL Server generally
  able to handle more connections as it does not wrap every session into one process and do some processing
  and operations more efficiently like a more powerful control over parallelism with a smaller granularity
@@ -141,4 +152,29 @@ Here are the key points and summary:
 
 * Inclusiveness and diversity:
 
-PostgreSQL, like many other open-source applications
+**PostgreSQL:** Is like many other open-source applications incredibly customizable, meaning that you can take different
+ parts of it and manually compile them for your own specific purposes. The main package is also not pretty much feature-rich
+ and all-inclusive relative to SQL Server, but different modules and extensions can be manually installed and added to add
+ feature and functionality to PostgreSQL. This gives you more freedom to install what you want and not install what you do
+ not selectively, keeping it as light as possible. For SQL Server, the freedom is much less here. You have to install some
+ features that you might never use, or the alternatives are much less diverse. The open-source trait has resulted 
+ in many solutions to be developed and released for a single specific PostgreSQL's functionality, as opposed to the
+ SQL Server for which such solutions are mostly offered by Microsoft. For instance, there
+ are many solutions that offer automation, HA/DR, etc. Most of them are free and open-source.
+ 
+**SQL Server:** Unlike PostgreSQL.
+
+---
+
+* **Terminology:**
+
+Some of the major differences between MSSQL-Windows and PG-Linux with respect to the terminology
+
+|PG|MSSQL|
+|-|-|
+|Replication|AlwaysOn|
+|MVCC|Snapshot Isolation (SI)|
+|Bash Scripting|PowerShell Scripting, Batch Scripting|
+|Database Cluster|SQL Server Instance|
+|Virtual IP (VIP)|Listener|
+|...|...|
