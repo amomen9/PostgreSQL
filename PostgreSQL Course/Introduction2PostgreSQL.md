@@ -220,3 +220,35 @@ execute_external_script (OpenR, OpenPython)
 
 * Its packages are also sometimes more bundled. For example, for RHEL the packages for pg server and pg client are separated. But for Ubuntu they are not. However, on ubuntu the service files are handled differently. i.e. one main `postgresql.service` service and a service template with one service created for every pg database cluster. The name of the default-initiated cluster is “main” and its instantiated service from `postgresql@.service` is `postgresql@*-main.service`. The service naming in general is `postgresql@*-clustername.service`. The default-initiated cluster is called "main".
 
+* As noted in the [Patroni documentation](../patroni/Part%20II%20Logs%20Purge%20%26%20Retention.md), For the database clusters with large amount of data, I used to move the data directory to somewhere else.
+ For example, /data/postgresql/13/main or whatever. However, later on I came to the conclusion that the best
+ way is, at least regarding PostgreSQL, to keep everything in its default location and instead define mount
+ points in the default locations and attach separate disks to those mount points. For example, prior to the
+ installation of PostgreSQL, we can consider the following mount points:
+
+- `/var/lib/postgresql/`
+- `/var/log/`
+- `/var/lib/etcd`
+- `/var/lib/postgresql/17/main/pg_tblspc/`
+
+Here is a sample figure of the disk layout:
+
+![1.png](../patroni/images/1.png)
+
+However, here we discuss moving the data directory for learning purposes. This might also be used somewhere by some of you if complies your taste and needs.
+
+#### Start with PostgreSQL native installation on Linux:
+
+The installation instructions are for RHEL And Ubuntu. However, if you learn them and complete reading this document, you should have no problem installing pg on other distributions.
+
+Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s default repositories etc.
+
+Use the package managers to install PostgreSQL and PostgreSQL Contrib and cli (if not bundled with the main package) packages for the start
+
+```shell
+sudo apt install postgresql-17 postgresql-contrib 
+sudo yum install postgresql17 postgresql17-contrib postgresql17-server
+```
+
+We plan to move the data directory ($PGDATA in pg’s service file) to some place else as we do so in the production environments. For that you can either modify the service file (explained here) or modify the data_directory parameter in postgresql.conf. For the former option, follow the next steps:
+
