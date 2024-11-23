@@ -220,7 +220,7 @@ execute_external_script (OpenR, OpenPython)
 
 * Its packages are also sometimes more bundled. For example, for RHEL the packages for pg server and pg client are separated. But for Ubuntu they are not. However, on ubuntu the service files are handled differently. i.e. one main `postgresql.service` service and a service template with one service created for every pg database cluster. The name of the default-initiated cluster is “main” and its instantiated service from `postgresql@.service` is `postgresql@*-main.service`. The service naming in general is `postgresql@*-clustername.service`. The default-initiated cluster is called "main".
 
-* As noted in the [Patroni documentation](../patroni/Part%20II%20Logs%20Purge%20%26%20Retention.md), For the database clusters with large amount of data, I used to move the data directory to somewhere else.
+* As noted in the [Patroni documentation](../patroni/Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md), For the database clusters with large amount of data, I used to move the data directory to somewhere else.
  For example, /data/postgresql/13/main or whatever. However, later on I came to the conclusion that the best
  way is, at least regarding PostgreSQL, to keep everything in its default location and instead define mount
  points in the default locations and attach separate disks to those mount points. For example, prior to the
