@@ -1,5 +1,7 @@
 # Introduction to PostgreSQL
 
+![majordifferencespgsqls](image/introduction2postgresql/elephant.png)
+
 
 ### A WORD FOR THE DATABASE ADMINISTRATORS
 
