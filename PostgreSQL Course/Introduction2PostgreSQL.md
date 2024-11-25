@@ -257,3 +257,39 @@ We plan to move the data directory ($PGDATA in pg’s service file) to some plac
  general, as noted before. For that you can either modify the service file (explained here) or modify the data_directory parameter in postgresql.conf. For the former option on RHEL,
  follow the next steps:
 
+1. Do not start the service. If it is started, stop it and remove the contents of the default installation directory only if you have not written any important data there. They can be removed later as well. In RHEL the service file will not start normally after the installation. It also depends on the repo.
+
+2.It is highly recommended to use a drop-in for the modification of pg’s service file configurations. To do so, write the following command:
+
+```shell
+sudo systemctl edit postgresql-16.service
+```
+
+this will automatically create a drop-in. You cannot override some major parameters such as 
+
+<pre>
+ExecStartPre
+ExecStart
+ExecReloadas
+</pre>
+
+ as they cannot be redundant (sysetmd concatenates the service file and it drop-ins) unless you void the previous value first.
+ you can do this like below:
+ 
+ main service file:
+ ```shell
+ ExecStart=<some default value>
+ ```
+ 
+ drop-in:
+ ```shell
+ # void the previous value of the main service file in the drop-in
+ ExecStart=
+ ExecStart=<new custom value>
+ ```
+  
+ A sample of the modifications that can be made come in the next slides. The parameters $PGDATA and $PGLOG should be overridden.
+
+
+
+
