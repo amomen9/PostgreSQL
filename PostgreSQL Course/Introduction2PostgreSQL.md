@@ -283,8 +283,9 @@ ExecStart
  
  drop-in:
  ```shell
- # void the previous value of the main service file in the drop-in
+ # void the previous value of the main service file in the drop-in first:
  ExecStart=
+ # now assign the new value:
  ExecStart=<new custom value>
  ```
   
