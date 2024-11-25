@@ -270,7 +270,7 @@ sudo systemctl edit postgresql-16.service
 <pre>
 ExecStartPre
 ExecStart
-ExecReload
+ExecReload
 </pre>
 
  as they cannot be redundant (sysetmd concatenates the service file and it drop-ins) unless you void the previous value first.
