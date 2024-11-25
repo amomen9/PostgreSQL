@@ -288,7 +288,7 @@ ExecStart
  ExecStart=<new custom value>
  ```
   
- A sample of the modifications that can be made comes next. The parameters $PGDATA and $PGLOG should be overridden.
+ A sample of the modifications that can be made comes next. The parameters `$PGDATA` and `$PGLOG` should be overridden.
 
 
 
