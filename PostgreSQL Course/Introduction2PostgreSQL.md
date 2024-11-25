@@ -1,4 +1,4 @@
-# Introduction to PostgreSQL
+# Introduction to PostgreSQL (With practical approach)
 
 ![majordifferencespgsqls](image/introduction2postgresql/elephant.png)
 
@@ -245,12 +245,15 @@ The installation instructions are for RHEL And Ubuntu. However, if you learn the
 
 Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s default repositories etc.
 
-Use the package managers to install PostgreSQL and PostgreSQL Contrib and cli (if not bundled with the main package) packages for the start
+Use the package managers to install PostgreSQL and PostgreSQL Contrib and cli (if not bundled with the main package) packages for the start.
+ Later versions of PostgreSQL > 9.6 include contrib package in the main server package bundle
 
 ```shell
 sudo apt install postgresql-17 postgresql-contrib 
 sudo yum install postgresql17 postgresql17-contrib postgresql17-server
 ```
 
-We plan to move the data directory ($PGDATA in pg’s service file) to some place else as we do so in the production environments. For that you can either modify the service file (explained here) or modify the data_directory parameter in postgresql.conf. For the former option, follow the next steps:
+We plan to move the data directory ($PGDATA in pg’s service file) to some place else for educational purposes. I do not personally recommend moving them in
+ general, as noted before. For that you can either modify the service file (explained here) or modify the data_directory parameter in postgresql.conf. For the former option on RHEL,
+ follow the next steps:
 
