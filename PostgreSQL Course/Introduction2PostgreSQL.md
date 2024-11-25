@@ -268,9 +268,9 @@ sudo systemctl edit postgresql-16.service
 this will automatically create a drop-in. You cannot override some major parameters such as 
 
 <pre>
-ExecStartPre
+ExecStartPre
 ExecStart
-ExecReloadas
+ExecReload
 </pre>
 
  as they cannot be redundant (sysetmd concatenates the service file and it drop-ins) unless you void the previous value first.
