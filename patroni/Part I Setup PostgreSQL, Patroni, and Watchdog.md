@@ -130,7 +130,7 @@ systemctl disable --now postgresql.service postgresql@17-main.service
 systemctl mask postgresql.service postgresql@17-main.service
 ```
 
-As said in the section `0`, we change the ownership of `/var/lib/postgresql` and `/var/lib/etcd`
+Now, as said in the section `0`, we change the ownership of `/var/lib/postgresql` and `/var/lib/etcd`
  to postgres and etcd respectively.
 
 ```shell
