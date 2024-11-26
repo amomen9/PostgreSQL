@@ -56,13 +56,9 @@ Here is a sample figure of the disk layout:
 If we actually set exclusive mount point for PostgreSQL or other services specific directories,
  such directories have to exist prior to these services installation. Upon installation of these
  services, their particular users will also be created. For PostgreSQL, it is postgres, and for
- etcd, it is etcd. Point is, right after the installtion which estabilishes these users, we run
- the following:
+ etcd, it is etcd. Point is, right after the installtion which estabilishes these users, we change
+ the ownership of `/var/lib/postgresql` and `/var/lib/etcd` to postgres and etcd respectively.
 
-```shell
-chown -R postgres:postgres /var/lib/postgresql
-chown -R etcd:etcd /var/lib/etcd
-```
 
 1. set hostnames and IP addresses if necessary (Every Node):
 
@@ -132,6 +128,14 @@ postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepa
 
 systemctl disable --now postgresql.service postgresql@17-main.service
 systemctl mask postgresql.service postgresql@17-main.service
+```
+
+As said in the section `0`, we change the ownership of `/var/lib/postgresql` and `/var/lib/etcd`
+ to postgres and etcd respectively.
+
+```shell
+chown -R postgres:postgres /var/lib/postgresql
+chown -R etcd:etcd /var/lib/etcd
 ```
 
 #### 5. Install Patroni (Every Node):
