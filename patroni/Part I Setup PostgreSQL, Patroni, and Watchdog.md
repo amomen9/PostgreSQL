@@ -99,22 +99,7 @@ systemctl disable --now ufw
 systemctl mask ufw
 ```
 
-#### 3. Create required directories (Every Node):
-
-Directories to create:
-
-```shell
-mkdir -p /var/log/patroni
-chown -R postgres:postgres /var/log/patroni
-
-# For local WAL archiving (using archive_command):
-mkdir -p /archive/postgresql/pg-wal-archive/
-# For local full backups:
-mkdir -p /archive/postgresql/pg-local-full-backup/systemd/
-chown -R postgres:postgres /archive/postgresql
-```
-
-#### 4. Install PostgreSQL (Every Node):
+#### 3. Install PostgreSQL (Every Node):
 
 First install the PostgreSQL's repository from its official website, [https://postgresql.org](https://postgresql.org).
 
@@ -130,12 +115,26 @@ systemctl disable --now postgresql.service postgresql@17-main.service
 systemctl mask postgresql.service postgresql@17-main.service
 ```
 
-Now, as said in the section `0`, we change the ownership of `/var/lib/postgresql` and `/var/lib/etcd`
- to postgres and etcd respectively.
+Now, as said in the section `0`, we change the ownership of `/var/lib/postgresql`
+ to postgres.
 
 ```shell
 chown -R postgres:postgres /var/lib/postgresql
-chown -R etcd:etcd /var/lib/etcd
+```
+
+#### 4. Create required directories (Every Node):
+
+Directories to create:
+
+```shell
+mkdir -p /var/log/patroni
+chown -R postgres:postgres /var/log/patroni
+
+# For local WAL archiving (using archive_command):
+mkdir -p /archive/postgresql/pg-wal-archive/
+# For local full backups:
+mkdir -p /archive/postgresql/pg-local-full-backup/systemd/
+chown -R postgres:postgres /archive/postgresql
 ```
 
 #### 5. Install Patroni (Every Node):
@@ -420,6 +419,13 @@ systemctl disable --now etcd
 ```shell
 apt install -y etcd-client etcd-discovery etcd-server
 systemctl disable --now etcd
+```
+
+Now, as said in the section `0`, we change the ownership of `/var/lib/etcd`
+ to etcd.
+
+```shell
+chown -R etcd:etcd /var/lib/etcd
 ```
 
 #### 9. Make the etcd API version 3 global (Every Node)
