@@ -450,6 +450,10 @@ Reference:
 
 [https://etcd.io/docs/v3.4/op-guide/configuration/](https://etcd.io/docs/v3.4/op-guide/configuration/)
 
+```shell
+vi /etc/default/etcd
+```
+
 Edit it like below:
 
 ```shell
