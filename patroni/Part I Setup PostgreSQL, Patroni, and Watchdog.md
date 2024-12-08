@@ -396,6 +396,8 @@ postgresql:
 
 </details>
 
+As it is arranged for the Patroni service to run with the root user in this document, there is no need to change ownerships for this file.
+
 #### 8. Install etcd (Every Node)
 
 Latest version of etcd can be installed through its own website, and they strongly recommend
