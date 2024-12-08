@@ -15,6 +15,10 @@ Link to the page with some PostgreSQL usefull references:
 
 [Introduction to PostgreSQL 17](Introduction2PostgreSQL.md)
 
+### Course Session Materials:
+
+For the materials of course sessions, refer to the "Course Sessions" directory.
+
 <!-- ---
 
 ### [•  Part I: Install and Configure PostgreSQL for pgPool ](./Part%20I%20Install%20and%20Configure%20PostgreSQL%20for%20pgPool.md)
