@@ -165,8 +165,8 @@ Reference:
 vi /etc/patroni/config.yml
 ```
 
-The patroni .yml configuration file should be something like the following on every node. Just note the `<ins>`node-specific
- configurations `</ins>` in this file
+The patroni .yml configuration file should be something like the following on every node. Just note the <ins>node-specific
+ configurations</ins> in this file
  
 A `##### SHOULD BE CHANGED #####` line has been added before every line that should conventionally be changed for every cluster,
  more or less for your case.
