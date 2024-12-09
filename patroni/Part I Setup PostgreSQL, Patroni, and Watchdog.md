@@ -175,11 +175,11 @@ A `##### SHOULD BE CHANGED #####` line has been added before every line that sho
 <summary>(click to expand) The complete <b>patroni configuration file (config.yml)</b>:</summary>
 
 ```YAML
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### PG Cluster Name&Version
 scope: "17-main"
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### Cluster Name
 namespace: "maunleashdb"
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### Node Name
 name: maunleash01
 
 log:
@@ -195,9 +195,9 @@ log:
 # @DCS_CONFIG@
 
 restapi:
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node Listen [IP] Address
   listen: 172.23.124.71:8008
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node Connect [IP] Address 
   connect_address: 172.23.124.71:8008
 #  certfile: /etc/ssl/certs/ssl-cert-snakeoil.pem
 #  keyfile: /etc/ssl/private/ssl-cert-snakeoil.key
@@ -212,7 +212,7 @@ restapi:
 
 etcd3:
   protocol: http
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### ETCD Nodes [IP] Addresses
   hosts: 172.23.124.71:2379,172.23.124.72:2379,172.23.124.73:2379
 
 
@@ -310,7 +310,7 @@ postgresql:
   # If you prefer to only listen on some interfaces, edit the below:
 #  listen: "@HOSTIP@@LISTEN_VIP@,127.0.0.1:@PORT@"
   listen: "*:5432"
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node Connect [IP] Address 
   connect_address: 172.23.124.71:5432
   use_unix_socket: true
   ## Default Debian/Ubuntu directory layout
@@ -319,19 +319,19 @@ postgresql:
   # config_dir: /etc/postgresql/@VERSION@/@CLUSTER@
   # pgpass: /var/lib/postgresql/@VERSION@-@CLUSTER@.pgpass
   # Modified directory layout:
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node data_dir 
   data_dir: /var/lib/postgresql/17/main/
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node bin_dir 
   bin_dir: /usr/lib/postgresql/17/bin
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node config_dir 
   config_dir: /etc/postgresql/17/main
   pgpass: /var/lib/postgresql/.pgpass
   
   authentication:
     replication:
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### replicator user 
       username: "replicator"
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### replicator user password
       password: "p@ssvv0rcl"
     # A superuser role is required in order for Patroni to manage the local
     # Postgres instance.  If the option `use_unix_socket' is set to `true',
@@ -342,7 +342,7 @@ postgresql:
     # below.
     superuser:
       username: "postgres"
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### superuser user password
       password: "p@ssvv0rcl"
     # A rewind role can be specified in order for Patroni to use on PostgreSQL
     # 11 or later for pg_rewind, i.e. rewinding a former primary after failover
@@ -354,7 +354,7 @@ postgresql:
 
   parameters:
     # data dir location
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node data_directory 
     data_directory: '/var/lib/postgresql/17/main/'
     # network params:
     listen_addresses: "*"
@@ -362,7 +362,7 @@ postgresql:
     # Emulate default Debian/Ubuntu logging
     logging_collector: 'on'
     log_directory: '/var/log/postgresql/'
-##### SHOULD BE CHANGED #####
+##### SHOULD BE CHANGED ##### This Node Log File Name 
     log_filename: 'postgresql-17-main-%A.log'
     #log_file_mode: 0600
     log_rotation_age: 1d
@@ -472,6 +472,7 @@ Reference:
 [https://etcd.io/docs/v3.4/op-guide/configuration/](https://etcd.io/docs/v3.4/op-guide/configuration/)
 
 ```shell
+truncate -s 0 /etc/default/etcd
 vi /etc/default/etcd
 ```
 
