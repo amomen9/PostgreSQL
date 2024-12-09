@@ -472,6 +472,7 @@ Reference:
 [https://etcd.io/docs/v3.4/op-guide/configuration/](https://etcd.io/docs/v3.4/op-guide/configuration/)
 
 ```shell
+cp -a /etc/default/etcd /etc/default/etcd.default
 truncate -s 0 /etc/default/etcd
 vi /etc/default/etcd
 ```
