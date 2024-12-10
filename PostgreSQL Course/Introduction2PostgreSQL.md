@@ -444,9 +444,9 @@ Also take a look at the following
 
 ---
 
-##### pg_ctl
+##### pg_ctl (RHEL)
 
-pg_ctl is the binary file provided by pg to handle operations performed on pg’s database cluster service. It is part of the 
- postgresql-server bundled package. The following are examples of pg_ctl executions:
+`pg_ctl` is the binary file provided by pg to handle operations performed on pg’s database cluster service. It is part of the 
+ postgresql-server bundled package. The following are examples of `pg_ctl` executions:
  
 
