@@ -337,7 +337,7 @@ ExecReload
 
 
 * You can connect to pg using postgres wth peer authentication after impersonating to postgres linux user. You can get the default postgres’s
- home directory with the following command which is `/var/lib/pgsql`
+ home directory with the following command which is `/var/lib/pgsql`
 ```shell 
  echo ~postgres
 ``` 
@@ -415,7 +415,7 @@ Initialize Database Cluster:
 As noted before, the data directory must be empty. Now we run the following binary
 
 ```shell
-/usr/pgsql-*/bin/postgresql-*-setup initdb
+/usr/pgsql-*/bin/postgresql-*-setup initdb
 ```
 or
 ```shell
