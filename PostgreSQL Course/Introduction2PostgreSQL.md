@@ -239,6 +239,28 @@ Here is a sample figure of the disk layout:
 
 However, here we discuss moving the data directory for learning purposes. This might also be used somewhere by some of you if complies your taste and needs.
 
+#### PostgreSQL Installation Methods
+
+
+* There are several ways to install PostgreSQL. The most recommended one is installing from package repositories, as they are widely used
+ and can resolve the requirements and prevent mismatches much more safely. Plus, you can upgrade the packages installed at no turmoil,
+ and other requirements like service files, service users, symbolic links, default directories and standard locations are created automatically.
+ 
+* Installation methods:
+1. Compile from source, install dependencies first and compile from the source
+2. Manually upload the binaries and other files to the server
+3. Manually download bundled packages, meaning rpm, deb, or other bundled packages and install them with the native package installers
+4. Use package managers (recommended)
+
+As said before, the approaches 1 and 2 need extra work like moving the files, creating users and directories, configuration files, and service files.
+ A small error in this operation could lead to big and unexpected troubles, but it may be a good exercise for learning purposes. It is advised that
+ you do it once if you want to become a good expert at PostgreSQL, both at compiling any application from the source in general, and setting
+ PostgreSQL compile-time configuration variables, like defining the size of index and heap files (Which is **1GB** by default).
+ 
+* We explain installing from the package managers here.
+
+
+
 #### Start with PostgreSQL native installation on Linux:
 
 The installation instructions are for RHEL And Ubuntu. However, if you learn them and complete reading this document, you should have no problem installing pg on other distributions.
@@ -259,10 +281,10 @@ We plan to move the data directory ($PGDATA in pg’s service file) to some plac
 
 1. Do not start the service. If it is started, stop it and remove the contents of the default installation directory only if you have not written any important data there. They can be removed later as well. In RHEL the service file will not start normally after the installation. It also depends on the repo.
 
-2.It is highly recommended to use a drop-in for the modification of pg’s service file configurations. To do so, write the following command:
+2. It is highly recommended to use a drop-in for the modification of pg’s service file configurations. To do so, write the following command:
 
 ```shell
-sudo systemctl edit postgresql-16.service
+sudo systemctl edit postgresql-17.service
 ```
 
 this will automatically create a drop-in. You cannot override some major parameters such as 
@@ -290,6 +312,8 @@ ExecReload
  ```
   
  A sample of the modifications that can be made comes next. The parameters `$PGDATA` and `$PGLOG` should be overridden.
+
+
 
 
 
