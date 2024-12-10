@@ -208,6 +208,8 @@ execute_external_script (OpenR, OpenPython)
 
 ![majordifferencespgsqls4](image/introduction2postgresql/majordifferencespgsqls4.png)
 
+---
+
 ### Installation:
 
 #### Notes:
@@ -239,6 +241,8 @@ Here is a sample figure of the disk layout:
 
 However, here we discuss moving the data directory for learning purposes. This might also be used somewhere by some of you if complies your taste and needs.
 
+---
+
 #### PostgreSQL Installation Methods
 
 
@@ -259,7 +263,7 @@ As said before, the approaches 1 and 2 need extra work like moving the files, cr
  
 * We explain installing from the package managers here.
 
-
+---
 
 #### Start with PostgreSQL native installation on Linux:
 
@@ -315,6 +319,29 @@ ExecReload
 
 
 
+---
 
 
+* Sample full path of the drop-in file:
+
+`/etc/systemd/system/postgresql-17.service.d/override.conf`
+
+* Environment=PGDATA=/data/postgresql/data/
+* Environment=PGLOG=/var/log/pg/
+* The default user for running PostgreSQL is postgres. It is created automatically by the postgres’s installation with no password. This user is
+ locked for direct logins. Do not try to activate it using passwd command to log in directly as it poses security risks. Instead, you can
+ impersonate to this user. It is locked on purpose to avoid network attacks. The corresponding user/role in pg DBMS is also postgres
+
+
+---
+
+
+* You can connect to pg using postgres wth peer authentication after impersonating to postgres linux user. You can get the default postgres’s
+ home directory with the following command which is `/var/lib/pgsql`
+```shell 
+ echo ~postgres
+``` 
+* postgres has superadmin rights on the pg DBMS. You should use its rights at the beginning to create initial users/roles and grant rights
+* The next slide has a sample drop-in we talked about
+* It is advisable that you choose the data and log directories without including pg’s version number, as we might perform a major upgrade later 
 
