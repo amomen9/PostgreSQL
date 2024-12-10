@@ -345,3 +345,10 @@ ExecReload
 * The next slide has a sample drop-in we talked about
 * It is advisable that you choose the data and log directories without including pg’s version number, as we might perform a major upgrade later 
 
+
+##### move pg data directory
+
+* Sample drop-in for the PostgreSQL service (RHEL):
+
+![movepgdatadir.png](image/introduction2postgresql/movepgdatadir.png)
+
