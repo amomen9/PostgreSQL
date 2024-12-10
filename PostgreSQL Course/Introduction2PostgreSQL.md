@@ -406,8 +406,9 @@ Example:
 This is where the database cluster is initialized by default, which we change to another directory. You can use “initdb.log”
  to track errors which are encountered by your incorrect configurations during the database cluster initialization process.
 
+---
 
-##### Setup the database cluster
+##### Launch the database cluster
 
 Initialize Database Cluster:
 
@@ -439,4 +440,12 @@ sudo systemctl enable --now postgresql-*.service
 Also take a look at the following
 
 ![pginitservice.png](image/introduction2postgresql/pginitservice.png)
+
+---
+
+##### pg_ctl
+
+pg_ctl is the binary file provided by pg to handle operations performed on pg’s database cluster service. It is part of the 
+ postgresql-server bundled package. The following are examples of pg_ctl executions:
+ 
 
