@@ -322,7 +322,7 @@ ExecReload
 ---
 
 
-* Sample full path of the drop-in file:
+* Sample full path of the drop-in file:
 
 `/etc/systemd/system/postgresql-17.service.d/override.conf`
 
