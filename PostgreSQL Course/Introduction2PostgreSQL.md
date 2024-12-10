@@ -333,7 +333,7 @@ ExecReload
  impersonate to this user. It is locked on purpose to avoid network attacks. The corresponding user/role in pg DBMS is also postgres
 
 
----
+
 
 
 * You can connect to pg using postgres wth peer authentication after impersonating to postgres linux user. You can get the default postgres’s
@@ -346,9 +346,58 @@ ExecReload
 * It is advisable that you choose the data and log directories without including pg’s version number, as we might perform a major upgrade later 
 
 
+---
+
 ##### move pg data directory
 
 * Sample drop-in for the PostgreSQL service (RHEL):
 
 ![movepgdatadir.png](image/introduction2postgresql/movepgdatadir.png)
 
+
+
+* The main installation will occur in PGDATA directory which you can override in the service file. This directory must be empty for you to be able
+ to initialize the database cluster (a single instance of pg is called pg database cluster). Note that this is by default the value returned
+ when you write the following command in shell as the postgres user, but if you override it, they will no more be the same
+ 
+ 
+![pgdata.png](image/introduction2postgresql/pgdata.png)
+
+
+* Do not forget to grant ownership to postgres user or any other user that you assign to pg in PostgreSQL service file, and 0755 permission (rwxr-xr-x).
+ This must be done recursively on `$PGDATA` and `$PGLOG`.
+
+* Now it’s time to initialize the database cluster. Before that, I say some default paths. First, run the following command to track some binaries
+ for PostgreSQL. Here we assume that the installation files are all in the default directories (Those can also of course be changed, but are not
+ within our learning scope)
+
+
+---
+
+##### Some Important Paths (RHEL)
+
+
+Use “which” to track binaries that exist in the path. Example:
+
+![which.png](image/introduction2postgresql/which.png)
+
+![which2.png](image/introduction2postgresql/which2.png)
+
+
+
+Use `readlink` with `-f` to view the origin of a symbolic link
+
+Some other important paths:
+
+`/usr/pgsql-*/bin/			# Containing main binaries of PostgreSQL`
+
+Example:
+
+`/usr/pgsql-*/bin/pg_ctl		# Control for pg (Search web for more info)`
+
+
+![path.png](image/introduction2postgresql/path.png)
+
+`/var/lib/pgsql/*/`
+
+![path2.png](image/introduction2postgresql/path2.png)
