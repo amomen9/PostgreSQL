@@ -401,3 +401,36 @@ Example:
 `/var/lib/pgsql/*/`
 
 ![path2.png](image/introduction2postgresql/path2.png)
+
+
+This is where the database cluster is initialized by default, which we change to another directory. You can use “initdb.log”
+ to track errors which are encountered by your incorrect configurations during the database cluster initialization process.
+
+
+##### Setup the database cluster
+
+Initialize Database Cluster:
+
+As noted before, the data directory must be empty. Now we run the following binary
+
+```shell
+/usr/pgsql-*/bin/postgresql-*-setup initdbor
+```
+```shell
+/usr/bin/postgresql-*-setup initdb
+```
+
+This will initialize the database cluster in the PGDATA directory
+
+
+![initmsg.png](image/introduction2postgresql/initmsg.png)
+
+
+The output is currently as simple as above. Note that you have to see “OK” to make sure that everything has actually gone ok. If not,
+ investigate initdb.log for problems as noted.
+ 
+ 
+Start and enable service:
+```shell
+sudo systemctl enable --now postgresql-*.service
+```
