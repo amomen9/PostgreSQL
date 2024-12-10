@@ -10,7 +10,7 @@
 
 ### •  Backup Automation
 
-#### •  systemd Backup Automation
+#### systemd Backup Automation
 
 1. [For pgPool](./simple%20systemd%20Backup%20Automation/pgpool.md)
 2. [For Patroni](./simple%20systemd%20Backup%20Automation/patroni.md)
