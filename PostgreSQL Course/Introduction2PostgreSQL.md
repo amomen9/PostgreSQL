@@ -415,8 +415,9 @@ Initialize Database Cluster:
 As noted before, the data directory must be empty. Now we run the following binary
 
 ```shell
-/usr/pgsql-*/bin/postgresql-*-setup initdbor
+/usr/pgsql-*/bin/postgresql-*-setup initdb
 ```
+or
 ```shell
 /usr/bin/postgresql-*-setup initdb
 ```
