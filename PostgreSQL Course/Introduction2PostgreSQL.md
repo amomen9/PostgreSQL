@@ -34,8 +34,8 @@ Navigating the database landscape in 2024: Shifting skills to match constant dem
 
 ##### 2. Ease of learning
 
-In my opinion, with the fundamentals and theories of RDBMSs being all the same, as a specialist in one other RDBMS,
- you can insanely easily learn a new RDBMS, namely PostgreSQL, relative to other people who have no prior knowledge.
+In my opinion, with the fundamentals and theories of RDBMSs being all the same, a specialist in one other RDBMS,
+ can insanely easily learn a new RDBMS, namely PostgreSQL, and also relative to other people who have no prior knowledge.
  Therefore, you need to invest dramatically less and yet be called a multi-skilled specialist.
 
 ---
