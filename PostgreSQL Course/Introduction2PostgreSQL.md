@@ -418,7 +418,9 @@ This is the value returned on the RHEL systems by default. On the Debian systems
  (Those can also of course be changed, but are not within our learning scope)
 
 
----
+<br/>
+<br/>
+
 
 ##### Some Important Paths (RHEL)
 
@@ -452,9 +454,12 @@ Example:
 This is where the database cluster is initialized by default, which we change to another directory. You can use “initdb.log”
  to track errors which are encountered by your incorrect configurations during the database cluster initialization process.
 
----
 
-##### Launch the database cluster
+---
+<br/>
+<br/>
+
+##### Initialize the database cluster
 
 Initialize Database Cluster:
 
