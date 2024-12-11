@@ -88,6 +88,13 @@ Refer to the following link for references:
 
 [Some Postgresql References](some%20postgresql%20references.md)
 
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+
 ### Notation:
 
 • `pg` stands for postgresql
@@ -101,6 +108,13 @@ Refer to the following link for references:
 • `Deb` stands for Debian
 
 • `RHEL` stands for Red Hat Enterprise Linux.
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+
 
 ### Comparing PostgreSQL with SQL Server
 
@@ -209,6 +223,13 @@ execute_external_script (OpenR, OpenPython)
 ![majordifferencespgsqls4](image/introduction2postgresql/majordifferencespgsqls4.png)
 
 ---
+---
+
+<br/>
+<br/>
+<br/>
+
+
 
 ### Installation:
 
@@ -243,6 +264,10 @@ However, here we discuss moving the data directory for learning purposes. This m
 
 ---
 
+<br/>
+<br/>
+<br/>
+
 #### PostgreSQL Installation Methods
 
 
@@ -264,6 +289,13 @@ As said before, the approaches 1 and 2 need extra work like moving the files, cr
 * We explain installing from the package managers here.
 
 ---
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+
 
 #### Start with PostgreSQL native installation on Linux:
 
@@ -315,29 +347,36 @@ ExecReload
  ExecStart=<new custom value>
  ```
   
- A sample of the modifications that can be made comes next. The parameters `$PGDATA` and `$PGLOG` should be overridden.
+ A sample of the modifications that can be made comes next. The parameters `$PGDATA` and `$PGLOG` should be overridden. You can also
+ use an environment file and place all start-up environemt variables there and only include `EnvironmentFile=-/etc/service/ENV`
+ directive in the service file.
 
 
+<br/>
 
----
 
 
 * Sample full path of the drop-in file:
 
 `/etc/systemd/system/postgresql-17.service.d/override.conf`
 
-* Environment=PGDATA=/data/postgresql/data/
-* Environment=PGLOG=/var/log/pg/
-* The default user for running PostgreSQL is postgres. It is created automatically by the postgres’s installation with no password. This user is
- locked for direct logins. Do not try to activate it using passwd command to log in directly as it poses security risks. Instead, you can
- impersonate to this user. It is locked on purpose to avoid network attacks. The corresponding user/role in pg DBMS is also postgres
+* `Environment=PGDATA=/data/postgresql/data/` and
+ `Environment=PGLOG=/var/log/pg/` or
+ 
+* `EnvironmentFile=-/etc/service/ENV`
+
+<br/>
+<br/>
+
+ 
+* The default user for running PostgreSQL is `postgres`. It is created automatically by the postgres’s installation with no password. This user is
+ locked for direct logins for security measures. Do not try to activate it using passwd command to log in directly as it poses security risks. Instead, you can
+ impersonate this user. The corresponding user/role in pg DBMS is also `postgres`
 
 
 
-
-
-* You can connect to pg using postgres wth peer authentication after impersonating to postgres linux user. You can get the default postgres’s
- home directory with the following command which is `/var/lib/pgsql`
+* You can connect to pg by using `postgres` user and peer authentication method. For that you can impersonate postgres linux user. You can get the default postgres’s
+ home directory with the following command which is `/var/lib/pgsql` (RHEL) by default
 ```shell 
  echo ~postgres
 ``` 
@@ -345,6 +384,9 @@ ExecReload
 * The next slide has a sample drop-in we talked about
 * It is advisable that you choose the data and log directories without including pg’s version number, as we might perform a major upgrade later 
 
+<br/>
+<br/>
+<br/>
 
 ---
 
@@ -356,20 +398,24 @@ ExecReload
 
 
 
-* The main installation will occur in PGDATA directory which you can override in the service file. This directory must be empty for you to be able
+* The database cluster data initialization (creating an instance of the data directory on which every data modification can be written and many other functionalities,
+ we will get to this later) will occur in `PGDATA` directory which you can override in the service file. This directory must be empty for you to be able
  to initialize the database cluster (a single instance of pg is called pg database cluster). Note that this is by default the value returned
- when you write the following command in shell as the postgres user, but if you override it, they will no more be the same
- 
+ when you write the following command in the user shell as the postgres user, but if you override it, they will no more be the same
  
 ![pgdata.png](image/introduction2postgresql/pgdata.png)
 
+This is the value returned on the RHEL systems by default. On the Debian systems this variable in not typically set by default.
 
-* Do not forget to grant ownership to postgres user or any other user that you assign to pg in PostgreSQL service file, and 0755 permission (rwxr-xr-x).
- This must be done recursively on `$PGDATA` and `$PGLOG`.
 
-* Now it’s time to initialize the database cluster. Before that, I say some default paths. First, run the following command to track some binaries
- for PostgreSQL. Here we assume that the installation files are all in the default directories (Those can also of course be changed, but are not
- within our learning scope)
+* Do not forget to grant ownership to `postgres` user or any other user that you assign to pg in PostgreSQL service file, and 0755/0750 permission (rwxr-xr-x).
+ This must be done recursively on `$PGDATA`, otherwise the DBMS will not start up. `$PGLOG` can be 0600 or more, but such strict permission for `$PGLOG` Is
+ typically not mandatory.
+
+
+* Now it’s time to initialize the database cluster. Before that, I say some default paths. First, you may run the which or whereis commands
+ as I am about to explain to track some binaries for PostgreSQL. Here we assume that the installation files are all in the default directories
+ (Those can also of course be changed, but are not within our learning scope)
 
 
 ---
