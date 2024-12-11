@@ -24,7 +24,7 @@
 
 ### Course Session Materials:
 
-["Course Sessions" directory](Course%20Sessions)
+["Course Sessions"](Course%20Sessions) directory
 
 
 <!-- ---
