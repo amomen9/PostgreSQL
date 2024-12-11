@@ -2,10 +2,6 @@
 
 ## References
 
-### PostgreSQL:
-
-Link to the page with some PostgreSQL usefull references:
-
 [Some PostgreSQL References](./some%20postgresql%20references.md)
 
 [Some Linux References](./some%20linux%20references.md)
@@ -28,7 +24,8 @@ Link to the page with some PostgreSQL usefull references:
 
 ### Course Session Materials:
 
-For the materials of course sessions, refer to the "Course Sessions" directory.
+["Course Sessions" directory](Course%20Sessions)
+
 
 <!-- ---
 
