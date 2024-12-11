@@ -10,18 +10,21 @@ Link to the page with some PostgreSQL usefull references:
 
 [Some Linux References](./some%20linux%20references.md)
 
+<br/>
+
 ---
 
 <br/>
-
 
 ### Introduction to PostgreSQL:
 
 [Introduction to PostgreSQL 17](Introduction2PostgreSQL.md)
 
----
 <br/>
 
+---
+
+<br/>
 
 ### Course Session Materials:
 
