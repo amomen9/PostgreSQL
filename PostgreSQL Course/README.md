@@ -13,7 +13,7 @@ Link to the page with some PostgreSQL usefull references:
 
 ### Introduction to PostgreSQL:
 
-[Introduction to PostgreSQL 17](Introduction2PostgreSQL.md)
+[Introduction to PostgreSQL (With practical approach)](Introduction2PostgreSQL.md)
 
 ### Course Session Materials:
 

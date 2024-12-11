@@ -3,6 +3,8 @@
 ![majordifferencespgsqls](image/introduction2postgresql/elephant.png)
 
 
+## Foreword:
+
 ### A WORD FOR THE DATABASE ADMINISTRATORS
 
 #### Why should I learn PostgreSQL?
