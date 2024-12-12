@@ -51,7 +51,7 @@ For the database clusters with large amount of data, I used to move the data dir
 
 Here is a sample figure of the disk layout:
 
-![1.png](images/1.png)
+![1.png](image/1.png)
 
 If we actually set exclusive mount point for PostgreSQL or other services specific directories,
  such directories have to exist prior to these services installation. Upon installation of these
@@ -165,7 +165,7 @@ Reference:
 vi /etc/patroni/config.yml
 ```
 
-The patroni .yml configuration file should be something like the following on every node. Just note the <ins>node-specific
+The patroni's `.yml` configuration file should be something like the following on every node. Just note the <ins>node-specific
  configurations</ins> in this file
  
 A `##### SHOULD BE CHANGED #####` line has been added before every line that should conventionally be changed for every cluster,
