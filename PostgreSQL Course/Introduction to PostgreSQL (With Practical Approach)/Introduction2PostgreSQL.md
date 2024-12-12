@@ -260,7 +260,7 @@ execute_external_script (OpenR, OpenPython)
 
 Here is a sample figure of the disk layout:
 
-![1.png](image/1.png)
+![1.png](image/introduction2postgresql/1.png)
 
 However, here we discuss moving the data directory for learning purposes. This might also be used somewhere by some of you if complies your taste and needs.
 
