@@ -11,7 +11,7 @@
 
 ##### 1. Necessity
 
-• Redgate recently launched theirState of the Database Landscape 2024 survey results, from almost 4,000 database professionals from around the globe. A clear picture emerged from the results, suggesting that 2024 is the year that skill diversification among database professionals is imperative. There’s the need to manage multiple databases, to migrate to the cloud, to introduce continuous delivery with DevOps, and even incorporating Generative AI into the mix.
+• Redgate recently launched their State of the Database Landscape 2024 survey results, from almost 4,000 database professionals from around the globe. A clear picture emerged from the results, suggesting that 2024 is the year that skill diversification among database professionals is imperative. There’s the need to manage multiple databases, to migrate to the cloud, to introduce continuous delivery with DevOps, and even incorporating Generative AI into the mix.
 
 
 • The key finding? That the pace of change in our industry is faster than ever. This is causing a recurring challenge to emerge: the rapid need for skill diversification from data professionals everywhere.
@@ -260,7 +260,7 @@ execute_external_script (OpenR, OpenPython)
 
 Here is a sample figure of the disk layout:
 
-![1.png](../patroni/images/1.png)
+![1.png](image/1.png)
 
 However, here we discuss moving the data directory for learning purposes. This might also be used somewhere by some of you if complies your taste and needs.
 
