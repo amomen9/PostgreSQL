@@ -36,7 +36,8 @@ Navigating the database landscape in 2024: Shifting skills to match constant dem
 
 In my opinion, with the fundamentals and theories of RDBMSs being all the same, a specialist in one other RDBMS,
  can insanely easily learn a new RDBMS, namely PostgreSQL, and also relative to other people who have no prior knowledge.
- Therefore, you need to invest dramatically less and yet be called a multi-skilled specialist.
+ Therefore, you need to invest dramatically less and yet be called a multi-skilled specialist. So, it is also a shame not to
+ do so.
 
 ---
 
