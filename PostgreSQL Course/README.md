@@ -14,7 +14,7 @@
 
 ### Introduction to PostgreSQL:
 
-[Introduction to PostgreSQL (With Practical Approach)](Introduction%20to%20PostgreSQL%20(With%20Practical%20Approach)/Introduction2PostgreSQL.md)
+[Introduction to PostgreSQL (With Practical Approach)](Introduction%20to%20PostgreSQL%20(With%20Practical%20Approach)/README.md)
 
 <br/>
 
