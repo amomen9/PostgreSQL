@@ -169,7 +169,7 @@ Also take a look at the following
 
 ![pginitservice.png](image/introduction2postgresql/pginitservice.png)
 
----
+
 
 
 

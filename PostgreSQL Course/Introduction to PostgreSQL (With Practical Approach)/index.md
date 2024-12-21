@@ -1,6 +1,11 @@
-## Index:
+## Previous: [Introduction to PostgreSQL (With practical approach)](README.md)
+## Next: [Installation](installation.md)
+
+# Index:
 
 * [Foreword](README.md)
+
+* [Index](index.md)
 
 * [Installation](installation.md)
 
@@ -17,3 +22,7 @@
 * [Installation](installation.md)
 
 -->
+
+## Previous: [Introduction to PostgreSQL (With practical approach)](README.md)
+## Next: [Installation](installation.md)
+

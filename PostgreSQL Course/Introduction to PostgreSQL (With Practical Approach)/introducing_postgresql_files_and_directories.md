@@ -1,3 +1,4 @@
+## Previous: [Installation](installation.md)
 
 # Introducing PostgreSQL Files and Directories
 
@@ -40,3 +41,4 @@ This is where the database cluster is initialized by default, which we change to
 ---
 
 
+## Next: [Exercise Move PG Data Directory](exercise_move_pg_data_directory.md)

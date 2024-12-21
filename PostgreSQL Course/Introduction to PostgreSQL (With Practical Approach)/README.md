@@ -257,13 +257,8 @@ execute_external_script (OpenR, OpenPython)
 
 ![majordifferencespgsqls4](image/introduction2postgresql/majordifferencespgsqls4.png)
 
----
----
 
 <br/>
 <br/>
-<br/>
-
-
 
 ## Next: [Index](index.md)
