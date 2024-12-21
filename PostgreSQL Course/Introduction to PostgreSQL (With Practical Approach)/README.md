@@ -22,7 +22,7 @@ PostgreSQL was named the first DBMS of the year according to [PostgreSQL is the 
 Previous winners of the DB-Engines DBMS of the Year Award:
 
 |PostgreSQL|	2023|
-|:-:|
+|-|-|
 |Snowflake|	2022|
 |Snowflake|	2021|
 |PostgreSQL|	2020|
