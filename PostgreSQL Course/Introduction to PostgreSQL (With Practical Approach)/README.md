@@ -70,7 +70,7 @@ In my opinion, with the fundamentals and theories of RDBMSs being all the same, 
  do so.
 
 
-##### 4. MORE GENERAL INFO ABOUT POSTGRESQL
+##### 4. More General Info About PostgreSQL
 
 • The PostgreSQL Object-relational Database Management System (ORDBMS) is a powerful, stable, open-source, free,
  and transactional database management system with diverse, powerful, abundant features, and the ability to
@@ -100,6 +100,10 @@ In my opinion, with the fundamentals and theories of RDBMSs being all the same, 
  data storage systems. This RDBMS is currently very popular and has established a strong base for itself.
 
 
+<br/>
+<br/>
+
+
 ### Robustness
 
 • In the context of PostgreSQL, robustness refers to the database system's ability to provide reliable performance,
@@ -111,7 +115,11 @@ In my opinion, with the fundamentals and theories of RDBMSs being all the same, 
 • Robustness in PostgreSQL ensures that the system can manage large volumes of data and complex queries without
  compromising on performance. It also means that PostgreSQL can recover from failures and continue to operate
  effectively, which is crucial for maintaining the availability and reliability of applications that depend on the database
- 
+
+---
+<br/>
+
+
 ### References:
 
 Refer to the following link for references:
