@@ -101,7 +101,6 @@ In my opinion, with the fundamentals and theories of RDBMSs being all the same, 
 
 
 <br/>
-<br/>
 
 
 ### Robustness
@@ -126,10 +125,10 @@ Refer to the following link for references:
 
 [Some Postgresql References](some%20postgresql%20references.md)
 
+---
+<br/>
+<br/>
 
-<br/>
-<br/>
-<br/>
 <br/>
 
 
