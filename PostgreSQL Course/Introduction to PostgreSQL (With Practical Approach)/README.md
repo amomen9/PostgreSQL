@@ -334,7 +334,8 @@ As said before, the approaches 1 and 2 need extra work like moving the files, cr
 
 #### Start with PostgreSQL native installation on Linux:
 
-The installation instructions are for RHEL And Ubuntu. Lator on, the primary steps to install PostgreSQL on Alpine Linux are also noted. However, if you
+The installation instructions are for RHEL And Ubuntu. RHEL explanations come first, the Ubuntu.
+ The primary steps to install PostgreSQL on Alpine Linux are also noted very briefly. However, if you
  learn them and complete reading this document, you should have no problem installing pg on other distributions.
 
 Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s default repositories (OS repositories are nearly always outdated) etc.
@@ -345,15 +346,6 @@ Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s de
 Use the package managers to install PostgreSQL and PostgreSQL Contrib and cli (if not bundled with the main package) packages for the start.
  Later versions of PostgreSQL > 9.6 include contrib package in the main server package bundle:
 
-##### Ubuntu
-
-```shell
-# Debian
-sudo apt install postgresql-17 postgresql-contrib 
-```
-
-The database cluster will be initialized and the service started automatically.
-
 ##### RHEL
 
 ```shell
@@ -363,10 +355,19 @@ sudo yum install postgresql17 postgresql17-contrib postgresql17-server
 
 The database cluster will not be initialized and the service will not be started automatically. You manually have to do so.
 
+##### Ubuntu
+
+```shell
+# Debian
+sudo apt install postgresql-17 postgresql-contrib 
+```
+
+The database cluster will be initialized and the service started automatically.
+
+
 ##### Alpine Linux
 
 First, add the required repositories to `/etc/apk/repositories`. Be careful to replace the Alpine major version with your Alpine version.
-
 
 
 ```shell
@@ -393,6 +394,93 @@ sudo rc-service postgresql start
 sudo -u postgres psql
 sudo rc-status postgresql
 ```
+
+---
+
+##### Initialize the database cluster (RHEL)
+
+
+As noted before, the data directory must be empty. Now we run the following binary
+
+```shell
+/usr/pgsql-*/bin/postgresql-*-setup initdb
+```
+or
+```shell
+/usr/bin/postgresql-*-setup initdb
+```
+
+This will initialize the database cluster in the PGDATA directory. If you wish to initialize the database cluster
+ somewhere custom, read `postgresql-*-setup` manual, or simply execute the initdb binary alone like below:
+ 
+```shell
+/usr/pgsql-*/bin/initdb -D <Custome Data Directory Location>
+```
+
+
+![initmsg.png](image/introduction2postgresql/initmsg.png)
+![initmsg2.png](image/introduction2postgresql/initmsg2.png)
+
+
+The output can be as simple as the first above figure or the next one. Note that you have to see “OK” to make sure
+ that everything has actually gone ok. If not,
+ investigate initdb.log for problems as noted if you do not see enough info in the initidb command output.
+ 
+ 
+Start and enable service:
+```shell
+sudo systemctl enable --now postgresql-*.service
+```
+
+
+Also take a look at the following
+
+![pginitservice.png](image/introduction2postgresql/pginitservice.png)
+
+---
+
+##### Some Important Paths (RHEL)
+
+
+Use “which” to track binaries that exist in the path. Example:
+
+![which.png](image/introduction2postgresql/which.png)
+
+![which2.png](image/introduction2postgresql/which2.png)
+
+
+
+Use `readlink` with `-f` to view the origin of a symbolic link
+
+Some other important paths:
+
+`/usr/pgsql-*/bin/			# Containing main binaries of PostgreSQL`
+
+Example:
+
+`/usr/pgsql-*/bin/pg_ctl		# Control for pg (Search web for more info)`
+
+
+![path.png](image/introduction2postgresql/path.png)
+
+`/var/lib/pgsql/*/`
+
+![path2.png](image/introduction2postgresql/path2.png)
+
+
+This is where the database cluster is initialized by default, which we change to another directory. You can use “initdb.log”
+ to track errors which are encountered by your incorrect configurations during the database cluster initialization process.
+
+
+
+<br/>
+
+---
+
+##### Introducing PostgreSQL Files and Directories
+
+
+
 
 ---
 
@@ -509,81 +597,7 @@ This is the value returned on the RHEL systems by default. On the Debian systems
 <br/>
 
 
-##### Some Important Paths (RHEL)
 
-
-Use “which” to track binaries that exist in the path. Example:
-
-![which.png](image/introduction2postgresql/which.png)
-
-![which2.png](image/introduction2postgresql/which2.png)
-
-
-
-Use `readlink` with `-f` to view the origin of a symbolic link
-
-Some other important paths:
-
-`/usr/pgsql-*/bin/			# Containing main binaries of PostgreSQL`
-
-Example:
-
-`/usr/pgsql-*/bin/pg_ctl		# Control for pg (Search web for more info)`
-
-
-![path.png](image/introduction2postgresql/path.png)
-
-`/var/lib/pgsql/*/`
-
-![path2.png](image/introduction2postgresql/path2.png)
-
-
-This is where the database cluster is initialized by default, which we change to another directory. You can use “initdb.log”
- to track errors which are encountered by your incorrect configurations during the database cluster initialization process.
-
-
-
-<br/>
-
-##### Initialize the database cluster
-
-
-As noted before, the data directory must be empty. Now we run the following binary
-
-```shell
-/usr/pgsql-*/bin/postgresql-*-setup initdb
-```
-or
-```shell
-/usr/bin/postgresql-*-setup initdb
-```
-
-This will initialize the database cluster in the PGDATA directory. If you wish to initialize the database cluster
- somewhere custom, read `postgresql-*-setup` manual, or simply execute the initdb binary alone like below:
- 
-```shell
-/usr/pgsql-*/bin/initdb -D <Custome Data Directory Location>
-```
-
-
-![initmsg.png](image/introduction2postgresql/initmsg.png)
-![initmsg2.png](image/introduction2postgresql/initmsg2.png)
-
-
-The output can be as simple as the first above figure or the next one. Note that you have to see “OK” to make sure
- that everything has actually gone ok. If not,
- investigate initdb.log for problems as noted if you do not see enough info in the initidb command output.
- 
- 
-Start and enable service:
-```shell
-sudo systemctl enable --now postgresql-*.service
-```
-
-
-Also take a look at the following
-
-![pginitservice.png](image/introduction2postgresql/pginitservice.png)
 
 ---
 
