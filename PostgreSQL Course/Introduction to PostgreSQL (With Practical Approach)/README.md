@@ -484,7 +484,7 @@ This is where the database cluster is initialized by default, which we change to
 
 ---
 
-##### move pg data directory
+##### move pg data directory (RHEL, Ubuntu is not a big deal after you learn this)
 
 We also clarify one approach of moving the data directory (`$PGDATA`) to some place else for educational purposes (Only RHEL, other distributions
  are very self-explanatory after you learn this). There are many approaches to do so
@@ -595,9 +595,6 @@ This is the value returned on the RHEL systems by default. On the Debian systems
 
 <br/>
 <br/>
-
-
-
 
 ---
 
