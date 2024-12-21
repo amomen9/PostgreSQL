@@ -13,7 +13,7 @@
 ![First Place](image/introduction2postgresql/pg_gold.png)
 
 ##### 1. PostgreSQL was named the first DBMS of the year according to [PostgreSQL is the DBMS of the Year 2023](https://db-engines.com/en/blog_post/106). 
- It is also a bridge to some other technologies like CockroachDB.
+ It is also a bridge to some other technologies like CockroachDB. More info about PostgreSQL is in the item No. 4.
  
 The ranking there is listed as follows:
  
@@ -39,7 +39,7 @@ Previous winners of the DB-Engines DBMS of the Year Award:
 <br/>
 
 
-##### 1. Necessity
+##### 2. Necessity
 
 • Redgate recently launched their State of the Database Landscape 2024 survey results, from almost 4,000 database professionals from around the globe. A clear picture emerged from the results, suggesting that 2024 is the year that skill diversification among database professionals is imperative. There’s the need to manage multiple databases, to migrate to the cloud, to introduce continuous delivery with DevOps, and even incorporating Generative AI into the mix.
 
@@ -62,18 +62,15 @@ Navigating the database landscape in 2024: Shifting skills to match constant dem
 [https://www.red-gate.com/hub/events/navigating-the-database-landscape-in-2024](https://www.red-gate.com/hub/events/navigating-the-database-landscape-in-2024)
 
 
-##### 2. Ease of learning
+##### 3. Ease of learning
 
 In my opinion, with the fundamentals and theories of RDBMSs being all the same, a specialist in one other RDBMS,
  can insanely easily learn a new RDBMS, namely PostgreSQL, and also relative to other people who have no prior knowledge.
  Therefore, you need to invest dramatically less and yet be called a multi-skilled specialist. So, it is also a shame not to
  do so.
 
----
 
-
-
-### MORE GENERAL INFO ABOUT POSTGRESQL
+##### 4. MORE GENERAL INFO ABOUT POSTGRESQL
 
 • The PostgreSQL Object-relational Database Management System (ORDBMS) is a powerful, stable, open-source, free,
  and transactional database management system with diverse, powerful, abundant features, and the ability to
