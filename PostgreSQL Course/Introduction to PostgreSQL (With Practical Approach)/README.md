@@ -496,7 +496,6 @@ This is where the database cluster is initialized by default, which we change to
 
 ##### Initialize the database cluster
 
-Initialize Database Cluster:
 
 As noted before, the data directory must be empty. Now we run the following binary
 
