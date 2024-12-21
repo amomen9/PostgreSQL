@@ -334,23 +334,78 @@ As said before, the approaches 1 and 2 need extra work like moving the files, cr
 
 #### Start with PostgreSQL native installation on Linux:
 
-The installation instructions are for RHEL And Ubuntu. However, if you learn them and complete reading this document, you should have no problem installing pg on other distributions.
+The installation instructions are for RHEL And Ubuntu. Lator on, the primary steps to install PostgreSQL on Alpine Linux are also noted. However, if you
+ learn them and complete reading this document, you should have no problem installing pg on other distributions.
 
-Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s default repositories etc.
+Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s default repositories (OS repositories are nearly always outdated) etc.
+ The best place to obtain the repositories is `postgresql.org` itself:
+
+[PostgreSQL Downloads](https://www.postgresql.org/download/) 
 
 Use the package managers to install PostgreSQL and PostgreSQL Contrib and cli (if not bundled with the main package) packages for the start.
- Later versions of PostgreSQL > 9.6 include contrib package in the main server package bundle
+ Later versions of PostgreSQL > 9.6 include contrib package in the main server package bundle:
+
+##### Ubuntu
 
 ```shell
+# Debian
 sudo apt install postgresql-17 postgresql-contrib 
+```
+
+The database cluster will be initialized and the service started automatically.
+
+##### RHEL
+
+```shell
+# RHEL
 sudo yum install postgresql17 postgresql17-contrib postgresql17-server
 ```
 
-We plan to move the data directory ($PGDATA in pg’s service file) to some place else for educational purposes. I do not personally recommend moving them in
- general, as noted before. For that you can either modify the service file (explained here) or modify the data_directory parameter in postgresql.conf. For the former option on RHEL,
- follow the next steps:
+The database cluster will not be initialized and the service will not be started automatically. You manually have to do so.
 
-1. Do not start the service. If it is started, stop it and remove the contents of the default installation directory only if you have not written any important data there. They can be removed later as well. In RHEL the service file will not start normally after the installation. It also depends on the repo.
+##### Alpine Linux
+
+First, add the required repositories to `/etc/apk/repositories`. Be careful to replace the Alpine major version with your Alpine version.
+
+
+
+```shell
+printf "
+https://dl-cdn.alpinelinux.org/alpine/v<Alpine Version>/main
+https://dl-cdn.alpinelinux.org/alpine/v<Alpine Version>/community
+https://dl-cdn.alpinelinux.org/alpine/edge/testing
+https://dl-cdn.alpinelinux.org/alpine/edge/main
+https://dl-cdn.alpinelinux.org/alpine/edge/community
+http://mirror.yandex.ru/mirrors/alpine/v<Alpine Version>/main/x86_64/APKINDEX.tar.gz /etc/apk/repositories
+" >> /etc/apk/repositories
+```
+
+Then:
+
+```shell
+# Alpine Linux:
+#(edge/main repository contains the latest PostgreSQL installation
+sudo apk update
+sudo apk add postgresql17 postgresql17-contrib
+sudo pg_ctl initdb -D /var/lib/postgresql/data
+sudo rc-update add postgresql boot
+sudo rc-service postgresql start
+sudo -u postgres psql
+sudo rc-status postgresql
+```
+
+---
+
+##### move pg data directory
+
+We also clarify one approach of moving the data directory (`$PGDATA`) to some place else for educational purposes (Only RHEL, other distributions
+ are very self-explanatory after you learn this). There are many approaches to do so
+ that as you get more familiar with PostgreSQL, you get to know how to do each of them. I do not personally recommend moving the data directory in
+ general, as noted before. For the approach noted here, you can follow the following steps:
+
+1. Do not start the service. If it is started, stop it and remove the contents of the default installation directory only if you have not written any
+ important data there. They can be removed later as well. In RHEL the service file will not start normally after the installation of the package
+ (unlike Ubuntu). It also depends on the repo from which the package comes from.
 
 2. It is highly recommended to use a drop-in for the modification of pg’s service file configurations. To do so, write the following command:
 
@@ -369,7 +424,8 @@ ExecReload
  as they cannot be redundant (sysetmd concatenates the service file and it drop-ins) unless you void the previous value first.
  you can do this like below:
  
- main service file:
+ Main service file:
+ 
  ```shell
  ExecStart=<some default value>
  ```
@@ -382,7 +438,7 @@ ExecReload
  ExecStart=<new custom value>
  ```
   
- A sample of the modifications that can be made comes next. The parameters `$PGDATA` and `$PGLOG` should be overridden. You can also
+ A sample of the modifications that can be made comes next. The parameter `$PGDATA` should be overridden. You can also
  use an environment file and place all start-up environemt variables there and only include `EnvironmentFile=-/etc/service/ENV`
  directive in the service file.
 
@@ -395,8 +451,7 @@ ExecReload
 
 `/etc/systemd/system/postgresql-17.service.d/override.conf`
 
-* `Environment=PGDATA=/data/postgresql/data/` and
- `Environment=PGLOG=/var/log/pg/` or
+* `Environment=PGDATA=/data/postgresql/data/`
  
 * `EnvironmentFile=-/etc/service/ENV`
 
@@ -423,11 +478,8 @@ ExecReload
 <br/>
 <br/>
 
----
 
-##### move pg data directory
-
-* Sample drop-in for the PostgreSQL service (RHEL):
+* Now, sample drop-in for the PostgreSQL service (RHEL):
 
 ![movepgdatadir.png](image/introduction2postgresql/movepgdatadir.png)
 
@@ -507,7 +559,12 @@ or
 /usr/bin/postgresql-*-setup initdb
 ```
 
-This will initialize the database cluster in the PGDATA directory
+This will initialize the database cluster in the PGDATA directory. If you wish to initialize the database cluster
+ somewhere custom, read `postgresql-*-setup` manual, or simply execute the initdb binary alone like below:
+ 
+```shell
+/usr/pgsql-*/bin/initdb -D <Custome Data Directory Location>
+```
 
 
 ![initmsg.png](image/introduction2postgresql/initmsg.png)
