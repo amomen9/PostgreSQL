@@ -1,3 +1,6 @@
+#### Previous: [Introducing PostgreSQL Files and Directories](introducing_postgresql_files_and_directories.md)
+<br/>
+
 ## move pg data directory (RHEL, Ubuntu is not a big deal after you learn this)
 
 We also clarify one approach of moving the data directory (`$PGDATA`) to some place else for educational purposes (Only RHEL, other distributions
@@ -110,4 +113,5 @@ This is the value returned on the RHEL systems by default. On the Debian systems
 <br/>
 <br/>
 
----
+#### Next: []()
+

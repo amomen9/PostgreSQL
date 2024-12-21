@@ -1,3 +1,7 @@
+
+#### Previous: [Index](index.md)
+
+
 # Installation:
 
 ## Notes:
@@ -171,5 +175,8 @@ Also take a look at the following
 
 
 
+<br/>
+
+#### Previous: [Introducing PostgreSQL Files and Directories](introducing_postgresql_files_and_directories.md)
 
 
