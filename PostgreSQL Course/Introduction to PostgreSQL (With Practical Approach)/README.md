@@ -9,6 +9,33 @@
 
 #### Why should I learn PostgreSQL?
 
+
+![First Place](image/introduction2postgresql/pg_gold.png)
+
+PostgreSQL was named the first DBMS of the year according to [PostgreSQL is the DBMS of the Year 2023](https://db-engines.com/en/blog_post/106). 
+ The ranking there is listed as follows:
+ 
+1. DBMS of the Year: PostgreSQL
+2. Runner-up: Databricks
+3. Third place: Google BigQuery
+
+Previous winners of the DB-Engines DBMS of the Year Award:
+
+|PostgreSQL|	2023|
+|:-:|
+|Snowflake|	2022|
+|Snowflake|	2021|
+|PostgreSQL|	2020|
+|MySQL|	2019|
+|PostgreSQL|	2018|
+|PostgreSQL|	2017|
+|Microsoft SQL Server|	2016|
+|Oracle|	2015|
+|MongoDB|	2014|
+|MongoDB|	2013|
+
+
+
 ##### 1. Necessity
 
 • Redgate recently launched their State of the Database Landscape 2024 survey results, from almost 4,000 database professionals from around the globe. A clear picture emerged from the results, suggesting that 2024 is the year that skill diversification among database professionals is imperative. There’s the need to manage multiple databases, to migrate to the cloud, to introduce continuous delivery with DevOps, and even incorporating Generative AI into the mix.
