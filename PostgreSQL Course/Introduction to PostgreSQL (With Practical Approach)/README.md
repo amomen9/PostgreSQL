@@ -542,8 +542,7 @@ This is where the database cluster is initialized by default, which we change to
  to track errors which are encountered by your incorrect configurations during the database cluster initialization process.
 
 
----
-<br/>
+
 <br/>
 
 ##### Initialize the database cluster
