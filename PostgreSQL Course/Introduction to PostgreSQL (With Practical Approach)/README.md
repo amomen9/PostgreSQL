@@ -72,33 +72,31 @@ In my opinion, with the fundamentals and theories of RDBMSs being all the same, 
 
 ##### 4. More General Info About PostgreSQL
 
-• The PostgreSQL Object-relational Database Management System (ORDBMS) is a powerful, stable, open-source, free,
- and transactional database management system with diverse, powerful, abundant features, and the ability to
- be developed with various procedural languages. These languages include PL/PGSQL, PL/Python, PL/Tcl, and PL/Perl.
- This makes PostgreSQL accessible to a wide range of developers. Its object-oriented features simplify the work
- for programmers using object-oriented programming capabilities. Other features include diverse data types and
- operator overloading, allows developers to define indexes in a broader and more complex manner. This RDBMS is
- specifically designed for free and open-source Unix-based operating systems, including Linux, but it can be
- installed and used on all major operating systems, including Windows, Unix, macOS, Solaris, BSD systems, and
- more, both natively and in containers. Additionally, this ORDBMS is used on numerous devices. PostgreSQL
- belongs to and is maintained by EnterpriseDB (EDB). The main Linux distribution that EDB uses is RHEL (for example,
- RHEL itself, RockyLinux, OracleLinux, CEntOS, Fedora, Alma Linux, etc.), but PostgreSQL as noted is highly flexible
- with the hosting platform because it is widely used on numerous platforms. But some of the peripheral modules
- maintained by EDB are known to have some issues with some other platforms for example Ubuntu.
 
-• Like its main host, Linux, PostgreSQL is highly customizable and can be managed with numerous peripheral extensions
- and modules, allowing users to add desired features to enhance this RDBMS as needed. Some of these extensions are
- exclusive for PostgreSQL, while some others are intended for many other applications, as well. However, this feature
- also makes its management more complex like Linux. PostgreSQL modules include both commercial and free ones, but they
- are mostly open-source and free.
+• The Object-Relational Database Management System (ORDBMS) PostgreSQL is a powerful, stable, open-source, and free transactional 
+database management system with a wide variety of features. It supports development in multiple procedural languages such as PL/PGSQL,
+ PL/Python, PL/Tcl, and PL/Perl, making PostgreSQL accessible to a wide range of developers.
 
+ Its object-oriented features simplify the work of programmers in using object-oriented programming capabilities.
+ For example, features like diverse data types and operator overloading allow developers to define indexes more broadly, custom, and complexly.
 
+• This RDBMS is specifically designed for free and open-source Unix-based operating systems, including Linux, but it can also be
+ installed and used on all major operating systems, including Windows, Unix, macOS, Solaris, BSD operating systems, and more,
+ natively and in containers. Additionally, this ORDBMS is used on numerous devices.
 
-• This RDBMS is very popular and has a large community of experts who contribute to the enhancement of PostgreSQL and
- its modules and help solve other experts' problems. PostgreSQL can be used for free at the enterprise level, and its
- main host, Linux, is also free, which is why many companies use it as their primary data storage system or one of their
- data storage systems. This RDBMS is currently very popular and has established a strong base for itself.
+• PostgreSQL, like its main host Linux, is highly customizable and manageable with numerous peripheral features and modules. Users
+ can install their desired features to enhance this RDBMS as needed. However, this feature also makes its management more complex,
+ similar to Linux. PostgreSQL modules include both commercial and free ones, with most being open-source and free.
 
+• This RDBMS is very popular and has a vast community of experts who contribute to the enhancement of PostgreSQL and its modules
+ and assist other experts in troubleshooting. PostgreSQL is free for enterprise-level use, and its main host, Linux, is also free.
+ For this reason, many companies use it as their primary data storage system or one of their main data storage systems. This RDBMS
+ is currently very popular and has established a powerful position for itself. PostgreSQL also serves as a bridge to access the advanced
+ and distributed RDBMS CockroachDB, which has numerous capabilities.
+
+• Finally, based on statistical reviews by various companies and obtained information, most companies today use hybrid data management
+ systems, one of the most important of which is PostgreSQL. According to a recent Redgate survey, most data management professionals
+ believe that modern specialists can no longer settle for learning a single data management solution and must master multiple DBMSs.
 
 <br/>
 
