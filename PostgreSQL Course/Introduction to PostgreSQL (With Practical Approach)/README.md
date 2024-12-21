@@ -12,7 +12,7 @@
 
 ![First Place](image/introduction2postgresql/pg_gold.png)
 
-1. PostgreSQL was named the first DBMS of the year according to [PostgreSQL is the DBMS of the Year 2023](https://db-engines.com/en/blog_post/106). 
+##### 1. PostgreSQL was named the first DBMS of the year according to [PostgreSQL is the DBMS of the Year 2023](https://db-engines.com/en/blog_post/106). 
  It is also a bridge to some other technologies like CockroachDB.
  
 The ranking there is listed as follows:
@@ -22,8 +22,6 @@ The ranking there is listed as follows:
 	3. Third place: Google BigQuery
 
 Previous winners of the DB-Engines DBMS of the Year Award:
-
-<br/>
 
 |PostgreSQL|	2023|
 |-|-|
