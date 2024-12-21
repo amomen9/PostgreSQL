@@ -567,10 +567,12 @@ This will initialize the database cluster in the PGDATA directory. If you wish t
 
 
 ![initmsg.png](image/introduction2postgresql/initmsg.png)
+![initmsg2.png](image/introduction2postgresql/initmsg2.png)
 
 
-The output is currently as simple as above. Note that you have to see “OK” to make sure that everything has actually gone ok. If not,
- investigate initdb.log for problems as noted.
+The output can be as simple as the first above figure or the next one. Note that you have to see “OK” to make sure
+ that everything has actually gone ok. If not,
+ investigate initdb.log for problems as noted if you do not see enough info in the initidb command output.
  
  
 Start and enable service:
