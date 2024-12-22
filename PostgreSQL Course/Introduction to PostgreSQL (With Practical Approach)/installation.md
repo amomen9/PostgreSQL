@@ -117,17 +117,29 @@ http://mirror.yandex.ru/mirrors/alpine/v<Alpine Version>/main/x86_64/APKINDEX.ta
 " >> /etc/apk/repositories
 ```
 
-Then:
+Then, run the following one by one:
 
 ```shell
 # Alpine Linux:
-#(edge/main repository contains the latest PostgreSQL installation
 sudo apk update
+```
+```shell
+#(edge/main repository contains the latest PostgreSQL installation
 sudo apk add postgresql17 postgresql17-contrib
+```
+```shell
 sudo pg_ctl initdb -D /var/lib/postgresql/data
+```
+```shell
 sudo rc-update add postgresql boot
+```
+```shell
 sudo rc-service postgresql start
+```
+```shell
 sudo -u postgres psql
+```
+```shell
 sudo rc-status postgresql
 ```
 
