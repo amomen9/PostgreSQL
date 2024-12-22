@@ -103,7 +103,7 @@ The database cluster will be initialized and the service started automatically.
 
 ### Alpine Linux
 
-First, add the required repositories to `/etc/apk/repositories`. Be careful to replace the Alpine major version with your Alpine version.
+First, add the recommended and required repositories to `/etc/apk/repositories`. Be careful to replace the Alpine major version with your Alpine version.
 
 
 ```shell
