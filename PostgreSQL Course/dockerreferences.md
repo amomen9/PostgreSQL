@@ -29,7 +29,7 @@ A book by Nigel Poulton, containing Docker, Docker Network, Docker Orchestration
 
 * Docker Deep Dive
 
-![1731188617351](image/dockerdeepdive.png)
+![Docker Deep Dive](image/somepostgresqlreferences/dockerdeepdive.png)
 
 ---
 
