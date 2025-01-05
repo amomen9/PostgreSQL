@@ -5,7 +5,7 @@
 ## Some Important Paths (RHEL)
 
 
-Use “which” to track binaries that exist in the path. Example:
+Use `which` to track binaries that exist in the path. Example:
 
 ![which.png](image/introduction2postgresql/which.png)
 
