@@ -1,7 +1,7 @@
 
-# Some Linux Reference text-books
+# Some Docker References
 
-The Linux references are incredibly numerous. Some of them are the following though:
+Some of them are the following though:
 
 ### • Docker Official
 
