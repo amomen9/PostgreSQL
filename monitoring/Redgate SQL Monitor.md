@@ -38,7 +38,7 @@ In addition, to this date, Sep. 2024, Redgate does not yet support PostgreSQL mo
 
 </div>
 
-<br/>
+
 <br/>
 
 ---
