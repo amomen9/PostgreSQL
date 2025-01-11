@@ -6,6 +6,8 @@
 
 # PostgreSQL Course
 
+<br/>
+
 ## References
 
 [Some PostgreSQL References](./some%20postgresql%20references.md)
