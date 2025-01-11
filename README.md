@@ -1,3 +1,6 @@
+
+![PostgreSQL](https://img.shields.io/Badge/PostgreSQL-blue)
+
 # PostgreSQL
 
 PostgreSQL Maintenance Bash Scripts, configuration files, and docs
