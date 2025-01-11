@@ -24,7 +24,11 @@ In addition, to this date, Sep. 2024, Redgate does not yet support PostgreSQL mo
 
 **RedgateMonitor Version 13:**
 
-<div width="60">![1726317547751](image/RedgateSQLMonitor/1726317547751.png)</div>
+<div width="60">
+
+![1726317547751](image/RedgateSQLMonitor/1726317547751.png)
+
+</div>
 
 **RedgateMonitor Version 14:**
 
