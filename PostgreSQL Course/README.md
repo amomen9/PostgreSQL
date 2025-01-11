@@ -1,5 +1,5 @@
 
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Course-blue?logo=postgresql&logoColor=ffffff)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Course-blue?logo=postgresql&labelColor=ffffff)
 
 
 # PostgreSQL Course
