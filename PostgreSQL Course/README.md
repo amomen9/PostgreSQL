@@ -2,6 +2,8 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Course-blue?logo=postgresql&logoSize=auto&labelColor=ffffff)
 
 
+<br/>
+
 # PostgreSQL Course
 
 ## References
