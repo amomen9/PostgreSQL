@@ -1,5 +1,5 @@
 
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL?logo=postgresql&logoSize=auto&labelColor=ffffff)
 
 # PostgreSQL
 
