@@ -230,6 +230,13 @@ Some of the major differences between MSSQL-Windows and PG-Linux with respect to
 |Virtual IP (VIP)|Listener|
 |...|...|
 
+
+More terminology comparison on:
+
+[SQL Server PostgreSQL terminology](https://wiki.postgresql.org/wiki/SQL_Server_PostgreSQL_terminology)
+
+[PostgreSQL Terminology for MySQL DBAs](https://wiki.postgresql.org/wiki/MySQL_PostgreSQL_terminology)
+
 ---
 
 * **Programming language support:**
