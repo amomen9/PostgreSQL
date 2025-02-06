@@ -17,8 +17,8 @@
  
 The ranking there is listed as follows:
  
-	1. First Place: PostgreSQL
-	2. Runner-up: Databricks
+	1. First Place: PostgreSQL	(RDBMS)
+	2. Runner-up: Databricks	(NoSQL)
 	3. Third place: Google BigQuery
 
 Previous winners of the DB-Engines DBMS of the Year Award:
