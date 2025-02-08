@@ -58,6 +58,13 @@ find $PG_WAL_ARCHIVE_DIR -mtime +4 -type f -exec rm -f {} \;
 2. Full Backup & Purge Script (postgres_backup.sh)
 <br/>
 
+* Install YAML query tool as a prerequisite:
+```shell
+sudo snap install yq
+```
+
+`postgres_backup.sh`:
+
 ```shell
 #!/bin/bash
 
