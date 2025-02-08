@@ -111,6 +111,21 @@ sudo apt install -y postgresql-17 postgresql-17-repack postgresql-17-plpgsql-che
 postgresql-17-cron postgresql-17-pgaudit postgresql-17-show-plans postgresql-doc-17 \
 postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepare iputils-arping
 
+
+# postgresql-17: This is the main PostgreSQL 17 database server package, which includes the core database server software.
+# postgresql-17-repack: A utility to reorganize tables and indexes without significant downtime, helping to optimize the database by reducing bloat.
+# postgresql-17-plpgsql-check: A package that provides a plpgsql_lint function to check the syntax and structure of PL/pgSQL functions.
+# postgresql-17-cron: Adds cron-like scheduling capabilities to PostgreSQL, allowing jobs to be scheduled and run inside the database.
+# postgresql-17-pgaudit: An extension that provides detailed session and object audit logging via the standard logging facility provided by PostgreSQL.
+# postgresql-17-show-plans: Captures execution plans of SQL statements automatically for monitoring purposes.
+# postgresql-doc-17: Documentation for PostgreSQL 17, including guides and manuals.
+# postgresql-contrib-17: A collection of additional extensions and tools contributed by the PostgreSQL community, enhancing the database's functionality.
+# postgresql-17-plprofiler: Provides profiling tools to analyze the performance of PL/pgSQL functions within PostgreSQL.
+# plprofiler: A related tool to postgresql-17-plprofiler, used to visualize and analyze PL/pgSQL profiling data.
+# postgresql-17-preprepare: An extension for pre-parsing SQL statements to improve performance by reducing the parsing overhead.
+# iputils-arping: A network utility for sending ARP requests to discover or ping a host on the same network.
+
+
 systemctl disable --now postgresql.service postgresql@17-main.service
 systemctl mask postgresql.service postgresql@17-main.service
 ```
