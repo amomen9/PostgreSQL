@@ -64,7 +64,7 @@ sudo snap install yq
 ```
 
 If you cannot use snap package manager on your server, you can install `yq` on a third Ubuntu server and simply transfer
-yq's binary to your server and <u>add it to the path</u>.
+yq's binary to your server and <ins>add it to the path</ins>.
 
 `postgres_backup.sh`:
 
