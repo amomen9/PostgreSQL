@@ -58,10 +58,13 @@ find $PG_WAL_ARCHIVE_DIR -mtime +4 -type f -exec rm -f {} \;
 2. Full Backup & Purge Script (postgres_backup.sh)
 <br/>
 
-* Install YAML query tool as a prerequisite:
+* Install YAML query tool `yq` as a prerequisite:
 ```shell
 sudo snap install yq
 ```
+
+If you cannot use snap package manager on your server, you can install `yq` on a third Ubuntu server and simply transfer
+yq's binary to your server and <u>add it to the path</u>.
 
 `postgres_backup.sh`:
 
