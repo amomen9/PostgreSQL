@@ -11,3 +11,7 @@
 ---
 
 ### [•  Part III: Evict/Add node from/to the cluster ](./Part%20III%20cluster%20Evict%2DAdd%20node.md)
+
+---
+
+### [•  Part IV: pgbouncer](Part%20IV%20pgbouncer.md)
