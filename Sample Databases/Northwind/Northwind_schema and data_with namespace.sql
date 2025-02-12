@@ -8,6 +8,26 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET search_path = public, aviation, product, sales, hr;
+
+DROP DATABASE IF EXISTS "Northwind" WITH (FORCE);
+
+CREATE DATABASE "Northwind";
+
+
+\c "Northwind"
+
+-- Ascertain that the role admin (legacy, before PostgreSQL 8.1) exists
+DO $$ BEGIN
+    -- Check the major version number
+    IF substring(current_setting('server_version_num') from 1 for 2)::integer < 81 THEN
+        -- Create the role 'admin' if it does not exist
+        IF NOT EXISTS ( SELECT 1 FROM pg_roles WHERE rolname = 'admin') THEN
+            CREATE ROLE admin;
+        END IF;
+    END IF;
+END $$;
+
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
@@ -4007,11 +4027,104 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 -- Name: public; Type: ACL; Schema: -; Owner: admin
 --
 
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM admin;
-GRANT ALL ON SCHEMA public TO admin;
-GRANT ALL ON SCHEMA public TO PUBLIC;
+CREATE SCHEMA aviation;
+CREATE SCHEMA product;
+CREATE SCHEMA sales;
+CREATE SCHEMA hr;
 
+DO $$ 
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN (SELECT schema_name FROM information_schema.schemata WHERE schema_name <> 'information_schema' AND schema_name !~ '^pg_')
+  LOOP
+    EXECUTE 'REVOKE ALL ON SCHEMA ' || quote_ident(r.schema_name) || ' FROM PUBLIC;';
+    EXECUTE 'REVOKE ALL ON SCHEMA ' || quote_ident(r.schema_name) || ' FROM admin;';
+  END LOOP;
+END $$;
+
+DO $$ 
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN (SELECT schema_name FROM information_schema.schemata WHERE schema_name <> 'information_schema' AND schema_name !~ '^pg_')
+  LOOP
+    EXECUTE 'GRANT ALL ON SCHEMA ' || quote_ident(r.schema_name) || ' TO PUBLIC;';
+    EXECUTE 'GRANT ALL ON SCHEMA ' || quote_ident(r.schema_name) || ' TO admin;';
+  END LOOP;
+END $$;
+
+
+ALTER TABLE public.airports			SET SCHEMA aviation;
+ALTER TABLE public.flights			SET SCHEMA aviation;
+ALTER TABLE public.categories 		SET SCHEMA product;
+ALTER TABLE public.products 		SET SCHEMA product;
+ALTER TABLE public.customers 		SET SCHEMA sales;
+ALTER TABLE public.orders 			SET SCHEMA sales;
+ALTER TABLE public.order_details 	SET SCHEMA sales;
+ALTER TABLE public.employees 		SET SCHEMA hr;
+
+
+ALTER TABLE IF EXISTS aviation.flights
+    ADD CONSTRAINT "FK_fights_departure_id_airports_id" FOREIGN KEY (departure_id)
+    REFERENCES aviation.airports ( id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+CREATE INDEX IF NOT EXISTS "fki_FK_fights_departure_id_airports_id"
+    ON aviation.flights(departure_id);
+
+
+ALTER TABLE IF EXISTS aviation.flights
+    ADD CONSTRAINT "FK_fights_arrival_id_airports_id" FOREIGN KEY (arrival_id)
+    REFERENCES aviation.airports (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+CREATE INDEX IF NOT EXISTS "fki_FK_fights_arrival_id_airports_id"
+    ON aviation.flights(arrival_id);
+
+	
+	
+ALTER TABLE IF EXISTS sales.orders
+    ADD CONSTRAINT "FK_Orders_Customer_ID_Customers" FOREIGN KEY (customer_id)
+    REFERENCES sales.customers (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    DEFERRABLE INITIALLY DEFERRED
+    NOT VALID;
+CREATE INDEX IF NOT EXISTS "fki_FK_Orders_Customer_ID_Customers"
+    ON sales.orders(customer_id);
+	
+	
+ALTER TABLE IF EXISTS sales.order_details
+    ADD CONSTRAINT "FK_OrderDetails_Orders" FOREIGN KEY (order_id)
+    REFERENCES sales.orders (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    DEFERRABLE;
+CREATE INDEX IF NOT EXISTS "fki_FK_OrderDetails_Orders"
+    ON sales.order_details(order_id);
+	
+	
+ALTER TABLE IF EXISTS sales.order_details
+    ADD CONSTRAINT "FK_Order_Details_Products" FOREIGN KEY (product_id)
+    REFERENCES product.products (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    DEFERRABLE;
+CREATE INDEX IF NOT EXISTS "fki_FK_Order_Details_Products"
+    ON sales.order_details(product_id);
+	
+	
+ALTER TABLE IF EXISTS product.products
+    ADD CONSTRAINT "FK_Products_Categories" FOREIGN KEY (category_id)
+    REFERENCES product.categories (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    DEFERRABLE;
+CREATE INDEX IF NOT EXISTS "fki_FK_Products_Categories"
+    ON product.products(category_id);
 
 --
 -- PostgreSQL database dump complete
