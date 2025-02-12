@@ -94,9 +94,9 @@ To disable firewall entirely:
 
 ```shell
 # Disable service
-systemctl disable --now ufw
+sudo systemctl disable --now ufw
 # Mask it so that it will start again
-systemctl mask ufw
+sudo systemctl mask ufw
 ```
 
 #### 3. Install PostgreSQL (Every Node):
@@ -126,15 +126,15 @@ postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepa
 # iputils-arping: A network utility for sending ARP requests to discover or ping a host on the same network.
 
 
-systemctl disable --now postgresql.service postgresql@17-main.service
-systemctl mask postgresql.service postgresql@17-main.service
+sudo systemctl disable --now postgresql.service postgresql@17-main.service
+sudo systemctl mask postgresql.service postgresql@17-main.service
 ```
 
 Now, as said in the section `0`, we change the ownership of `/var/lib/postgresql`
  to postgres.
 
 ```shell
-chown -R postgres:postgres /var/lib/postgresql
+sudo chown -R postgres:postgres /var/lib/postgresql
 ```
 
 #### 4. Create required directories (Every Node):
@@ -142,14 +142,14 @@ chown -R postgres:postgres /var/lib/postgresql
 Directories to create:
 
 ```shell
-mkdir -p /var/log/patroni
-chown -R postgres:postgres /var/log/patroni
+sudo mkdir -p /var/log/patroni
+sudo chown -R postgres:postgres /var/log/patroni
 
 # For local WAL archiving (using archive_command):
-mkdir -p /archive/postgresql/pg-wal-archive/
+sudo mkdir -p /archive/postgresql/pg-wal-archive/
 # For local full backups:
-mkdir -p /archive/postgresql/pg-local-full-backup/systemd/
-chown -R postgres:postgres /archive/postgresql
+sudo mkdir -p /archive/postgresql/pg-local-full-backup/systemd/
+sudo chown -R postgres:postgres /archive/postgresql
 ```
 
 #### 5. Install Patroni (Every Node):
@@ -157,16 +157,16 @@ chown -R postgres:postgres /archive/postgresql
 Install Patroni and Stop and disable it if it's running
 
 ```shell
-apt install -y patroni
-systemctl disable --now patroni
+sudo apt install -y patroni
+sudo systemctl disable --now patroni
 ```
 
 #### 6. Put patroni config files in place (config.yml disable dcs.yml) (Every Node)
 
 ```shell
 # We are not needing dcs.yml in our implementation
-mv /etc/patroni/dcs.yml /etc/patroni/dcs.yml.bak
-chown -R postgres:postgres /etc/patroni
+sudo mv /etc/patroni/dcs.yml /etc/patroni/dcs.yml.bak
+sudo chown -R postgres:postgres /etc/patroni
 
 ```
 
@@ -177,7 +177,7 @@ Reference:
 [YAML Configuration Settings, Patroni Documentation](https://patroni.readthedocs.io/en/latest/yaml_configuration.html)
 
 ```shell
-vi /etc/patroni/config.yml
+sudo vi /etc/patroni/config.yml
 ```
 
 The patroni's `.yml` configuration file should be something like the following on every node. Just note the <ins>node-specific
@@ -446,22 +446,22 @@ Install `etcd` and stop and disable it if it's running.
 * On Ubuntu 22.04 and before:
 
 ```shell
-apt install -y etcd
-systemctl disable --now etcd
+sudo apt install -y etcd
+sudo systemctl disable --now etcd
 ```
 
 * On Ubuntu 24.04:
 
 ```shell
-apt install -y etcd-client etcd-discovery etcd-server
-systemctl disable --now etcd
+sudo apt install -y etcd-client etcd-discovery etcd-server
+sudo systemctl disable --now etcd
 ```
 
 Now, as said in the section `0`, we change the ownership of `/var/lib/etcd`
  to etcd.
 
 ```shell
-chown -R etcd:etcd /var/lib/etcd
+sudo chown -R etcd:etcd /var/lib/etcd
 ```
 
 #### 9. Make the etcd API version 3 global (Every Node)
@@ -469,8 +469,8 @@ chown -R etcd:etcd /var/lib/etcd
 Make it global by putting it inside /etc/profile
 
 ```shell
-echo >> /etc/profile
-echo export ETCDCTL_API=3 >> /etc/profile
+sudo echo >> /etc/profile
+sudo echo export ETCDCTL_API=3 >> /etc/profile
 
 ```
 
@@ -487,9 +487,9 @@ Reference:
 [https://etcd.io/docs/v3.4/op-guide/configuration/](https://etcd.io/docs/v3.4/op-guide/configuration/)
 
 ```shell
-cp -a /etc/default/etcd /etc/default/etcd.default
-truncate -s 0 /etc/default/etcd
-vi /etc/default/etcd
+sudo cp -a /etc/default/etcd /etc/default/etcd.default
+sudo truncate -s 0 /etc/default/etcd
+sudo vi /etc/default/etcd
 ```
 
 Edit it like below:
@@ -533,7 +533,7 @@ select * from pg_user;
 Delete data directory contents on the 2nd and 3rd nodes only
 
 ```shell
-rm -rf /var/lib/postgresql/17/main/*
+sudo rm -rf /var/lib/postgresql/17/main/*
 ```
 
 #### 13. Enable and start etcd service (Every Node)
@@ -542,7 +542,7 @@ Start `<ins>`from the first node `</ins>`, then go on with other nodes, as well.
  the first node to be the watchdog leader, thus we start from the first node.
 
 ```shell
-systemctl enable --now etcd
+sudo systemctl enable --now etcd
 ```
 
 #### 14. Enable and start patroni service (First Node Only)
@@ -555,7 +555,7 @@ We do these by executing the following commands:
 
 ```shell
 pg_ctlcluster 17 main --skip-systemctl-redirect stop -m immediate
-systemctl enable --now patroni
+sudo systemctl enable --now patroni
 ```
 
 #### 15. Enable and start patroni service (2nd and 3rd Nodes Only)
@@ -565,7 +565,7 @@ Now that the first node is taken care of, we go over to the 2nd and 3rd to enabl
  built-in functionality:
 
 ```shell
-systemctl enable --now patroni
+sudo systemctl enable --now patroni
 ```
 
 After running this, the key-value pairs will be created inside etcd and if you run the following command,
@@ -598,8 +598,8 @@ This can be done using some scripts and timers. However, for ease of use and set
 Install and setup vip-manager (version 2). Then stop it if it's running:
 
 ```shell
-apt install -y vip-manager2
-systemctl stop vip-manager
+sudo apt install -y vip-manager2
+sudo systemctl stop vip-manager
 ```
 
 #### 17. Edit vip-manager service:
@@ -608,7 +608,7 @@ We want to create a configuration file. Therefore, we need to modify the vip-man
  from that configuration file upon start:
 
 ```shell
-systemctl edit vip-manager
+sudo systemctl edit vip-manager
 ```
 
 Write the following inside the drop-in
@@ -624,7 +624,7 @@ ExecStart=/usr/bin/vip-manager --config=/etc/default/vip-manager.yml
 Reload deamon:
 
 ```shell
-systemctl daemon-reload
+sudo systemctl daemon-reload
 ```
 
 #### 18. Create the vip-manager configuration file:
@@ -632,7 +632,7 @@ systemctl daemon-reload
 Create it with the address that we specified in the vip-manager service file:
 
 ```shell
-touch /etc/default/vip-manager.yml
+sudo touch /etc/default/vip-manager.yml
 ```
 
 #### 19. Config VIP Manager.
@@ -702,7 +702,7 @@ verbose: false
 #### 20. Start+enable vip-manager service:
 
 ```shell
-systemctl enable --now vip-manager
+sudo systemctl enable --now vip-manager
 ```
 
 # [Next: Part II: Logs Purge &amp; Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
