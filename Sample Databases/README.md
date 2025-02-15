@@ -1,3 +1,3 @@
-The files have been obtained from "Lorin Thwaits" Northwind repository with modifications at:
+The files have been obtained from ["Lorin Thwaits" Northwind repository](https://github.com/lorint/Northwind) and modified
 
-[https://github.com/lorint/Northwind](https://github.com/lorint/Northwind)
+
