@@ -3,7 +3,7 @@ The files have been obtained from ["Lorin Thwaits" Northwind repository](https:/
 
 Copy the files to the client from which you want to export Northwind data to using `psql` command
 
-a. Northwind_schema and data_with namespace.sql
+a. Schema Classified Tables (Northwind_schema and data_with namespace.sql)
 
 Modified lorint full database creation sql script with added backward compatibility for role "admin".
  It suffices to run the following to install the database completely:
@@ -11,7 +11,9 @@ Modified lorint full database creation sql script with added backward compatibil
 psql -h<Target Server> -U<user> < Northwind_schema\ and\ data_with\ namespace.sql
 ```
 ---
-b. Original lorint <ins>Schema and Data</ins> sql script. The following steps are required to install
+b. All tables in the public schema (Original lorint <ins>Schema and Data</ins> sql script).
+
+The following steps are required to install
  the database:
  1. Create the Northwind database
 ```shell
