@@ -8,14 +8,14 @@ a. Northwind_schema and data_with namespace.sql
 Modified lorint full database creation sql script with added backward compatibility for role "admin".
  It suffices to run the following to install the database completely:
 ```shell
-psql -Upostgres < Northwind_schema\ and\ data_with\ namespace.sql
+psql -h<Target Server> -U<user> < Northwind_schema\ and\ data_with\ namespace.sql
 ```
 ---
 b. Original lorint <ins>Schema and Data</ins> sql script. The following steps are required to install
  the database:
  1. Create the Northwind database
 ```shell
-psql -Upostgres -c "create database \"Northwind\""
+psql -h<Target Server> -U<user> -c "create database \"Northwind\""
 ```
  2. Create the role "admin" for backward compatibility
 ```shell
