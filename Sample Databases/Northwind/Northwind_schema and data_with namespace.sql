@@ -4126,6 +4126,18 @@ ALTER TABLE IF EXISTS product.products
 CREATE INDEX IF NOT EXISTS "fki_FK_Products_Categories"
     ON product.products(category_id);
 
+
+
+ALTER TABLE IF EXISTS sales.orders
+    ADD CONSTRAINT "FK_Orders_Employee_ID_Employees" FOREIGN KEY (employee_id)
+    REFERENCES hr.employees (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+CREATE INDEX IF NOT EXISTS "fki_FK_Orders_Employee_ID_Employees"
+    ON sales.orders(employee_id);
+
+
 --
 -- PostgreSQL database dump complete
 --
