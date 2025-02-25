@@ -1,3 +1,8 @@
+-- Use the following when needed:
+--SELECT pg_backend_pid();
+--SELECT pg_rotate_logfile();
+
+
 CREATE EXTENSION IF NOT EXISTS file_fdw;
 CREATE SERVER IF NOT EXISTS my_log_server FOREIGN DATA WRAPPER file_fdw;
 
@@ -54,15 +59,12 @@ $$ LANGUAGE plpgsql;
 SELECT update_log_file_path();
 
 
---SELECT pg_backend_pid();
+
 
 
 
 -- Query the Foreign Table for Errors within a Specific Timestamp Period
 SELECT log_time, "user", "database", pid, "Client Address:port", ('x' || split_part(column6, '.', 1))::bit(32)::int AS xid, ('x' || split_part(column6, '.', 2))::bit(16)::int AS "pid(redundant)", process_log_id, "command_type/backend_status", "timestamp(redundant)", column11, error_severity, error_code, system_message, parameters_values, suggestion, error_fragment, column18, "subject error and line number", executed_text, column21, column22, application_name, application_type, column25, column26
 FROM pg_log_file_dynamic
---where column26 like '%-%'
-where column26::bigint <>0
---WHERE error_severity = 'ERROR'
---AND log_time BETWEEN '2025-02-18 00:00:00' AND '2025-02-19 23:59:59';
+
 
