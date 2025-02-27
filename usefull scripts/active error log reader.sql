@@ -66,5 +66,5 @@ SELECT update_log_file_path();
 -- Query the Foreign Table for Errors within a Specific Timestamp Period
 SELECT log_time, "user", "database", pid, "Client Address:port", ('x' || split_part(column6, '.', 1))::bit(32)::int AS xid, ('x' || split_part(column6, '.', 2))::bit(16)::int AS "pid(redundant)", process_log_id, "command_type/backend_status", "timestamp(redundant)", column11, error_severity, error_code, system_message, parameters_values, suggestion, error_fragment, column18, "subject error and line number", executed_text, column21, column22, application_name, application_type, column25, column26
 FROM pg_log_file_dynamic
-
+ORDER BY log_time DESC
 
