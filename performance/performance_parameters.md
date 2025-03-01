@@ -3,17 +3,20 @@
 These are the recommended and typical best practices to pick suitable values for the performance configurations
 of postgresql.conf. The real best practice however, is obviously specific to every particular service and must be ascertained individually:
 
+You can start with these recommendations and increase or decrease the values in time by monitoring the system.
 
 ### Memory Settings
 	"shared_buffers": Set to 25% of the total system memory.
-	"wal_buffers": > 3% * shared_buffers
+	"wal_buffers": at least 3% * shared_buffers
 	"work_mem": Start with 4MB and adjust based on your workload.
 	"maintenance_work_mem": Set to 10% of the total system memory, up to a maximum of 1GB.
 	"effective_cache_size": Generally adding Linux free+cached will give you a good idea.
+ 	"temp_buffers": Depends on the developers' behavior and how much they use temporary tables.
 
 ### Connection Settings
 	"max_connections": Start with 100 and adjust based on your workload.
-	connection pooling: Use a connection pooler like PgBouncer to manage connections efficiently.
+ 
+Also consider a connection pooling solution like PgBouncer to manage connections efficiently.
 
 ### Logging and Monitoring
 	"log_min_duration_statement": Set to 500ms to log slow queries.
@@ -32,7 +35,7 @@ of postgresql.conf. The real best practice however, is obviously specific to eve
 	"max_wal_senders": A good starting point is to set max_wal_senders to 5-10, and then adjust based on your needs
 
 ### Workload and development dependent:
-	"temp_buffers":
+	
 
 ### CPU
 	"max_worker_processes": A good general recommendation is to set max_worker_processes to match the total number of CPU cores available on your system
