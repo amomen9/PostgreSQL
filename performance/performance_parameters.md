@@ -1,6 +1,6 @@
 ## postgresql.conf performance directives
 
-These are the recommended and typical best practices to pick suitable values for the performance configurations
+These are some of the recommended and typical best practices to pick suitable values for the major performance configurations
 of postgresql.conf. The real best practice however, is obviously specific to every particular service and must be ascertained individually:
 
 You can start with these recommendations and increase or decrease the values in time by monitoring the system.
