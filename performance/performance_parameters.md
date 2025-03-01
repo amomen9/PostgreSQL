@@ -20,7 +20,8 @@ Also consider a connection pooling solution like PgBouncer to manage connections
 
 ### Logging and Monitoring
 	"log_min_duration_statement": Set to 500ms to log slow queries.
-	"pg_stat_statements": Enable this extension to track execution statistics of all SQL statements.
+	"pg_stat_statements": 
+	"shared_preload_libraries": include 'pg_stat_statements' as a value for this directive, then create pg_stat_statements extension in the database to track execution statistics of all SQL statements.
 
 ### Disk I/O
 	"effective_io_concurrency": Set to 2 for SSDs and 1 for HDDs.
