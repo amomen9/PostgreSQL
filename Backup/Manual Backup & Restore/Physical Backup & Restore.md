@@ -55,6 +55,7 @@ Defines the tablespace mapping from the source cluster's path to the new cluster
 Enables gzip compression for the backup.
 
 `•  -X (also --wal-method) s (also stream):`
+
 Stream write-ahead log data while the backup is being taken. This method will open a second connection to the server and start streaming the write-ahead log in parallel while running the backup. Therefore, it will require two replication connections not just one.
 
 `•  -P (also --progress): `
