@@ -54,7 +54,7 @@ Defines the tablespace mapping from the source cluster's path to the new cluster
 `•  -z (also --gzip): `
 Enables gzip compression for the backup.
 
-`•  -Xs (also -X stream):`
+`•  -X (also --wal-method) s (also stream):`
 Includes only the required WAL files in the backup using the "stream" method.
 
 `•  -P (also --progress): `
