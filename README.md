@@ -10,3 +10,6 @@ PostgreSQL Maintenance Bash Scripts, useful SQL and procedural scripts, configur
 If you are planning to use this repo, please hit the star. Thanks!
 
 
+### Useful Scripts
+
+These scripts are within the [useful scripts](useful%20scripts) directory. See the README file there for details
