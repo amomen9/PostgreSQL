@@ -10,7 +10,7 @@ PostgreSQL Maintenance Bash Scripts, useful SQL and procedural scripts, configur
 If you are planning to use this repo, please hit the star. Thanks!
 
 
-### Useful Scripts
+### Useful SQL Scripts
 
 This is the list of contained scripts:
 * active error log reader.sql
