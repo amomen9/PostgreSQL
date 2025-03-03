@@ -15,7 +15,7 @@ Here we assume that we are upgrading from 15 to 16. For different versions choos
 systemctl stop patroni
 ```
 
-3. Uninstall subsidiary postgresql packages. We do not use `--purge` flag here.
+3. Uninstall subsidiary Postgresql packages. We <ins>do not</ins> use `--purge` flag here.
 
 ```shell
 sudo apt remove -y postgresql-15-repack postgresql-15-plpgsql-check \
