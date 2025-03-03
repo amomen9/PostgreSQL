@@ -15,3 +15,7 @@
 ---
 
 ### [•  Part IV: pgbouncer](Part%20IV%20pgbouncer.md)
+
+---
+
+### [•  Part V: PG major version upgrade](Part%20V%20pg%20major%20version%20upgrade.md)
