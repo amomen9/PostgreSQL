@@ -2,7 +2,7 @@
 
 **Short Summary:**
 
-Dynamically see, slice and dice the active log file of the PostgreSQL database cluster (It has to be a primary and cannot be in recovery state)
+Dynamically see, slice and dice the active log file of the PostgreSQL database cluster (It has to be a primary and cannot be in recovery state). This script introduces a way to read the DBMS error log like how `xp_readerrorlog` in SQL Server does.
 
 ### **Script Description and Purpose**
 
@@ -67,14 +67,11 @@ The provided query extracts and formats specific fields from the log file, such 
 
 This script is particularly useful for database administrators and developers who need to monitor and analyze PostgreSQL logs in real-time or as part of their troubleshooting workflows.
 
-
 # get objects added by an installed extension.sql
 
 Get the names and types and arguments/column names of the objects that creating an extension has added to the database
 
-
 # pg_class report.sql
-
 
 ### **Script Description and Purpose**
 
