@@ -5,7 +5,7 @@ Here we assume that we are upgrading from 15 to 16. For different versions choos
 
 1. Take precautionary backups from your cluster, both logical (pg_dumpall) and physical (pg_basebackup)
 
-## On every node:
+### On every node:
 
 2. Stop patroni on all the nodes starting from secondary nodes. For precaution end all use
  sessions before that including those of monitoring and application connections and also
@@ -15,7 +15,7 @@ Here we assume that we are upgrading from 15 to 16. For different versions choos
 systemctl stop patroni
 ```
 
-3. Uninstall subsidiary postgresql packages. We do not use `--purge` flag here.
+3. Uninstall subsidiary Postgresql packages. We <ins>do not</ins> use `--purge` flag here.
 
 ```shell
 sudo apt remove -y postgresql-15-repack postgresql-15-plpgsql-check \
@@ -32,7 +32,7 @@ sudo apt install -y postgresql-16 postgresql-16-repack postgresql-16-plpgsql-che
 	postgresql-contrib-16 postgresql-16-plprofiler postgresql-16-preprepare
 ```
 
-## On the first node:
+### On the first node:
 
 create a new cluster but do not run it.
 
@@ -67,6 +67,6 @@ scope: "15-main"
 
 Start Patroni and check service functionality. It must be fully functional
 
-## secondary nodes:
+### secondary nodes:
 
-Alter patroni config file and start it. Now all they nodes should be funtional
+Alter patroni config file and start it. Now all the nodes should be functional
