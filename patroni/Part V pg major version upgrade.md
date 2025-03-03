@@ -14,6 +14,8 @@ Here we assume that we are upgrading from 15 to 16. For different versions choos
 ```shell
 systemctl stop patroni
 ```
+A clean database shutdown is required. Otherwise:
+![Screenshot_130.png](image/PartV/Screenshot_130.png)
 
 3. Uninstall subsidiary Postgresql packages. We <ins>do not</ins> use `--purge` flag here.
 
@@ -52,6 +54,9 @@ sudo -u postgres /usr/lib/postgresql/16/bin/pg_upgrade
   --old-options="-c config_file=/etc/postgresql/15/main/postgresql.conf" 
   --new-options="-c config_file=/etc/postgresql/16/main/postgresql.conf"
 ```
+
+The output is something like below:
+![Screenshot_131.png](image/PartV/Screenshot_131.png)
 
 Alter patroni configuration file on the first node and change the necessary config parameters
  a sample of the parameters that need to be changed can be the list below
