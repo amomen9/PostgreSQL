@@ -3,7 +3,7 @@ PostgreSQL major version upgrade is simpler than what it might look to some peop
 Here we assume that we are upgrading from 15 to 16. For different versions choose appropriate names
  accordingly.
 
-1. Take precautionary backups of your cluster, both logical (pg_dumpall) and physical (pg_basebackup)
+1. Take precautionary backups from your cluster, both logical (pg_dumpall) and physical (pg_basebackup)
 
 ## On every node:
 
@@ -34,7 +34,11 @@ sudo apt install -y postgresql-16 postgresql-16-repack postgresql-16-plpgsql-che
 
 ## On the first node:
 
-create new cluster but do not run it.
+create a new cluster but do not run it.
+
+```shell
+pg_createcluster 16 main
+```
 
 Run the following and make sure it is executed without error. After the end of these steps
  you can run the produced shell script to remove the old data directory contents
