@@ -69,4 +69,4 @@ Start Patroni and check service functionality. It must be fully functional
 
 ## secondary nodes:
 
-Alter patroni config file and start it.
+Alter patroni config file and start it. Now all they nodes should be funtional
