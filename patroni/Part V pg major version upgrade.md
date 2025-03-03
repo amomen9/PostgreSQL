@@ -12,7 +12,7 @@ Here we assume that we are upgrading from 15 to 16. For different versions choos
  prevent new connections to ease database system clean shutdown.
 
 ```shell
-systemctl stop patroni
+sudo systemctl stop patroni
 ```
 A clean database shutdown is required. Otherwise:
 
@@ -37,13 +37,13 @@ sudo apt install -y postgresql-16 postgresql-16-repack postgresql-16-plpgsql-che
 
 ### On the first node:
 
-create a new cluster but do not run it.
+5. Create a new cluster but do not run it.
 
 ```shell
 pg_createcluster 16 main
 ```
 
-Run the following and make sure it is executed without error. After the end of these steps
+6. Run the following and make sure it is executed without error. After the end of these steps
  you can run the produced shell script to remove the old data directory contents
 
 ```shell
@@ -57,9 +57,10 @@ sudo -u postgres /usr/lib/postgresql/16/bin/pg_upgrade
 ```
 
 The output is something like below:
+
 ![Screenshot_131.png](image/PartV/Screenshot_131.png)
 
-Alter patroni configuration file on the first node and change the necessary config parameters
+7. Alter patroni configuration file on the first node and change the necessary config parameters
  a sample of the parameters that need to be changed can be the list below
 
 ```yaml
@@ -71,8 +72,12 @@ scope: "15-main"
     log_filename: 'postgresql-15-main-%A.log'
 ```
 
-Start Patroni and check service functionality. It must be fully functional
+8. Start Patroni and check service functionality. It must be fully functional
+
+```shell
+sudo systemctl start patroni.service
+```
 
 ### secondary nodes:
 
-Alter patroni config file and start it. Now all the nodes should be functional
+9. Alter patroni config file and start it. Now all the nodes should be functional
