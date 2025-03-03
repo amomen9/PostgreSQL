@@ -15,6 +15,7 @@ Here we assume that we are upgrading from 15 to 16. For different versions choos
 systemctl stop patroni
 ```
 A clean database shutdown is required. Otherwise:
+
 ![Screenshot_130.png](image/PartV/Screenshot_130.png)
 
 3. Uninstall subsidiary Postgresql packages. We <ins>do not</ins> use `--purge` flag here.
