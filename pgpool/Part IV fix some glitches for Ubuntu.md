@@ -15,7 +15,8 @@
 #### 34. Add the environment variables: 
 
 As noted in number 1. of Part I, the environment variables are not present in Ubuntu distribution like RHEL and thus cause a glitch if not defined like below or in the `/etc/postgresql/<pg version>/<cluster name>/environment` file.
- They must be added manually. Therefore, follow that instruction and set the environment variables if you have not already.
+
+They must be added manually. Therefore, follow that instruction and set the environment variables if you have not already.
  
 #### 35. Change heartbeat port (Every Node)
 
