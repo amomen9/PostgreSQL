@@ -51,7 +51,7 @@ For the database clusters with large amount of data, I used to move the data dir
 
 Here is a sample figure of the disk layout:
 
-![1.png](patroni/image/1.png)
+![1.png](image/1.png)
 
 If we actually set exclusive mount point for PostgreSQL or other services specific directories,
  such directories have to exist prior to these services installation. Upon installation of these
