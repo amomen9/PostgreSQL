@@ -432,7 +432,7 @@ postgresql:
 
 As it is arranged for the Patroni service to run with the root user in this document, there is no need to change ownerships for this file.
 
-* <b>Very important note!!!</b>
+##### <b>Very important note!!!</b>
 
 Some parameters, listed below, are critical for Patroni to be set identically across all replicas, such as `max_connections`. Since the Patroni YAML configuration files might differ across replicas, if these parameters are set in these files, Patroni will silently ignore them (at least in the current version) without any errors or warnings. Instead, it requires these settings to be stored in the DCS (Distributed Configuration Store), which is consistent across all replicas.
 
