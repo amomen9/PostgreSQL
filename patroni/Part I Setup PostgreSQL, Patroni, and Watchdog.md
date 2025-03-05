@@ -441,7 +441,7 @@ To add these configurations, Patroni provides the following command:
 patronictl -c <path to the yml config file> edit-config <cluster name>
 ```
 
-Here, `<cluster name>` refers to the scope. The format of these configurations is also YAML, and they must be defined under the following structure:
+Here, `<cluster name>` is `scope` in the yml configuration. The format of these configurations is also YAML, and they must be defined under the following structure:
 ```yaml
 postgresql:
   parameters:
