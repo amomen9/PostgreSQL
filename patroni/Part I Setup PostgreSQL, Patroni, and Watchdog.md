@@ -448,6 +448,12 @@ postgresql:
     <config parameters>
 ```
 
+Now you can run the following to confirm that:
+
+```bash
+patronictl -c <path to the yml config file> show-config <cluster name>
+```
+
 Example:
 
 ![example](image/PartISetupPostgreSQL,Patroni,andWatchdog/Picture1.png)
