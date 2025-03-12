@@ -3,6 +3,8 @@ The files have been obtained from ["Lorin Thwaits" Northwind repository](https:/
 
 Copy the files to the client from which you want to export Northwind data to using `psql` command
 
+---
+
 a. Schema Classified Tables (Northwind_schema and data_with namespace.sql)
 
 Modified lorint full database creation sql script with added backward compatibility for role "admin".
