@@ -17,6 +17,7 @@ The following steps are required to install
  the database:
  1. Create the Northwind database
 ```shell
+psql -h<Target Server> -U<user> -c "drop database if exists \"Northwind\" with (force)"
 psql -h<Target Server> -U<user> -c "create database \"Northwind\""
 ```
  2. Create the role "admin" for backward compatibility
