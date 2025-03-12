@@ -8,7 +8,7 @@ a. Schema Classified Tables (Northwind_schema and data_with namespace.sql)
 Modified lorint full database creation sql script with added backward compatibility for role "admin".
  It suffices to run the following to install the database completely:
 ```shell
-psql -h<Target Server> -U<user> < Northwind_schema\ and\ data_with\ namespace.sql
+psql < Northwind_complete.sql
 ```
 ---
 b. All tables in the 'public' schema (Original lorint <ins>Schema and Data</ins> sql script).
@@ -17,12 +17,12 @@ The following steps are required to install
  the database:
  1. Create the Northwind database
 ```shell
-psql -h<Target Server> -U<user> -c "drop database if exists \"Northwind\" with (force)"
-psql -h<Target Server> -U<user> -c "create database \"Northwind\""
+psql -c "drop database if exists \"Northwind\" with (force)"
+psql -c "create database \"Northwind\""
 ```
  2. Create the role "admin" for backward compatibility
 ```shell
-psql -Upostgres -dNorthwind -c "
+psql -c "
 DO \$\$ BEGIN
     -- Check the major version number
     IF substring(current_setting('server_version_num') from 1 for 2)::integer < 81 THEN
@@ -36,6 +36,6 @@ END \$\$;
 ```
  3. Import data (Tables without schema classification)
 ```shell
-psql -Upostgres -dNorthwind < Northwind_lorint_schema\ and\ data.sql
+psql -dNorthwind < Northwind_lorint_schema\ and\ data.sql
 ```
 
