@@ -9,6 +9,10 @@ existed before PostgreSQL 8.1 but not in the later versions.
 ---
 A. Original Lorint <b>Schema and Data</b> SQL script (<ins>Northwind_lorint_raw.sql</ins>).
 
+It suffices to run the following to install the database completely:
+```shell
+psql < Northwind_complete.sql
+```
 ---
 
 B. Complete Schema Classified Tables with relations (<ins>Northwind_complete.sql</ins>)
