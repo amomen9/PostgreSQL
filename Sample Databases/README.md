@@ -3,41 +3,26 @@ The files have been obtained from ["Lorin Thwaits" Northwind repository](https:/
 
 Copy the files to the client from which you want to export Northwind data to using `psql` command
 
+The Lorint SQL script has also been modified to add backward compatibility for the role "admin" that 
+existed before PostgreSQL 8.1 but not in the later versions.
+
+---
+A. Original Lorint <b>Schema and Data</b> SQL script (<ins>Northwind_lorint_raw.sql</ins>).
+
 ---
 
-a. Schema Classified Tables (Northwind_schema and data_with namespace.sql)
+B. Complete Schema Classified Tables with relations (<ins>Northwind_complete.sql</ins>)
 
-Modified lorint full database creation sql script with added backward compatibility for role "admin".
- It suffices to run the following to install the database completely:
+It suffices to run the following to install the database completely:
 ```shell
 psql < Northwind_complete.sql
 ```
----
-b. All tables in the 'public' schema (Original lorint <ins>Schema and Data</ins> sql script).
 
-The following steps are required to install
- the database:
- 1. Create the Northwind database
-```shell
-psql -c "drop database if exists \"Northwind\" with (force)"
-psql -c "create database \"Northwind\""
-```
- 2. Create the role "admin" for backward compatibility
-```shell
-psql -c "
-DO \$\$ BEGIN
-    -- Check the major version number
-    IF substring(current_setting('server_version_num') from 1 for 2)::integer < 81 THEN
-        -- Create the role 'admin' if it does not exist
-        IF NOT EXISTS ( SELECT 1 FROM pg_roles WHERE rolname = 'admin') THEN
-            CREATE ROLE admin;
-        END IF;
-    END IF;
-END \$\$;
-"
-```
- 3. Import data (Tables without schema classification)
-```shell
-psql -dNorthwind < Northwind_lorint_schema\ and\ data.sql
-```
+---
+
+C. Imported to PostgreSQL from SQL Server (<ins>Northwind_MSSQL.sql</ins>)
+
+This `SQL` file is imported to PostgreSQL using `pgloader`. It has the schema <b>dbo</b>
+
+
 
