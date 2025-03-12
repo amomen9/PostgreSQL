@@ -63,6 +63,17 @@ find $PG_WAL_ARCHIVE_DIR -mtime +4 -type f -exec rm -f {} \;
 sudo snap install yq
 ```
 
+If you cannot use snap package manager, you can download the binary directly from its official github page.
+ The URL is something like:
+ 
+```shell
+sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+```
+Then:
+```shell
+sudo chmod +x /usr/bin/yq
+```
+
 If you cannot use snap package manager on your server, you can install `yq` on a third Ubuntu server and simply transfer
 a single yq's binary to your server and <ins>add it to the path</ins>.
 
