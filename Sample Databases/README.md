@@ -11,7 +11,7 @@ A. Original Lorint <b>Schema and Data</b> SQL script (<ins>Northwind_lorint_raw.
 
 It suffices to run the following to install the database completely:
 ```shell
-psql < Northwind_complete.sql
+psql < Northwind_lorint_raw.sql
 ```
 ---
 
