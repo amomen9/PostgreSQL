@@ -12,7 +12,7 @@ There is more to this document than a setup manual, though.
 It's concise and, to my belief, comprehensive, informative, and time-saving:
 
 If you republish the materials on this blog, please also cite the reference.
-
+---
 ### Barman documentation online:
 
 Relating to this document:
@@ -23,7 +23,7 @@ Lastest:
 
 [http://docs.pgbarman.org/](http://docs.pgbarman.org/)
 
-
+---
 
 ## Barman 2.14 installation on CentOS 8 with PostgreSQL 8.3+:
 
