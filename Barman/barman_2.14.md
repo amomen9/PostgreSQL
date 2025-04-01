@@ -12,6 +12,7 @@ There is more to this document than a setup manual, though.
 It's concise and, to my belief, comprehensive, informative, and time-saving:
 
 If you republish the materials on this blog, please also cite the reference.
+
 ---
 ### Barman documentation online:
 
