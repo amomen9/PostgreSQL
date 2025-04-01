@@ -25,7 +25,7 @@ Lastest:
 
 
 
-## Barman 2.14 installation on CentOS 8 with postgresql 8.3+:
+## Barman 2.14 installation on CentOS 8 with PostgreSQL 8.3+:
 
 * This manual is written for CentOS, but it is really recommended for other Linux
 distributions too, because the major difference between diverse Linux
@@ -169,10 +169,10 @@ writing to its log file.
 4) Install PostgreSQL>8.3 on backup server
 
 ```shell
-sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-sudo dnf -qy module disable postgresql
-sudo dnf install -y postgresql13-server
-sudo dnf install -y postgresql13-client
+sudo dnf install -y https://download.PostgreSQL.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+sudo dnf -qy module disable PostgreSQL
+sudo dnf install -y PostgreSQL13-server
+sudo dnf install -y PostgreSQL13-client
 ``` 
  
 5) on
@@ -524,7 +524,7 @@ cp /etc/Barman.d/c1.conf /etc/Barman.d/c2.conf
 ```
   
 23-a) On
-PGs, if you want the streaming method with Barman, in postgresql.conf
+PGs, if you want the streaming method with Barman, in PostgreSQL.conf
 (Because Barman streaming does not rely on PostgreSQL’s built-in archiving
 capability, but the streaming replication capability):
    
@@ -537,7 +537,7 @@ II. leave the archive_command commented out.
  
  
 23-b) Only
-if you want rsync/ssh method with Barman, modify postgresql.conf archive
+if you want rsync/ssh method with Barman, modify PostgreSQL.conf archive
 command like the following:
 ```shell
 #If you want to use Barman-cli (highly recommended):
@@ -547,7 +547,7 @@ archive_command='test ! -f /archive/archive_zabbix/%f && cp %p /archive/archive_
 archive_command='scp -i ~/.ssh/barman_pg "%p" "Barman@cos8cbarman151:/var/lib/Barman/bd/c1/incoming_wals_directory/%f"'
 ``` 
  
-24) On pg, modify postgresql.conf restore command like the following:
+24) On pg, modify PostgreSQL.conf restore command like the following:
 ```shell
 restore_command = 'Barman-wal-restore -P -U Barman cos8share c1 %f %p'
 ``` 
@@ -1069,7 +1069,7 @@ I have not tested this, but you may want to do so. It may interfere with other B
  command in streaming mode will be affected and you can also use ordinary cp
  command instead of scp and rsync or Barman-wal-restore and Barman-wal-archive.
 
-Important postgresql commands:
+Important PostgreSQL commands:
 
 ```shell
 #/data/postgres13/data is the PGDATA directory
