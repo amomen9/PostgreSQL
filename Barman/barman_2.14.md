@@ -1,15 +1,15 @@
 
 **Hello everybody!**
 
-At this time, October 9th 2021, the latest Barman version for PostgreSQL is 2.14. Barman
-is great if you master it!!! The following is step by step instruction to
+At this time, October 9th, 2021, the latest Barman version for PostgreSQL is 2.14. Barman
+is great if you master it!!! The following are step-by-step instructions to
 install and utilize Barman on CentOS8. I am inciting you to use these instructions
-for other Linux distributions as well, because most
+for other Linux distributions, as well. Because most
 of the materials are concerning Barman itself rather than the Linux
 distribution.
 
-There is more to this document than a setup manual though,
-it's concise and to my belief, comprehensive, informative and time-saving:
+There is more to this document than a setup manual, though.
+It's concise and, to my belief, comprehensive, informative, and time-saving:
 
 If you republish the materials on this blog, please also cite the reference.
 
@@ -28,8 +28,8 @@ Lastest:
 ## Barman 2.14 installation on CentOS 8 with PostgreSQL 8.3+:
 
 * This manual is written for CentOS, but it is really recommended for other Linux
-distributions too, because the major difference between diverse Linux
-distributions in the eyes of Barman and PostgreSQL is the package managers and
+distributions, too, because the major difference between diverse Linux
+distributions in the eyes of Barman and PostgreSQL are the package managers and
 repositories.
  
 * This
@@ -85,14 +85,14 @@ single node PGs but not read-only PGs such as:
    
 e. 192.168.241.151 is the backup server
 
-f. we are going to setup 1)streaming Barman connection here and 2) ssh/rsync both which
+f. We are going to set up 1)streaming Barman connection here and 2) ssh/rsync both, which
 are the two offered services by Barman. In streaming connection for topologies
 with VIP, the streaming connection should be connected to the VIP
  
  
 * If you
 opt to run Barman with root user in its config file, you must run its
-executable with root user,but if you choose Barman user you can both run it
+executable with the root user, but if you choose Barman user, you can both run it
 with Barman user and root
  
  
@@ -102,7 +102,7 @@ server: Only for RHEL 8+:
 EPEL (Extra Packages for Enterprise Linux) packages
 assume that the 'powertools' repository is enabled
    
-You must make powertools repo if it does not exit by:
+You must enable the powertools (changed to CRB in the new versions) repo if it does not exist by:
    
 a.
    
@@ -129,7 +129,7 @@ yum -y install epel-release
 ``` 
    
 important note! Barman and Barman-cli are also available in pgdg-common repo.
-The version in this repo may be newer than that of epel repo. Choose according
+The version in this repo may be newer than that of the EPEL (Extra Packages for Enterprise Linux) repo. Choose according
 to your preference.
  
  
@@ -160,8 +160,8 @@ If you use
 NFS share for storing your WAL files and PG servers archive the WALs directly
 to NFS share, you may need to specify 'postgres' user for Barman everywhere not
 Barman, or make other plans for the files and directories to be fully
-accessible to both Barman and postgres users. However f you change Barman
-user to postgres, some unprecedented errors might occur, for example when the
+accessible to both Barman and postgres users. However, if you change Barman
+user to postgres, some unprecedented errors might occur, for example, when the
 Barman log (default path: /var/log/Barman/) rotates, the new log file may be
 granted ownership to Barman, and that way Barman logger will be denied from
 writing to its log file.
