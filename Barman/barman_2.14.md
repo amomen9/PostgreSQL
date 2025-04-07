@@ -1,18 +1,19 @@
 
 **Hello everybody!**
 
-At this time, October 9th 2021, the latest Barman version for PostgreSQL is 2.14. Barman
-is great if you master it!!! The following is step by step instruction to
+At this time, October 9th, 2021, the latest Barman version for PostgreSQL is 2.14. Barman
+is great if you master it!!! The following are step-by-step instructions to
 install and utilize Barman on CentOS8. I am inciting you to use these instructions
-for other Linux distributions as well, because most
+for other Linux distributions, as well. Because most
 of the materials are concerning Barman itself rather than the Linux
 distribution.
 
-There is more to this document than a setup manual though,
-it's concise and to my belief, comprehensive, informative and time-saving:
+There is more to this document than a setup manual, though.
+It's concise and, to my belief, comprehensive, informative, and time-saving:
 
 If you republish the materials on this blog, please also cite the reference.
 
+---
 ### Barman documentation online:
 
 Relating to this document:
@@ -23,13 +24,13 @@ Lastest:
 
 [http://docs.pgbarman.org/](http://docs.pgbarman.org/)
 
+---
 
-
-## Barman 2.14 installation on CentOS 8 with postgresql 8.3+:
+## Barman 2.14 installation on CentOS 8 with PostgreSQL 8.3+:
 
 * This manual is written for CentOS, but it is really recommended for other Linux
-distributions too, because the major difference between diverse Linux
-distributions in the eyes of Barman and PostgreSQL is the package managers and
+distributions, too, because the major difference between diverse Linux
+distributions in the eyes of Barman and PostgreSQL are the package managers and
 repositories.
  
 * This
@@ -85,14 +86,14 @@ single node PGs but not read-only PGs such as:
    
 e. 192.168.241.151 is the backup server
 
-f. we are going to setup 1)streaming Barman connection here and 2) ssh/rsync both which
+f. We are going to set up 1)streaming Barman connection here and 2) ssh/rsync both, which
 are the two offered services by Barman. In streaming connection for topologies
 with VIP, the streaming connection should be connected to the VIP
  
  
 * If you
 opt to run Barman with root user in its config file, you must run its
-executable with root user,but if you choose Barman user you can both run it
+executable with the root user, but if you choose Barman user, you can both run it
 with Barman user and root
  
  
@@ -102,7 +103,7 @@ server: Only for RHEL 8+:
 EPEL (Extra Packages for Enterprise Linux) packages
 assume that the 'powertools' repository is enabled
    
-You must make powertools repo if it does not exit by:
+You must enable the powertools (changed to CRB in the new versions) repo if it does not exist by:
    
 a.
    
@@ -129,7 +130,7 @@ yum -y install epel-release
 ``` 
    
 important note! Barman and Barman-cli are also available in pgdg-common repo.
-The version in this repo may be newer than that of epel repo. Choose according
+The version in this repo may be newer than that of the EPEL (Extra Packages for Enterprise Linux) repo. Choose according
 to your preference.
  
  
@@ -160,8 +161,8 @@ If you use
 NFS share for storing your WAL files and PG servers archive the WALs directly
 to NFS share, you may need to specify 'postgres' user for Barman everywhere not
 Barman, or make other plans for the files and directories to be fully
-accessible to both Barman and postgres users. However f you change Barman
-user to postgres, some unprecedented errors might occur, for example when the
+accessible to both Barman and postgres users. However, if you change Barman
+user to postgres, some unprecedented errors might occur, for example, when the
 Barman log (default path: /var/log/Barman/) rotates, the new log file may be
 granted ownership to Barman, and that way Barman logger will be denied from
 writing to its log file.
@@ -169,10 +170,10 @@ writing to its log file.
 4) Install PostgreSQL>8.3 on backup server
 
 ```shell
-sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-sudo dnf -qy module disable postgresql
-sudo dnf install -y postgresql13-server
-sudo dnf install -y postgresql13-client
+sudo dnf install -y https://download.PostgreSQL.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+sudo dnf -qy module disable PostgreSQL
+sudo dnf install -y PostgreSQL13-server
+sudo dnf install -y PostgreSQL13-client
 ``` 
  
 5) on
@@ -524,7 +525,7 @@ cp /etc/Barman.d/c1.conf /etc/Barman.d/c2.conf
 ```
   
 23-a) On
-PGs, if you want the streaming method with Barman, in postgresql.conf
+PGs, if you want the streaming method with Barman, in PostgreSQL.conf
 (Because Barman streaming does not rely on PostgreSQL’s built-in archiving
 capability, but the streaming replication capability):
    
@@ -537,7 +538,7 @@ II. leave the archive_command commented out.
  
  
 23-b) Only
-if you want rsync/ssh method with Barman, modify postgresql.conf archive
+if you want rsync/ssh method with Barman, modify PostgreSQL.conf archive
 command like the following:
 ```shell
 #If you want to use Barman-cli (highly recommended):
@@ -547,7 +548,7 @@ archive_command='test ! -f /archive/archive_zabbix/%f && cp %p /archive/archive_
 archive_command='scp -i ~/.ssh/barman_pg "%p" "Barman@cos8cbarman151:/var/lib/Barman/bd/c1/incoming_wals_directory/%f"'
 ``` 
  
-24) On pg, modify postgresql.conf restore command like the following:
+24) On pg, modify PostgreSQL.conf restore command like the following:
 ```shell
 restore_command = 'Barman-wal-restore -P -U Barman cos8share c1 %f %p'
 ``` 
@@ -1069,7 +1070,7 @@ I have not tested this, but you may want to do so. It may interfere with other B
  command in streaming mode will be affected and you can also use ordinary cp
  command instead of scp and rsync or Barman-wal-restore and Barman-wal-archive.
 
-Important postgresql commands:
+Important PostgreSQL commands:
 
 ```shell
 #/data/postgres13/data is the PGDATA directory
