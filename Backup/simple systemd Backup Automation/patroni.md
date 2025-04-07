@@ -35,7 +35,10 @@ List of scripts:
 
 ```shell
 #!/bin/bash
+# PostgreSQL WAL Archiving Script
+set -euo pipefail
 
+# Variables
 PG_WAL_BACKUP_ARCHIVE_DIR=/backup/postgresql/pg-wal-backup-archive/systemd/$(hostname)/
 # Directory where backups are to be copied
 
@@ -43,15 +46,31 @@ PG_WAL_ARCHIVE_DIR=/archive/postgresql/pg-wal-archive/
 # The directory where PostgreSQL DB Cluster copies the generated WAL files for archiving.
 # Note: Every node in a clustered replication generates its own WAL files, and thus we will
 # have # of nodes backup archives.
+INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
+LOG_FILE="/var/log/postgresql/wal_archive_${INSTANCE}.log"
 
-
+# Ensure directories exist
+mkdir -p "$(dirname "$LOG_FILE")"
 mkdir -p $PG_WAL_BACKUP_ARCHIVE_DIR
 
-tar cvf "$PG_WAL_BACKUP_ARCHIVE_DIR"pg-wal-backup-archive_`TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S`.tar "$PG_WAL_ARCHIVE_DIR"* # --remove-files
-# The tar command archives and compresses the WAL files existing in the PG_WAL_ARCHIVE_DIR directory.
+# Log function
+log() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
+}
 
-find $PG_WAL_BACKUP_ARCHIVE_DIR -mtime +10 -type f -exec rm -f {} \;
-find $PG_WAL_ARCHIVE_DIR -mtime +4 -type f -exec rm -f {} \;
+log "Starting WAL archiving"
+
+# Archive all pending WAL files
+for wal_file in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null); do
+  wal_name=$(basename "$wal_file")
+  log "Archiving $wal_name..."
+  echo $wal_file
+  timeout 1m  mv "$wal_file" "$PG_WAL_BACKUP_ARCHIVE_DIR"
+done
+
+log "WAL archiving completed successfully"
+
+exit 0
 
 ```
 
@@ -84,16 +103,8 @@ a single yq's binary to your server and <ins>add it to the path</ins>.
 
 # Run by postgres user
 
-USER=replicator
-# User with which we take the physical backup
-PORT=5432
-# Connection port to the server
 PATRONI_YAML_PATH=/etc/patroni/config.yml
-export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PATRONI_YAML_PATH")
-# Env variable for pg password. The password is extracted from the password file which is automatically created and 
-# updated by Patroni
-
-
+VIP_MANAGER_YAML_PATH=/etc/default/vip-manager.yml
 PG_LOCAL_FULL_BACKUP_DIR=/archive/postgresql/pg-local-full-backup/systemd/
 # Full backup root directory on a locally mounted drive (DAS)
 PG_FULL_BACKUP_DIR=/backup/postgresql/pg-full-backup/systemd/
@@ -105,6 +116,22 @@ BACKUP_DIR=$PG_LOCAL_FULL_BACKUP_DIR$TIMESTAMP
 # This backup local specific directory with the current timestamp.
 
 
+
+
+#-------------PG Variables -------------------------------------------------
+export PGHOST=$(yq eval '.ip' "$VIP_MANAGER_YAML_PATH")
+# Host to take the backup from
+
+export PGUSER=$(yq e '.postgresql.authentication.replication.username' "$PATRONI_YAML_PATH")
+# User with which we take the physical backup
+export PORT=5432
+# Connection port to the server
+export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PATRONI_YAML_PATH")
+# Env variable for pg password. The password is extracted from the password file which is automatically created and 
+# updated by Patroni
+
+
+#----------------------------------------------------------------------------
 # Starting the body of the script:
 
 (! [ -z $PATRONI_YAML_PATH ] && ! [ -z $USER ] && ! [ -z $PORT ] && \
@@ -133,9 +160,7 @@ mkdir -p $PG_FULL_BACKUP_DIR
 mkdir -p $PG_FULL_BACKUP_ARCHIVE_DIR
 
 
-
-
-/usr/bin/pg_basebackup -h vip -p $PORT -U $USER -w -D $BACKUP_DIR  -Ft -z -Xs -P;
+/usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z 1 -Xs -P;
 # Backup statement
 
 if [ $? -eq 0 ]; then
