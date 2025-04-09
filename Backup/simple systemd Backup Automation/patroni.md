@@ -26,11 +26,11 @@ chown -R postgres:postgres /archive/postgresql
 
 List of scripts:
 
-|<div align="left">archive_wal.sh<br/>postgres_backup.sh</div>|
+|<div align="left">pg_wal_backup.sh<br/>pg_full_backup.sh</div>|
 |:-:|
 
 * **Note**: The scripts will be placed under `/var/lib/postgresql/scripts/ directory`.
-1. WAL Backup & Purge Script (archive_wal.sh)
+1. WAL Backup & Purge Script (pg_wal_backup.sh)
 <br/>
 
 `pg_wal_backup.sh`:
@@ -42,12 +42,12 @@ set -euo pipefail
 
 
 INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
-LOG_FILE="/var/log/postgresql/wal_archive_${INSTANCE}.log"
+LOG_FILE="/var/log/postgresql/pg_wal_backup_${INSTANCE}.log"
 OVERALL_RESULT=0
 CMDOUT=""
 # Functions ---------------------------------------------------------------
 # TIMESTAMP function
-get_TIMESTAMP {
+get_TIMESTAMP() {
 	echo $(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
 }
 
@@ -62,7 +62,7 @@ log() {
 
 # Exit script
 exitscript() {
-	if [ $1 -ne 0 ]; log "Warning! Some operation(s) failed."
+	if [ $1 -ne 0 ]; then log "Warning! Some operation(s) failed."; fi
 	log "--------------------------------$(get_TIMESTAMP) Finished -------------------------------------"
 	log
 	log
@@ -143,9 +143,10 @@ log "WAL archiving completed successfully."
 exitscript 0
 
 
+
 ```
 
-2. Full Backup & Purge Script (postgres_backup.sh)
+2. Full Backup & Purge Script (pg_full_backup.sh)
 <br/>
 
 * Install YAML query tool `yq` as a prerequisite:
@@ -364,7 +365,7 @@ fi
 
 ### 3. [X] Service template
 
-|<div align="left">Service Template: `PostgreSQL@.service`<br/>base backup: `PostgreSQL@postgres_backup.service`<br/>WAL backup: `PostgreSQL@archive_wal.service`</div>|
+|<div align="left">Service Template: `PostgreSQL@.service`<br/>base backup: `PostgreSQL@pg_full_backup.service`<br/>WAL backup: `PostgreSQL@pg_wal_backup.service`</div>|
 |:-:|
 
 The following is the `PostgreSQL@.service` service template which is used to execute the above scripts on a regular basis. For more details regarding services, service templates, timers, and their schedules refer to the link to a short article about this below:
@@ -415,7 +416,7 @@ WantedBy=multi-user.target
 
 ### 4. [X] Timers
 
-1. Timer to trigger WAL backup (archive_wal.timer)
+1. Timer to trigger WAL backup (pg_wal_backup.timer)
 
 ```shell
 
@@ -424,10 +425,10 @@ WantedBy=multi-user.target
 
 [Unit]
 Description=timer unit is for backing up WAL segments
-Requires=PostgreSQL@archive_wal.service
+Requires=PostgreSQL@pg_wal_backup.service
 
 [Timer]
-Unit=PostgreSQL@archive_wal.service
+Unit=PostgreSQL@pg_wal_backup.service
 OnCalendar=*-*-* *:00:00
 # Every hour
 
@@ -437,7 +438,7 @@ WantedBy=timers.target
 
 ```
 
-2. Timer to trigger full backup (postgres_backup.timer)
+2. Timer to trigger full backup (pg_full_backup.timer)
 
 ```shell
 # This timer unit is for PostgreSQL base backup 
@@ -445,10 +446,10 @@ WantedBy=timers.target
 
 [Unit]
 Description=This timer unit is for PostgreSQL base backup
-Requires=PostgreSQL@postgres_backup.service
+Requires=PostgreSQL@pg_full_backup.service
 
 [Timer]
-Unit=PostgreSQL@postgres_backup.service
+Unit=PostgreSQL@pg_full_backup.service
 OnCalendar=*-*-* 19:30:00
 # Evert day at 19:30:00
 
@@ -464,27 +465,27 @@ WantedBy=timers.target
 
 2. Enable services
 ```shell
-sudo systemctl enable PostgreSQL@archive_wal.service
-sudo systemctl enable PostgreSQL@postgres_backup.service
+sudo systemctl enable PostgreSQL@pg_wal_backup.service
+sudo systemctl enable PostgreSQL@pg_full_backup.service
 ```
 
 3. Enable timers
 ```shell
-sudo systemctl enable --now archive_wal.timer
-sudo systemctl enable --now postgres_backup.timer
+sudo systemctl enable --now pg_wal_backup.timer
+sudo systemctl enable --now pg_full_backup.timer
 ```
 
 4. View the status of created and enabled units:
 ```shell
-sudo systemctl status archive_wal.timer
-sudo systemctl status postgres_backup.timer
-sudo systemctl status PostgreSQL@archive_wal.service
-sudo systemctl status PostgreSQL@postgres_backup.service
+sudo systemctl status pg_wal_backup.timer
+sudo systemctl status pg_full_backup.timer
+sudo systemctl status PostgreSQL@pg_wal_backup.service
+sudo systemctl status PostgreSQL@pg_full_backup.service
 ```
 
 * Note: To manually take a full backup or archive WALs (for instance, in the event that there is a low disk space problem), you can simply execute their services and you do not need to manually write and execute the commands
-`sudo systemctl start PostgreSQL@archive_wal.service`
-`sudo systemctl start PostgreSQL@postgres_backup.service`
+`sudo systemctl start PostgreSQL@pg_wal_backup.service`
+`sudo systemctl start PostgreSQL@pg_full_backup.service`
 
 
 
