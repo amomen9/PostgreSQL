@@ -33,10 +33,52 @@ List of scripts:
 1. WAL Backup & Purge Script (archive_wal.sh)
 <br/>
 
+`pg_wal_backup.sh`:
+
 ```shell
 #!/bin/bash
 # PostgreSQL WAL Archiving Script
 set -euo pipefail
+
+
+INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
+LOG_FILE="/var/log/postgresql/wal_archive_${INSTANCE}.log"
+OVERALL_RESULT=0
+CMDOUT=""
+# Functions ---------------------------------------------------------------
+# TIMESTAMP function
+get_TIMESTAMP {
+	echo $(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
+}
+
+# Log function
+log() {
+  if [ $# -eq 0 ]; then
+	echo >> "$LOG_FILE"; 
+  else  
+	echo "$(get_TIMESTAMP) - $INSTANCE: $@" >> "$LOG_FILE";
+  fi
+}
+
+# Exit script
+exitscript() {
+	if [ $1 -ne 0 ]; log "Warning! Some operation(s) failed."
+	log "--------------------------------$(get_TIMESTAMP) Finished -------------------------------------"
+	log
+	log
+	log
+	exit $1
+}
+
+# Multiple commands exit code check
+run_command() {
+    CMDOUT="$CMDOUT$("$@" 2>&1)"
+    if [ $? -ne 0 ]; then
+        OVERALL_RESULT=1
+    fi
+}
+# -------------------------------------------------------------------------
+
 
 # Variables
 PG_WAL_BACKUP_ARCHIVE_DIR=/backup/postgresql/pg-wal-backup-archive/systemd/$(hostname)/
@@ -46,31 +88,60 @@ PG_WAL_ARCHIVE_DIR=/archive/postgresql/pg-wal-archive/
 # The directory where PostgreSQL DB Cluster copies the generated WAL files for archiving.
 # Note: Every node in a clustered replication generates its own WAL files, and thus we will
 # have # of nodes backup archives.
-INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
-LOG_FILE="/var/log/postgresql/wal_archive_${INSTANCE}.log"
+
+
+
 
 # Ensure directories exist
 mkdir -p "$(dirname "$LOG_FILE")"
 mkdir -p $PG_WAL_BACKUP_ARCHIVE_DIR
 
-# Log function
-log() {
-  echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
-}
+MAX_SIZE=$((100*1024*1024))  # 100MB in bytes
+current_size=$(stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
 
-log "Starting WAL archiving"
+if [ "$current_size" -gt "$MAX_SIZE" ]; then
+    > "$LOG_FILE"
+    echo "Truncated $LOG_FILE (was ${current_size} bytes)"
+fi
 
+
+
+log "--------------------------------$(get_TIMESTAMP) Started -------------------------------------"
+log "Starting WAL archiving..."
+echo "LOG file path: $LOG_FILE"
+
+
+CMDOUT=""
+OVERALL_RESULT=0
 # Archive all pending WAL files
 for wal_file in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null); do
   wal_name=$(basename "$wal_file")
   log "Archiving $wal_name..."
-  echo $wal_file
-  timeout 1m  mv "$wal_file" "$PG_WAL_BACKUP_ARCHIVE_DIR"
+  run_command timeout 1m  mv "$wal_file" "$PG_WAL_BACKUP_ARCHIVE_DIR"
 done
 
-log "WAL archiving completed successfully"
 
-exit 0
+if [ $OVERALL_RESULT -eq 0 ]; then
+	log "Copy all WAL files completed successfully."
+	echo "Copy all WAL files completed successfully."
+	exitscript 0
+	#echo "Copy full backup to remote tape storage finished successfully."
+else
+	log "Copy some WAL files failed. MSG: "$CMDOUT
+	echo "Copy some WAL files failed."
+	exitscript 1
+	# On the condition of the backup failure, the purging operation will be skipped and the
+	# service will also be marked as failed for this run.
+fi	
+
+
+
+timeout 1h find $PG_WAL_BACKUP_ARCHIVE_DIR -maxdepth 1 -type f -mtime +10 -print0 | xargs -0 -r rm -rf
+
+
+log "WAL archiving completed successfully."
+exitscript 0
+
 
 ```
 
@@ -96,12 +167,53 @@ sudo chmod +x /usr/bin/yq
 If you cannot use snap package manager on your server, you can install `yq` on a third Ubuntu server and simply transfer
 a single yq's binary to your server and <ins>add it to the path</ins>.
 
-`postgres_backup.sh`:
+`pg_full_backup.sh`:
 
 ```shell
 #!/bin/bash
+# PostgreSQL Full Backup Script
+set -euo pipefail
 
-# Run by postgres user
+
+INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
+LOG_FILE="/var/log/postgresql/pg_full_backup_${INSTANCE}.log"
+OVERALL_RESULT=0
+CMDOUT=""
+# Functions ---------------------------------------------------------------
+# TIMESTAMP function
+get_TIMESTAMP() {
+	echo $(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
+}
+
+# Log function
+log() {
+  if [ $# -eq 0 ]; then
+	echo >> "$LOG_FILE"; 
+  else  
+	echo "$(get_TIMESTAMP) - $INSTANCE: $@" >> "$LOG_FILE";
+  fi
+}
+
+# Exit script
+exitscript() {
+	if [ $1 -ne 0 ]; log "Warning! Some operation(s) failed."
+	log "--------------------------------$(get_TIMESTAMP) Finished -------------------------------------"
+	log
+	log
+	log
+	exit $1
+}
+
+
+# Multiple commands exit code check
+run_command() {
+    CMDOUT="$CMDOUT$("$@" 2>&1)"
+    if [ $? -ne 0 ]; then
+        OVERALL_RESULT=1
+    fi
+}
+# -------------------------------------------------------------------------
+
 
 PATRONI_YAML_PATH=/etc/patroni/config.yml
 VIP_MANAGER_YAML_PATH=/etc/default/vip-manager.yml
@@ -111,10 +223,29 @@ PG_FULL_BACKUP_DIR=/backup/postgresql/pg-full-backup/systemd/
 # Directory on a remote location to copy the full backups to
 PG_FULL_BACKUP_ARCHIVE_DIR=/backup/postgresql/pg-full-backup-archive/systemd/
 # Conventionally tape archive of the backups which has its own retention policies
-TIMESTAMP=$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
-BACKUP_DIR=$PG_LOCAL_FULL_BACKUP_DIR$TIMESTAMP
+START_TIMESTAMP=$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
+BACKUP_DIR=$PG_LOCAL_FULL_BACKUP_DIR$(get_TIMESTAMP)
 # This backup local specific directory with the current timestamp.
 
+
+
+
+# Ensure directories exist
+mkdir -p "$(dirname "$LOG_FILE")"
+
+MAX_SIZE=$((100*1024*1024))  # 100MB in bytes
+current_size=$(stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
+
+if [ "$current_size" -gt "$MAX_SIZE" ]; then
+    > "$LOG_FILE"
+    echo "Truncated $LOG_FILE (was ${current_size} bytes)"
+fi
+
+
+
+log "--------------------------------$(get_TIMESTAMP) Started -------------------------------------"
+log "Starting Full Backup..."
+echo "LOG file path: $LOG_FILE"
 
 
 
@@ -137,16 +268,15 @@ export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PAT
 (! [ -z $PATRONI_YAML_PATH ] && ! [ -z $USER ] && ! [ -z $PORT ] && \
 ! [ -z $PG_LOCAL_FULL_BACKUP_DIR ] && ! [ -z $PG_FULL_BACKUP_DIR ] && \
 ! [ -z $PG_FULL_BACKUP_ARCHIVE_DIR ]) || \
-{ echo "At least one variable is not assigned a value to. Check your variables." >&2; exit 1; }
+{ echo "At least one variable is not assigned a value to. Check your variables." >&2; exitscript 1; }
 # Exit the script if any of the variables are not assigned a value to.
 
-set -o xtrace
 
 
 
 if [ $(ip -4 addr show $(ip -br link | awk '$1 != "lo" {print $1}' | tail -1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | wc -l) -ne 2 ]; then
 	echo "Backup process was skipped because this is not the primary replica."
-	exit 0
+	exitscript 0
 fi
 # Full backup will be only taken from the primary replica in a replication cluster according to the policies. A secondary replica however can
 # also be manually specified.
@@ -160,40 +290,75 @@ mkdir -p $PG_FULL_BACKUP_DIR
 mkdir -p $PG_FULL_BACKUP_ARCHIVE_DIR
 
 
-/usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z 1 -Xs -P;
+#--------------------------------------------------------------
+CMDOUT=$(/usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z 1 -Xs -P 2>&1)
 # Backup statement
 
 if [ $? -eq 0 ]; then
-	echo "Backup process finished successfully."
+	log("Full backup process finished successfully. MSG:"$CMDOUT)
+	echo "Full backup process finished successfully. MSG:"$CMDOUT
 else
-	echo "Backup process failed."
-	exit 1
+	log("Full backup process failed. MSG:"$CMDOUT)
+	echo "Full backup process failed. MSG:"$CMDOUT
+	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
 fi	
-	
+#--------------------------------------------------------------
+
+#--------------------------------------------------------------	
 #cp -rf "$(find ${BACKUP_DIR} -maxdepth 1 -type d -exec ls -t {} + | head -1)" $PG_FULL_BACKUP_DIR	
-cp -rf "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR
+CMDOUT=$(timeout 24h cp -rf "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
 # Copy from the local to the remote backup
 
 if [ $? -eq 0 ]; then
-	echo "Copy the backup to the remote location finished successfully."
+	log("Copy full backup to remote storage finished successfully.")
+	echo "Copy full backup to remote storage finished successfully."
 else
-	echo "Copy the backup to the remote location failed."
-	exit 1
-	# On the condition of the backup copy to the remote location failure, the purging operation
-	# will be skipped and the service will also be marked as failed for this run.
+	log("Copy full backup to remote storage failed. MSG:"$CMDOUT)
+	exitscript 1
+	# On the condition of the backup failure, the purging operation will be skipped and the
+	# service will also be marked as failed for this run.
 fi	
+#--------------------------------------------------------------
 
-cp -rf "$PG_FULL_BACKUP_DIR""$(find ${PG_FULL_BACKUP_DIR} -maxdepth 0 -type d -exec ls -t {} + | head -1)" \
-$PG_FULL_BACKUP_ARCHIVE_DIR	
+CMDOUT=$(timeout 24h cp -rf "$PG_FULL_BACKUP_DIR""$(find ${PG_FULL_BACKUP_DIR} -maxdepth 0 -type d -exec ls -t {} + | head -1)" \
+$PG_FULL_BACKUP_ARCHIVE_DIR)	
+
+if [ $? -eq 0 ]; then
+	log("Copy full backup to remote tape storage finished successfully.")
+	#echo "Copy full backup to remote tape storage finished successfully."
+else
+	log("Copy full backup to remote tape storage failed. MSG:"$CMDOUT)
+	exitscript 1
+	# On the condition of the backup failure, the purging operation will be skipped and the
+	# service will also be marked as failed for this run.
+fi	
 # Copy from the remote backup to the remote backup archive.
 
 
-find $PG_LOCAL_FULL_BACKUP_DIR -mtime +2 -type d -exec rm -rf {} \;
-find $PG_FULL_BACKUP_DIR -mtime +15 -type d -exec rm -rf {} \;
-find $PG_FULL_BACKUP_ARCHIVE_DIR -mtime +15 -type f -exec rm -f {} \;
+$CMDOUT=""
+OVERALL_RESULT=0
+# For local directory (fast filesystem)
+run_command timeout 30m find "$PG_LOCAL_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +2 -exec rm -rf {} +
+# For CIFS shares (slower network filesystems)
+run_command timeout 1h find "$PG_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
+run_command timeout 1h find "$PG_FULL_BACKUP_ARCHIVE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
 # purging operation
+
+
+
+if [ $OVERALL_RESULT -eq 0 ]; then
+	log "Purge completed successfully."
+	exitscript 0
+	#echo "Copy full backup to remote tape storage finished successfully."
+else
+	log "Some purge steps failed. MSG:"$CMDOUT
+	exitscript 1
+	# On the condition of the backup failure, the purging operation will be skipped and the
+	# service will also be marked as failed for this run.
+fi	
+
 
 ```
 
