@@ -62,8 +62,8 @@ log() {
 
 # Exit script
 exitscript() {
-	if [ $1 -ne 0 ]; then log "Warning! Some operation(s) failed."; fi
-	log "--------------------------------$(get_TIMESTAMP) Finished -------------------------------------"
+	if [ $1 -eq 1 ]; then log "Warning! Some operation(s) failed."; fi
+	log "-------------------------------- Finished -------------------------------------"
 	log
 	log
 	log
@@ -106,7 +106,7 @@ fi
 
 
 
-log "--------------------------------$(get_TIMESTAMP) Started -------------------------------------"
+log "-------------------------------- Started -------------------------------------"
 log "Starting WAL archiving..."
 echo "LOG file path: $LOG_FILE"
 
@@ -114,11 +114,19 @@ echo "LOG file path: $LOG_FILE"
 CMDOUT=""
 OVERALL_RESULT=0
 # Archive all pending WAL files
+wal_files_found=0
 for wal_file in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null); do
+  wal_files_found=1
   wal_name=$(basename "$wal_file")
   log "Archiving $wal_name..."
-  run_command timeout 1m  mv "$wal_file" "$PG_WAL_BACKUP_ARCHIVE_DIR"
+  run_command timeout 1m mv "$wal_file" "$PG_WAL_BACKUP_ARCHIVE_DIR"
 done
+
+if [ "$wal_files_found" -eq 0 ]; then
+  log "Warning! No WAL files were found to backup"
+  echo "Warning! No WAL files were found to backup"
+  exitscript 2
+fi
 
 
 if [ $OVERALL_RESULT -eq 0 ]; then
@@ -141,6 +149,7 @@ timeout 1h find $PG_WAL_BACKUP_ARCHIVE_DIR -maxdepth 1 -type f -mtime +10 -print
 
 log "WAL archiving completed successfully."
 exitscript 0
+
 
 
 
@@ -197,8 +206,8 @@ log() {
 
 # Exit script
 exitscript() {
-	if [ $1 -ne 0 ]; log "Warning! Some operation(s) failed."
-	log "--------------------------------$(get_TIMESTAMP) Finished -------------------------------------"
+	if [ $1 -ne 0 ]; then log "Warning! Some operation(s) failed."; fi
+	log "-------------------------------- Finished -------------------------------------"
 	log
 	log
 	log
@@ -234,6 +243,7 @@ BACKUP_DIR=$PG_LOCAL_FULL_BACKUP_DIR$(get_TIMESTAMP)
 # Ensure directories exist
 mkdir -p "$(dirname "$LOG_FILE")"
 
+
 MAX_SIZE=$((100*1024*1024))  # 100MB in bytes
 current_size=$(stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
 
@@ -244,7 +254,7 @@ fi
 
 
 
-log "--------------------------------$(get_TIMESTAMP) Started -------------------------------------"
+log "-------------------------------- Started -------------------------------------"
 log "Starting Full Backup..."
 echo "LOG file path: $LOG_FILE"
 
@@ -282,7 +292,7 @@ fi
 # Full backup will be only taken from the primary replica in a replication cluster according to the policies. A secondary replica however can
 # also be manually specified.
 
-mkdir -p $PG_LOCAL_FULL_BACKUP_DIR && sudo chown -R postgres:postgres $PG_LOCAL_FULL_BACKUP_DIR
+mkdir -p $PG_LOCAL_FULL_BACKUP_DIR
 
 
 mkdir -p $PG_FULL_BACKUP_DIR
