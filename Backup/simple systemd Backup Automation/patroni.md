@@ -48,7 +48,7 @@ CMDOUT=""
 # Functions ---------------------------------------------------------------
 # TIMESTAMP function
 get_TIMESTAMP() {
-	echo $(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
+	echo $(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N)
 }
 
 # Log function
@@ -63,7 +63,7 @@ log() {
 # Exit script
 exitscript() {
 	if [ $1 -eq 1 ]; then log "Warning! Some operation(s) failed."; fi
-	log "-------------------------------- Finished -------------------------------------"
+	log "-------------------------------- Finished ------------------------------------"
 	log
 	log
 	log
@@ -153,6 +153,7 @@ exitscript 0
 
 
 
+
 ```
 
 2. Full Backup & Purge Script (pg_full_backup.sh)
@@ -192,7 +193,7 @@ CMDOUT=""
 # Functions ---------------------------------------------------------------
 # TIMESTAMP function
 get_TIMESTAMP() {
-	echo $(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
+	echo $(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N)
 }
 
 # Log function
@@ -207,7 +208,7 @@ log() {
 # Exit script
 exitscript() {
 	if [ $1 -ne 0 ]; then log "Warning! Some operation(s) failed."; fi
-	log "-------------------------------- Finished -------------------------------------"
+	log "-------------------------------- Finished ------------------------------------"
 	log
 	log
 	log
@@ -306,11 +307,11 @@ CMDOUT=$(/usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z 1 -
 # Backup statement
 
 if [ $? -eq 0 ]; then
-	log("Full backup process finished successfully. MSG:"$CMDOUT)
-	echo "Full backup process finished successfully. MSG:"$CMDOUT
+	log "Full backup process finished successfully. MSG: $CMDOUT" 
+	echo "Full backup process finished successfully. MSG: $CMDOUT"
 else
-	log("Full backup process failed. MSG:"$CMDOUT)
-	echo "Full backup process failed. MSG:"$CMDOUT
+	log "Full backup process failed. MSG: $CMDOUT" 
+	echo "Full backup process failed. MSG: $CMDOUT"
 	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
@@ -323,10 +324,10 @@ CMDOUT=$(timeout 24h cp -rf "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
 # Copy from the local to the remote backup
 
 if [ $? -eq 0 ]; then
-	log("Copy full backup to remote storage finished successfully.")
+	log "Copy full backup to remote storage finished successfully."
 	echo "Copy full backup to remote storage finished successfully."
 else
-	log("Copy full backup to remote storage failed. MSG:"$CMDOUT)
+	log "Copy full backup to remote storage failed. MSG: $CMDOUT"
 	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
@@ -337,10 +338,10 @@ CMDOUT=$(timeout 24h cp -rf "$PG_FULL_BACKUP_DIR""$(find ${PG_FULL_BACKUP_DIR} -
 $PG_FULL_BACKUP_ARCHIVE_DIR)	
 
 if [ $? -eq 0 ]; then
-	log("Copy full backup to remote tape storage finished successfully.")
+	log "Copy full backup to remote tape storage finished successfully."
 	#echo "Copy full backup to remote tape storage finished successfully."
 else
-	log("Copy full backup to remote tape storage failed. MSG:"$CMDOUT)
+	log "Copy full backup to remote tape storage failed. MSG: $CMDOUT"
 	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
@@ -348,7 +349,7 @@ fi
 # Copy from the remote backup to the remote backup archive.
 
 
-$CMDOUT=""
+CMDOUT=""
 OVERALL_RESULT=0
 # For local directory (fast filesystem)
 run_command timeout 30m find "$PG_LOCAL_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +2 -exec rm -rf {} +
@@ -364,11 +365,12 @@ if [ $OVERALL_RESULT -eq 0 ]; then
 	exitscript 0
 	#echo "Copy full backup to remote tape storage finished successfully."
 else
-	log "Some purge steps failed. MSG:"$CMDOUT
+	log "Some purge steps failed. MSG: $CMDOUT"
 	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
 fi	
+
 
 
 ```
