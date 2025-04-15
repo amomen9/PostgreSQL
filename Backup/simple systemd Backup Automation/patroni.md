@@ -1,5 +1,6 @@
 # simple systemd Backup Automation (A typical cluster like Patroni with a VIP)
 
+
 The systemd backup automation plan is a simple plan composed of a service template with two 
  timers without any additional/external tools or extensions like Barman, pgagent, pg_cron, 
  etc. One of the timers triggers the service instance for compressing, backing up, and purging 
@@ -301,7 +302,7 @@ export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PAT
 
 
 if [ $(ip -4 addr show $(ip -br link | awk '$1 != "lo" {print $1}' | tail -1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | wc -l) -ne 2 ]; then
-	echo "Exiting. $BACKUP_TYPE backup process was skipped because this is not the primary replica."
+	echo "Warning! Exiting: $BACKUP_TYPE backup process was skipped because this is not the primary replica."
 	exitscript 0
 fi
 # Full backup will be only taken from the primary replica in a replication cluster according to the policies. A secondary replica however can
@@ -472,6 +473,7 @@ fi
 #---------------------------- Exit control ---------------------------------------
 exitscript 0
 #---------------------------------------------------------------------------------
+
 
 
 ```
