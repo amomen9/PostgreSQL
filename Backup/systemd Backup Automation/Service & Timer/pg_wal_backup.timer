@@ -1,15 +1,18 @@
+
 # This timer unit is for backing up WAL segments
 #
 
 [Unit]
 Description=timer unit is for backing up WAL segments
-Requires=PostgreSQL@archive_wal.service
+Requires=PostgreSQL@pg_wal_backup.service
 
 [Timer]
-Unit=PostgreSQL@archive_wal.service
+Unit=PostgreSQL@pg_wal_backup.service
 OnCalendar=*-*-* *:00:00
-
+# Every hour
 
 
 [Install]
 WantedBy=timers.target
+
+
