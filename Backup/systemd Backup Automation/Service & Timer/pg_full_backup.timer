@@ -3,12 +3,15 @@
 
 [Unit]
 Description=This timer unit is for PostgreSQL base backup
-Requires=PostgreSQL@postgres_backup.service
+Requires=PostgreSQL@pg_full_backup.service
 
 [Timer]
-Unit=PostgreSQL@postgres_backup.service
+Unit=PostgreSQL@pg_full_backup.service
 OnCalendar=*-*-* 19:30:00
+# Evert day at 19:30:00
 
 
 [Install]
 WantedBy=timers.target
+
+
