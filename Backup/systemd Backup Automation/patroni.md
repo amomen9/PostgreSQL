@@ -389,7 +389,7 @@ PG_LOCAL_FULL_BACKUP_DIR=/archive/postgresql/pg-local-full-backup/systemd/
 # Full backup root directory on a locally mounted drive (DAS)
 PG_FULL_BACKUP_DIR=/backup/Backups/postgresql/pg-full-backup/systemd/
 # Directory on a remote location to copy the full backups to
-PG_FULL_BACKUP_TAPE_DIR=/backup/TapeBackups/postgresql/pg-full-backup-archive/systemd/
+PG_FULL_BACKUP_ARCHIVE_DIR=/backup/TapeBackups/postgresql/pg-full-backup-tape/systemd/
 # Conventionally tape archive of the backups which has its own retention policies
 BACKUP_TIMEOUT_DURATION="24h"  # Set your timeout duration (e.g., 1h, 30m, 3600s)
 BACKUP_TYPE=Full	# Full/Incremental
@@ -427,17 +427,19 @@ exitscript() {
 
 # Multiple commands exit code check
 run_command() {
-    CMDOUT="("$@" 2>&1)" 2>&1
+    CMDOUT=$("$@" 2>&1)
     if [ $? -ne 0 ]; then
         OVERALL_RESULT=1
     fi
 }
+
 # -----------------------------------------
 
 
 # ---------- Calculated Variables ---------
 INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
 LOG_FILE="${LOG_FILE_DIRECTORY}""pg_full_backup_${INSTANCE}.log"
+START_TIMESTAMP=$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
 OVERALL_RESULT=0
 CMDOUT=""
 BACKUP_DIR=$PG_LOCAL_FULL_BACKUP_DIR$(get_TIMESTAMP)"/"
@@ -486,7 +488,7 @@ export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PAT
 
 (! [ -z $PATRONI_YAML_PATH ] && ! [ -z $USER ] && ! [ -z $PORT ] && \
 ! [ -z $PG_LOCAL_FULL_BACKUP_DIR ] && ! [ -z $PG_FULL_BACKUP_DIR ] && \
-! [ -z $PG_FULL_BACKUP_TAPE_DIR ]) || \
+! [ -z $PG_FULL_BACKUP_ARCHIVE_DIR ]) || \
 { echo "At least one variable is not assigned a value to. Check your variables." >&2; exitscript 1; }
 # Exit the script if any of the variables are not assigned a value to.
 
@@ -506,10 +508,12 @@ mkdir -p $PG_LOCAL_FULL_BACKUP_DIR
 mkdir -p $PG_FULL_BACKUP_DIR
 
 
-mkdir -p $PG_FULL_BACKUP_TAPE_DIR
+mkdir -p $PG_FULL_BACKUP_ARCHIVE_DIR
 
 
 #-------------------------- Backup process start: ------------------------------------
+#CMDOUT=$(time /usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z 1 -Xs 2>&1)
+
 
 # Initialize duration with default value
 duration="00:00:00:00.000"
@@ -585,6 +589,7 @@ else
 	exitscript -1
 fi
 
+
 #-------------------------- Backup process end------------------------------------
 
 
@@ -607,7 +612,7 @@ fi
 #-------------------------- Copy to tape remote location -------------------------
 #set -x
 CMDOUT=$(timeout 24h cp -rf "${PG_FULL_BACKUP_DIR}""$(basename ${BACKUP_DIR})" \
-$PG_FULL_BACKUP_TAPE_DIR) 2>&1	
+$PG_FULL_BACKUP_ARCHIVE_DIR) 2>&1	
 # set +x
 
 if [ $? -eq 0 ]; then
@@ -639,7 +644,7 @@ run_command timeout 1h find "$PG_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +15
 echo "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
 log "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
 
-run_command timeout 1h find "$PG_FULL_BACKUP_TAPE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
+run_command timeout 1h find "$PG_FULL_BACKUP_ARCHIVE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
 echo "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
 log "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
 # purging operation
@@ -662,6 +667,8 @@ fi
 #---------------------------- Exit control ---------------------------------------
 exitscript 0
 #---------------------------------------------------------------------------------
+
+
 
 
 ```
