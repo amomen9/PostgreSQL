@@ -46,7 +46,7 @@ set -euo pipefail
 
 # ----------- Custom Variables -------------
 # All directory path values must end with /
-PG_WAL_BACKUP_ARCHIVE_ROOT_DIR=/backup/Backups/postgresql/pg-wal-backup-archive/systemd/
+PG_WAL_BACKUP_ARCHIVE_ROOT_DIR=/backup/Backups/postgresql/pg-wal-backup/systemd/
 # Directory where backups are to be moved
 
 PG_WAL_ARCHIVE_DIR=/archive/postgresql/pg-wal-archive/
@@ -146,10 +146,10 @@ log() {
 
 # Exit script
 exitscript() {
-	#echo -c "Distinct list of errors: \n---------"
-	#echo -c "$CUMULATIVE_COMMAND_OUTPUT\n---------"
-	echo "Duration: $duration (DD:HH:MM:SS)"
-	log "Duration: $duration (DD:HH:MM:SS)"
+	#echo "Distinct list of errors: \n---------"
+	#echo "$CUMULATIVE_COMMAND_OUTPUT\n---------"
+	echo "---"$'\n'"Total Duration: $duration (DD:HH:MM:SS)"
+	log -c "---\nDuration: $duration (DD:HH:MM:SS)"
 
 
 	if [ $# -eq 0 ]; then
@@ -326,8 +326,8 @@ else
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
 
-	#echo -c "Distinct list of errors: \n---------"
-	#echo -c "$CUMULATIVE_COMMAND_OUTPUT\n---------"
+	#echo "Distinct list of errors: \n---------"
+	#echo "$CUMULATIVE_COMMAND_OUTPUT\n---------"
 	log -c "Distinct list of errors: \n---------"
 	log -c "$(echo $CUMULATIVE_COMMAND_OUTPUT | sort -u )\n---------"	
 
@@ -338,14 +338,24 @@ fi
 #-------------------------- Backup process end------------------------------------
 
 
+#-------------------------- Purge process start: ---------------------------------
 
 
-timeout 1h find $PG_WAL_BACKUP_ARCHIVE_DIR -maxdepth 1 -type f -mtime +10 -print0 | xargs -0 -r rm -rf
+run_command timeout 1h find $PG_WAL_BACKUP_ARCHIVE_DIR -type f -mtime +10 -print0 | xargs -0 -r rm -rf
+
+if [ $? -ne 0 ]; then 
+	log "Purge failed. Output returned by the purge command: ${SINGLE_COMMAND_OUTPUT}"
+	echo "Purge failed."
+	exitscript 5	
+fi
+
+echo "WAL archiving & purging completed successfully."
+log "WAL archiving & purging completed successfully."
+
+#-------------------------- Purge process end ------------------------------------
 
 
-log "WAL archiving completed successfully."
 exitscript 0
-
 
 
 ```
@@ -391,7 +401,7 @@ PG_FULL_BACKUP_DIR=/backup/Backups/postgresql/pg-full-backup/systemd/
 # Directory on a remote location to copy the full backups to
 PG_FULL_BACKUP_ARCHIVE_DIR=/backup/TapeBackups/postgresql/pg-full-backup-tape/systemd/
 # Conventionally tape archive of the backups which has its own retention policies
-BACKUP_TIMEOUT_DURATION="24h"  # Set your timeout duration (e.g., 1h, 30m, 3600s)
+BACKUP_TIMEOUT_DURATION="infinity"  # Set your timeout duration (e.g., 1h, 30m, 3600s)
 BACKUP_TYPE=Full	# Full/Incremental
 BACKUP_COMPRESSION_LEVEL="1"
 # -----------------------------------------
@@ -427,10 +437,12 @@ exitscript() {
 
 # Multiple commands exit code check
 run_command() {
-    CMDOUT=$("$@" 2>&1)
-    if [ $? -ne 0 ]; then
+    local tmpfile=$(mktemp)
+    if ! "$@" > "$tmpfile" 2>&1; then
         OVERALL_RESULT=1
     fi
+    CMDOUT=$(<"$tmpfile" tr -d '\0')  # Read and clean output: remove null bytes
+    rm -f "$tmpfile"
 }
 
 # -----------------------------------------
@@ -525,9 +537,16 @@ temp_out=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
 start_time=$(date +%s.%N) || start_time=$(date +%s) # Fallback to seconds precision
 set +e
 
+
+
+
 ###### ------------------ Backup command --------------------
+# Ajdust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
 timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
 ###### ------------------------------------------------------
+
+
+
 
 exit_code=$?
 set -e
@@ -635,17 +654,19 @@ CMDOUT=""
 OVERALL_RESULT=0
 
 # For local directory (fast filesystem)
+echo "Purging ..."
+log "Purging ..."
 run_command timeout 30m find "$PG_LOCAL_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +2 -exec rm -rf {} +
-echo "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
+#echo "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
 log "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
 
 # For CIFS shares (slower network filesystems)
 run_command timeout 1h find "$PG_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
-echo "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
+# echo "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
 log "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
 
 run_command timeout 1h find "$PG_FULL_BACKUP_ARCHIVE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
-echo "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
+#echo "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
 log "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
 # purging operation
 
@@ -667,7 +688,6 @@ fi
 #---------------------------- Exit control ---------------------------------------
 exitscript 0
 #---------------------------------------------------------------------------------
-
 
 
 
