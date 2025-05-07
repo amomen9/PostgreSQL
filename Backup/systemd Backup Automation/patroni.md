@@ -541,14 +541,20 @@ set +e
 
 
 ###### ------------------ Backup command --------------------
-# Ajdust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
-timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
+if psql -p $PORT -t -c "SELECT pg_is_in_backup()" | grep -q f; then
+	# Ajdust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
+    timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
+	exit_code=$?
+else
+    echo "Skipping backup and the rest of the operation as a backup is already in progress"
+    log "Skipping backup and the rest of the operation as a backup is already in progress"
+	exitscript -1
+fi
 ###### ------------------------------------------------------
 
 
 
 
-exit_code=$?
 set -e
 end_time=$(date +%s.%N) || end_time=$(date +%s) # Fallback to seconds precision
 
@@ -688,6 +694,7 @@ fi
 #---------------------------- Exit control ---------------------------------------
 exitscript 0
 #---------------------------------------------------------------------------------
+
 
 
 
