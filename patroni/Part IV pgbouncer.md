@@ -54,3 +54,16 @@ systemctl restart pgbouncer.service
 
 5. Connect to postgres database cluster using `<server name/address>`, `<server pgbouncer port>`, `<pgbouncer user>`
  , and `<pgbouncer pass>`
+ 
+ 
+**Note!**
+If you plan to install `prometheus-pgbouncer-exporter` too for pgbouncer monitoring, you will need to adjust the
+ location for pgbouncer Unix domain socket file. The default location is /tmp. However, `prometheus-pgbouncer-exporter`
+ expects it to be /var/run/postgresql beside PostgreSQL main socket file.
+ 
+You can do this by adding the following line to the pgbouncer configuration:
+
+```ini
+[pgbouncer]
+unix_socket_dir = /var/run/postgresql
+```
