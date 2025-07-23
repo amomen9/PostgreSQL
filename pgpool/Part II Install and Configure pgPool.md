@@ -54,6 +54,8 @@ This is the template of the entries that you should write inside the sudoers fil
 | <div align="left">Defaults:postgres !requiretty<br/>postgres ALL=(ALL) NOPASSWD: /usr/sbin/ip addr add, /usr/sbin/ip addr del</div> |
 |:-----:|
 
+You can also add `postgres ALL=(ALL) NOPASSWD: ALL` to allow all commands
+
 In our case, we write the following:
 
 ```shell
