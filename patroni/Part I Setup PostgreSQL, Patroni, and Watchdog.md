@@ -68,13 +68,15 @@ If we actually set exclusive mount point for PostgreSQL or other services specif
 sudo hostnamectl set-hostname <hostname>
 ```
 
-* 2. set static IP addresses either using DHCP or directly giving the machines static IP addresses.
-* 3. Add hostnames and IPs to the `/etc/hosts` file for local hostname resolution (Every Node):
+* 2. Make sure that the nodes' IP Addresses and the VIP IP Address is static in the network without any IP conflict.
+* 3. Add hostnames and IPs to the `/etc/hosts` file for local hostname resolution. If you need the node name to be
+different in the patroni config files, those names must be added here too, for that name resolution is also
+required for the cluster to work (Every Node):
 
 ```hosts
-172.23.124.71 funleashpgdb01
-172.23.124.72 funleashpgdb02
-172.23.124.73 funleashpgdb03
+172.23.124.71 funleashpgdb01 funleashpgdb01.l.domain.com maunleash01
+172.23.124.72 funleashpgdb02 funleashpgdb02.l.domain.com maunleash02
+172.23.124.73 funleashpgdb03 funleashpgdb03.l.domain.com maunleash03
 172.23.124.74 vip
 
 ```
@@ -436,6 +438,8 @@ As it is arranged for the Patroni service to run with the root user in this docu
 
 Some parameters, listed below, are critical for Patroni to be set identically across all replicas, such as `max_connections`. Since the Patroni YAML configuration files might differ across replicas, if these parameters are set in these files, Patroni will silently ignore them (at least in the current version) without any errors or warnings. Instead, it requires these settings to be stored in the DCS (Distributed Configuration Store), which is consistent across all replicas.
 
+Since this document is written in order of actions that shall be taken to setup the cluster, the details will be skipped to their suitable step.
+
 To add these configurations, Patroni provides the following command:
 ```bash
 patronictl -c <path to the yml config file> edit-config <cluster name>
@@ -503,21 +507,17 @@ sudo chown -R etcd:etcd /var/lib/etcd
 
 #### 9. Make the etcd API version 3 global (Every Node)
 
-Make it global by putting it inside /etc/profile
+Make it global by putting it inside /etc/profile, then make it effective for the current session too:
 
 ```shell
 sudo echo >> /etc/profile
 sudo echo export ETCDCTL_API=3 >> /etc/profile
-
-```
-
-Then make it effective for the current session too:
-
-```shell
+# make it effective for the current session too
 source /etc/profile
 ```
 
-#### 10. Edit the /etc/default/etcd file (Every Node)
+
+#### 10. Edit the /etc/default/etcd file (Nodes 1st and 2nd only)
 
 Reference:
 
@@ -549,6 +549,43 @@ ETCD_MAX_WALS=5
 
 ```
 
+#### 10. Edit the /etc/default/etcd file (Node(s) 3rd and ... only)
+
+Reference:
+
+[https://etcd.io/docs/v3.4/op-guide/configuration/](https://etcd.io/docs/v3.4/op-guide/configuration/)
+
+The `etcd` cluster must be brought up with at least 2 nodes as "new", because more than 1 node in the
+etcd configuration file has been specified.
+
+
+```shell
+sudo cp -a /etc/default/etcd /etc/default/etcd.default
+sudo truncate -s 0 /etc/default/etcd
+sudo vi /etc/default/etcd
+```
+
+Edit it like below:
+
+```shell
+ETCD_NAME=n2
+ETCD_DATA_DIR="/var/lib/etcd/default"
+ETCD_LISTEN_PEER_URLS="http://172.23.124.72:2380"
+ETCD_LISTEN_CLIENT_URLS="http://172.23.124.72:2379,http://127.0.0.1:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://172.23.124.72:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://172.23.124.72:2379"
+ETCD_INITIAL_CLUSTER="n1=http://172.23.124.71:2380,n2=http://172.23.124.72:2380,n3=http://172.23.124.73:2380"
+# The following parameter will be different on the 2nd ... nth nodes on initial ETCD startup
+ETCD_INITIAL_CLUSTER_STATE="existing"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster-pg"
+ETCD_AUTO_COMPACTION_RETENTION=168
+# 7 days
+ETCD_AUTO_COMPACTION_MODE=periodic
+ETCD_MAX_SNAPSHOTS=5
+ETCD_MAX_WALS=5
+
+```
+
 #### 11. Create the necessary PostgreSQL users (First Node Only)
 
 Make sure the postgresql database cluster is functional on the first node, we disabled it
@@ -557,6 +594,8 @@ Make sure the postgresql database cluster is functional on the first node, we di
 
 ```shell
 pg_ctlcluster 17 main --skip-systemctl-redirect start
+# Enter psql PostgreSQL CLI client
+sudo -iu postgres psql
 ```
 
 ```PL/PGSQL
@@ -564,6 +603,14 @@ alter user postgres password 'p@ssvv0rcl';
 create user replicator replication password 'p@ssvv0rcl';
 select * from pg_user;
 ```
+
+#### *. Stop running pg executable (First Node Only)
+
+```shell
+pg_ctlcluster 17 main --skip-systemctl-redirect stop -m immediate
+
+```
+
 
 #### 12. Delete data directory contents (2nd and 3rd Nodes only)
 
@@ -607,6 +654,10 @@ sudo systemctl enable --now patroni
 
 After running this, the key-value pairs will be created inside etcd and if you run the following command,
  a result like below should show up:
+
+```shell
+etcdctl get "" --prefix --keys-only
+```
 
 ![1731832173916](image/PartISetupPostgreSQL,Patroni,andWatchdog/1731832173916.png)
 
