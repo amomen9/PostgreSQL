@@ -55,8 +55,8 @@ unix_socket_dir = /var/run/postgresql
 3. populate `/etc/pgbouncer/userlist.txt` file
 
 ```text
-"<user1>" "<user1 pass>"
-"<user2>" "<user2 pass>"
+"user1" "pass"
+"user2" "pass"
 ```
 
 The pass can be in any format. It does not need to be database cluster user/password, it is
