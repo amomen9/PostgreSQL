@@ -63,6 +63,10 @@ The pass can be in any format. It does not need to be database cluster user/pass
  for pgbouncer authentication, but the hashing algorithm is the same. If you need it to be
  the same as the database cluster, for the hashed password, you can query `pg_authid` catalog
  table.
+
+```pl\pgsql
+SELECT rolpassword FROM pg_authid WHERE rolname='Your User'
+```
  
 4. restart pgbouncer service
 
