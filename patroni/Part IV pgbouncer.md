@@ -64,7 +64,7 @@ The pass can be in any format. It does not need to be database cluster user/pass
  the same as the database cluster, for the hashed password, you can query `pg_authid` catalog
  table.
 
-```pl\pgsql
+```sql
 SELECT rolpassword FROM pg_authid WHERE rolname='Your User'
 ```
  
