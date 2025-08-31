@@ -34,6 +34,24 @@ default_pool_size = 20
 
 ```
 
+**Sample**
+
+```ini
+[databases]
+postgres = host=127.0.0.1 port=5432 user=postgres password=postgrespass client_encoding=UNICODE datestyle=ISO
+
+[pgbouncer]
+listen_addr = *
+listen_port = 6432
+auth_type = md5
+auth_file = /etc/pgbouncer/userlist.txt
+pool_mode = transaction
+max_client_conn = 3000
+default_pool_size = 20
+unix_socket_dir = /var/run/postgresql
+```
+
+
 3. populate `/etc/pgbouncer/userlist.txt` file
 
 ```text
