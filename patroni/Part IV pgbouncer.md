@@ -17,6 +17,7 @@ vi /etc/pgbouncer/pgbouncer.ini
 ```
 
 ```ini
+; pgbouncer.ini
 [databases]
 <db1> = host=127.0.0.1 port=5432 user=payam password=<pass> client_encoding=UNICODE datestyle=ISO
 <db2> = host=127.0.0.1 port=5432 user=postgres password=<pass> client_encoding=UNICODE datestyle=ISO
