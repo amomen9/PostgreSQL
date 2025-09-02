@@ -54,8 +54,11 @@ unix_socket_dir = /var/run/postgresql
 ```
 
 
-3. populate `/etc/pgbouncer/userlist.txt` file
+3. Populate `/etc/pgbouncer/userlist.txt` file
 
+```shell
+vi /etc/pgbouncer/userlist.txt
+```
 ```text
 "user1" "pass"
 "user2" "pass"
