@@ -13,6 +13,8 @@ sudo apt-get install pgbouncer -y
  
 ```shell
 truncate -s 0 /etc/pgbouncer/pgbouncer.ini 
+```
+```shell
 vi /etc/pgbouncer/pgbouncer.ini 
 ```
 
