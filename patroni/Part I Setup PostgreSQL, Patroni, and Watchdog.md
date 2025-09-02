@@ -712,6 +712,7 @@ ExecStart=
 ExecStart=/usr/bin/vip-manager --config=/etc/default/vip-manager.yml
 
 ```
+Save and exit.
 
 Reload deamon:
 
