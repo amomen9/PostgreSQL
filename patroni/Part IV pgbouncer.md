@@ -82,7 +82,16 @@ systemctl restart pgbouncer.service
 
 5. Connect to postgres database cluster using `<server>`, `<pgbouncer port>`, `<pgbouncer user>`
  , and `<pgbouncer user's pass>`
- 
+
+```shell
+root@feasypgdb01:~# psql -h 172.23.124.74 -Upayam -p6432 payam_db -c "SELECT CURRENT_USER, CURRENT_DATABASE()"
+Password for user payam:
+ current_user | current_database
+--------------+------------------
+ payam        | payam_db
+(1 row)
+
+``` 
  
 **Note!**
 If you plan to install `prometheus-pgbouncer-exporter` too for pgbouncer monitoring, you will need to adjust the
