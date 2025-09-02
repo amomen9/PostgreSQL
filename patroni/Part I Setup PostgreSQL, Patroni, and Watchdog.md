@@ -736,12 +736,29 @@ Set the configurations inside the vip-manager.yml file.
 sudo vi /etc/default/vip-manager.yml
 ```
 
-The trigger-value must be specific to every node,
-and it is typically the only directive that differs between the different nodes.
+* This is typically different between different clusters (Ex: your new cluster and the sample configuration here)
+```YAML
+trigger-key: "/maunleashdb/17-main/leader"
+trigger-value: "maunleash01"
+ip: 172.23.124.74
+interface: ens160
+dcs-type: etcd
+dcs-endpoints:
+  - http://127.0.0.1:2379
+  - http://172.23.124.71:2379
+  - http://172.23.124.72:2379
+  - http://172.23.124.73:2379
+
+``` 
+
+* This is typically the only directive that differs across different nodes of the same cluster.
 
 ```YAML
 trigger-value: "maunleash01"
+
 ```
+
+**Sample**:
 
 <details>
 <summary>(click to expand) Sample <b>vip-manager configuration file (vip-manager.yml)</b>:</summary>
