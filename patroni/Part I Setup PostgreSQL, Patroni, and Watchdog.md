@@ -804,4 +804,11 @@ verbose: false
 sudo systemctl enable --now vip-manager
 ```
 
+#### 21. See status of VIP Manager service:
+
+```shell
+sudo systemctl status vip-manager
+```
+
+
 # [Next: Part II: Logs Purge &amp; Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
