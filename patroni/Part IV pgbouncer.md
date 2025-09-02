@@ -92,6 +92,8 @@ Password for user payam:
 (1 row)
 
 ``` 
+
+---
  
 **Note!**
 If you plan to install `prometheus-pgbouncer-exporter` too for pgbouncer monitoring, you will need to adjust the
