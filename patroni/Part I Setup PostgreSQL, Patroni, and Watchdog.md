@@ -730,7 +730,13 @@ sudo touch /etc/default/vip-manager.yml
 
 #### 19. Config VIP Manager.
 
-Set the configurations inside the vip-manager.yml file. The trigger-value must be specific to every node,
+Set the configurations inside the vip-manager.yml file.
+
+```shell
+sudo vi /etc/default/vip-manager.yml
+```
+
+The trigger-value must be specific to every node,
 and it is typically the only directive that differs between the different nodes.
 
 ```YAML
