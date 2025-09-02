@@ -80,8 +80,8 @@ systemctl enable pgbouncer.service
 systemctl restart pgbouncer.service
 ```
 
-5. Connect to postgres database cluster using `<server name/address>`, `<server pgbouncer port>`, `<pgbouncer user>`
- , and `<pgbouncer pass>`
+5. Connect to postgres database cluster using `<server>`, `<pgbouncer port>`, `<pgbouncer user>`
+ , and `<pgbouncer user's pass>`
  
  
 **Note!**
