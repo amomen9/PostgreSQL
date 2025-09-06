@@ -17,10 +17,13 @@ This is the list of contained scripts:
 * get objects added by an installed extension.sql
 * pg_class report.sql
 
+These scripts are within the [useful scripts](useful%20scripts) directory. See the README file there for their details
+
 ### AI Contributed Queries
 For some useful queries like the "User/Role Permissions" one, the idea is mine, but the query has been written by AI. It has gone through
 multiple tests to resolve compile-time and run-time errors, and also improved step-by-step. Above such scripts, it is written
 "AI contributed script".
 
-These scripts are within the [useful scripts](useful%20scripts) directory. See the README file there for their details
+
+
 
