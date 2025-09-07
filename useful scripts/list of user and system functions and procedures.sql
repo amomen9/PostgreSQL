@@ -18,5 +18,7 @@ SELECT
 FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
 JOIN pg_language l ON p.prolang = l.oid
---where p.proname like '%func or proc%'
+--where p.proname like '%func or proc%'		/* p.proname= function_name */
+											/* p.prokind= function_type */
+											/* n.nspname AS schema_name */											
 ORDER BY n.nspname, p.proname;
