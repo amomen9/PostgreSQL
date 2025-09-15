@@ -210,4 +210,4 @@ union_selects AS (
 )
 SELECT *
 FROM union_selects
-WHERE user_name='dataplatform_ro'
+WHERE user_name='dataplatform_ro' and object_type='TABLE'
