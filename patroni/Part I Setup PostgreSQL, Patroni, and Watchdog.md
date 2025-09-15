@@ -1,4 +1,4 @@
-&nbsp;Doc parts:
+&nbsp; Doc parts:
 
 * [Part I: Setup PostgreSQL, Patroni, and Watchdog ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md)
 * [Part II: Logs Purge &amp; Retention ](./Part%20II%20Logs%20Purge%20%26%20Retention.md)
@@ -6,14 +6,19 @@
 
 # Part I: Setup PostgreSQL, Patroni, and Watchdog
 
+To begin with, I propose using some aliases that will be pretty handy later.
+```
+
+```
+
 **Install and Configure PostgreSQL**
 
 **Note:**
 
 1. PostgreSQL major version specified here is 17. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, and most likely later versions, as well.
-2. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we setup the watchdog on all the backend (pg) nodes themselves.
+2. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we set up the watchdog on all the backend (pg) nodes themselves.
 3. The scripts and configuration files are both embedded in this doc and included in the git repository.
-4. Most of the steps in this document are sequential and the later steps depend on the earlier steps. So, follow the steps in order.
+4. Most of the steps in this document are sequential, and the later steps depend on the earlier steps. So, follow the steps in order.
 5. Not mentioning the non-mandatory command-line arguments means their default values.
 6. The PostgreSQL database cluster can also initially be created from a backup rather than a raw database cluster.
 7. The following are the node details used in this documentation:
@@ -32,17 +37,17 @@ The replication topology is composed of:
 | 3   | funleashpgdb03 | 172.23.124.73 | Node 3 (asynchronous) |
 | 4   |      VIP      | 172.23.124.74 | floating Virtual IP    |
 
-One of the standby nodes is synchronous and the other one is asynchronous in quorum mode (the
+One of the standby nodes is synchronous, and the other one is asynchronous in quorum mode (the
  word "ANY 1" is used in the "synchronous_standby_names" directive of the postgresql.conf file)
 
 0. **Disk layouts (Every Node):**
 
-For the database clusters with large amount of data, I used to move the data directory to somewhere else.
- For example, /data/postgresql/13/main or whatever. However, later on I came to the conclusion that the best
+For the database clusters with a large amount of data, I used to move the data directory to somewhere else.
+ For example, /data/postgresql/13/main or whatever. However, later on, I came to the conclusion that the best
  way is, at least regarding PostgreSQL, to keep everything in its default location and instead define mount
  points in the default locations and attach separate disks to those mount points. For example, prior to the
  installation of PostgreSQL, we can consider the following mount points. We actually do the first 3 of the following
- 4 this in this document:
+ 4 in this document:
 
 - `/var/lib/postgresql/`
 - `/var/log/`
