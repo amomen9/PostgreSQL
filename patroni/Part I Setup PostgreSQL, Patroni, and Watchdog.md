@@ -6,13 +6,18 @@
 
 # Part I: Setup PostgreSQL, Patroni, and Watchdog
 
-To begin with, I propose using some aliases that will be pretty handy later. You can see how much they shorten the commands
+To begin with, I propose using some aliases and variables that will be pretty handy later. You can see how much they shorten the commands
 ```
-alias patctl='patronictl -c /etc/patroni/config.yml'
-alias sysstt='systemctl start'
-alias sysstp='systemctl stop'
-alias sysrst='systemctl restart'
-alias sysrld='systemctl restart'
+alias patctl='sudo patronictl -c /etc/patroni/config.yml'
+alias sysstt='sudo systemctl start'
+alias sysstp='sudo systemctl stop'
+alias sysrst='sudo systemctl restart'
+alias sysrld='sudo systemctl reload'
+alias etcdget='etcdctl get --prefix'
+export PATCONF=/etc/patroni/config.yml
+export PGBCONF=/etc/pgbouncer/pgbouncer.ini
+export PGVERSION=$(bash -c '([ -d /lib/postgresql ] && ls -1 /lib/postgresql | grep -E "^(9\.[0-6]|[1-9][0-9]*)$" | sort -V) || echo "PostgreSQL not found"')
+export PGDATA
 ```
 
 **Install and Configure PostgreSQL**
