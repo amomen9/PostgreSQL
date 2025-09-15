@@ -6,9 +6,13 @@
 
 # Part I: Setup PostgreSQL, Patroni, and Watchdog
 
-To begin with, I propose using some aliases that will be pretty handy later.
+To begin with, I propose using some aliases that will be pretty handy later. You can see how much they shorten the commands
 ```
-
+alias patctl='patronictl -c /etc/patroni/config.yml'
+alias sysstt='systemctl start'
+alias sysstp='systemctl stop'
+alias sysrst='systemctl restart'
+alias sysrld='systemctl restart'
 ```
 
 **Install and Configure PostgreSQL**
