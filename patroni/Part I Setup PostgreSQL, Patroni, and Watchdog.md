@@ -17,7 +17,8 @@ alias etcdget='etcdctl get --prefix'
 export PATCONF=/etc/patroni/config.yml
 export PGBCONF=/etc/pgbouncer/pgbouncer.ini
 export PGVERSION=$(bash -c '([ -d /lib/postgresql ] && ls -1 /lib/postgresql | grep -E "^(9\.[0-6]|[1-9][0-9]*)$" | sort -V) || echo "PostgreSQL not found"')
-export PGDATA
+export PGDATA=/var/lib/postgresql/$PGVERSION/main
+export PGCONF=/etc/postgresql/$PGVERSION/main
 ```
 
 **Install and Configure PostgreSQL**
