@@ -155,7 +155,7 @@ set +e
 
 
 ###### ------------------ Backup command --------------------
-if psql -t -c "SELECT pg_is_in_backup()" | grep -q f; then
+if psql -t -c "SELECT COUNT(*) > 0 FROM pg_stat_progress_basebackup" | grep -q f; then
 	# Ajdust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
     timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
 	exit_code=$?
