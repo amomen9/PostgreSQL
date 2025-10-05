@@ -15,7 +15,7 @@ Variables:
 export PGHOST=vip
 export PGPORT=5432
 export PGUSER=replicator
-export PGPASSWORD='>-M]e{Td,wU)u[U_9n'
+export PGPASSWORD='P@$4VV0rd'
 
 0.c I assume that our cluster is composed of 3 nodes and one of the secondary replicas is synchronous and the other one is asynchronous
 If you have chosen the quroum-based secondary replicas using the ANY keyword in postgresql.conf synchronous_standby_names directive,
@@ -49,7 +49,7 @@ SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_p
 
 
 2. Full base backup. Sample command:
-export PGHOST=vip && export PGPORT=5432 && export PGUSER=replicator && export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && export PGPASSWORD='>-M]e{Td,wU)u[U_9n' && \
+export PGHOST=vip && export PGPORT=5432 && export PGUSER=replicator && export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && export PGPASSWORD='P@$4VV0rd' && \
 time /usr/bin/pg_basebackup -h $PGHOST -p $PGPORT -U $PGUSER -w -c fast -D $BACKUP_DIR -Ft -Xs -P
 
 3. Adjust desirable config for all nodes (edit).  
@@ -136,7 +136,7 @@ sudo -iu postgres psql -c 'SHOW wal_segment_size;'
 sudo -iu postgres psql -c 'SHOW wal_level;'
 
 *. Take a backup and throw it away (if needed, check wal_level, and if it was minimal, then take the backup. This might happen if have tried to start pg from patroni service by mistake)
-export PGHOST=vip && export PGPORT=5432 && export PGUSER=replicator && export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && export PGPASSWORD='>-M]e{Td,wU)u[U_9n' && \
+export PGHOST=vip && export PGPORT=5432 && export PGUSER=replicator && export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && export PGPASSWORD='P@$4VV0rd' && \
 time /usr/bin/pg_basebackup -h $PGHOST -p $PGPORT -U $PGUSER -w -c fast -D $BACKUP_DIR -Ft -Xs -P
 
 
