@@ -16,7 +16,10 @@ PG_FULL_BACKUP_ARCHIVE_DIR=/backup/TapeBackups/postgresql/pg-full-backup-tape/sy
 # Conventionally tape archive of the backups which has its own retention policies
 BACKUP_TIMEOUT_DURATION="infinity"  # Set your timeout duration (e.g., 1h, 30m, 3600s)
 BACKUP_TYPE=Full	# Full/Incremental
-BACKUP_COMPRESSION_LEVEL="1"
+BACKUP_COMPRESSION_LEVEL="1"  # Compression level for pg_basebackup (0-9)
+# 0 = no compression, 1 = fastest, 9 = best compression
+STAT_PERCENTAGE=10 # Percentage of the backup completion to log progress for
+
 # -----------------------------------------
 
 
