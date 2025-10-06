@@ -141,6 +141,6 @@ This example uses pgbouncer.ini entries given above. We want to give the Data Wa
  but here, we use this example approach with the directives noted. The Data Warehouse service is not as sensitive as
  the OLTP services and populates their databases incrementally. This way, we can easily change the connection of its service to other nodes 
  more conveniently by altering the connection string of pgbouncer.ini on the 3rd node and give the pgbouncer service a restart instead of
- restarting PostgreSQL or Patroni services.
+ restarting PostgreSQL or Patroni services. The diagram below can also help with understanding the topic better:
 
  
