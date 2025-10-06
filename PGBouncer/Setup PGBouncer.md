@@ -125,7 +125,7 @@ Because `PGBouncer` is a proxy, it can offer some other minor functionalities. F
 
 ```ini
 ; The following 2 will actually point to the same database:
-payam_db = host=127.0.0.1 port=5432 user=payam password=dF84Avedaq6wJm7WoqBA4Kb8ae7reWw client_encoding=UNICODE datestyle=ISO
+payam_db = host=127.0.0.1 port=5432 user=payam password=<pass> client_encoding=UNICODE datestyle=ISO
 payam_dw = host=127.0.0.1 port=5432 user=payam dbname=payam_db password=<pass> application_name=readonly_client options='-c default_transaction_read_only=on' client_encoding=UNICODE datestyle=ISO
 ```
  
