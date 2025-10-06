@@ -25,7 +25,8 @@ vi /etc/pgbouncer/pgbouncer.ini
 ```
 
 ```ini
-; pgbouncer.ini
+; pgbouncer.ini:
+
 [databases]
 <db1> = host=127.0.0.1 port=5432 user=payam password=<pass> client_encoding=UNICODE datestyle=ISO
 <db2> = host=127.0.0.1 port=5432 user=postgres password=<pass> client_encoding=UNICODE datestyle=ISO
@@ -124,7 +125,8 @@ Because `PGBouncer` is a proxy, it can offer some other minor functionalities. F
  use multiple aliases for the same database. An example for such directives can be below:
 
 ```ini
-; pgbouncer.ini
+; pgbouncer.ini:
+
 [databases]
 ; The following 2 will actually point to the same database:
 payam_db = host=127.0.0.1 port=5432 user=payam password=<pass> client_encoding=UNICODE datestyle=ISO
