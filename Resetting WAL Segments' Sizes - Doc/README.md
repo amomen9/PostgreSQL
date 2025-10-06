@@ -1,6 +1,6 @@
 # Resetting WAL Segment Sizes Documentation
 
-This article assumes that only the planned `pg_resetwal` operation shall be carried out, and not any other operation such as an OS or PostgreSQL (PG) update. In fact, these two groups of actions must be mutually exclusive. This also implies that an OS restart is **not** intended during this maintenance window.
+This article assumes that only one operation which is the planned **reset wal** task shall be carried out, and not any other operation such as an OS or PostgreSQL (PG) update. In fact, these two groups of actions must be mutually exclusive. This also implies that an OS restart is **not** intended during this maintenance window.
 
 This document applies to changing the size of the WAL (Write-Ahead Log) segments for:
 - A single database cluster, or
