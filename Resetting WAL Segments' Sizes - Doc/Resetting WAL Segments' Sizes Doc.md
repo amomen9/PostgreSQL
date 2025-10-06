@@ -1,197 +1,418 @@
-This article assumes that only the planned resetwal shall be carried out and not any other operation like OS or PG update
-in fact, these two group of actions must be mutually excluded. This also implies that an OS start is not intended
+# Resetting WAL Segment Sizes Documentation
 
-*. This document works for changing the size of the WAL segments for single database clusters or multiple replicas in a
-replication
+This article assumes that only the planned `pg_resetwal` operation shall be carried out, and not any other operation such as an OS or PostgreSQL (PG) update. In fact, these two groups of actions must be mutually exclusive. This also implies that an OS restart is **not** intended during this maintenance window.
 
+This document applies to changing the size of the WAL (Write-Ahead Log) segments for:
+- A single database cluster, or
+- A replication setup with multiple replicas (primary and standby nodes).
 
-Preliminary steps:
+The objective is to safely adjust the WAL segment size using `pg_resetwal`, while ensuring cluster consistency and recovery capability.
 
-0.a Make sure you have entered hostnames and IP Addresses including the following in the /etc/hosts file. 
-vip		<vip IP Address>
+---
 
-0.b We set and consider envrionment variables for ease:
-Variables:
+## Preliminary Steps
+
+### 0.a Populate `/etc/hosts`
+Ensure you have entered hostnames and IP addresses including the following in the `/etc/hosts` file:
+```
+vip     <vip IP Address>
+```
+This enables consistent hostname resolution for the virtual IP used by clients and internal scripts.
+
+### 0.b Set Environment Variables
+For convenience and consistency during the procedure, set the following environment variables (adjust values as needed):
+
+```shell
 export PGHOST=vip
 export PGPORT=5432
 export PGUSER=replicator
 export PGPASSWORD='P@$4VV0rd'
+```
 
-0.c I assume that our cluster is composed of 3 nodes and one of the secondary replicas is synchronous and the other one is asynchronous
-If you have chosen the quroum-based secondary replicas using the ANY keyword in postgresql.conf synchronous_standby_names directive,
-shutting down one of the standby nodes makes the other node the synchronous replica anyways
+These variables allow commands such as `psql` and `pg_basebackup` to run without repeatedly specifying connection options.
 
-0.d pg_resetwal official documentation and reference:
+### 0.c Replication Topology Assumption
+We assume the cluster consists of three nodes:
+- One primary
+- Two standbys (one synchronous, one asynchronous)
+
+If you have configured quorum-based replication using the `ANY` keyword in the `synchronous_standby_names` directive (for example: `ANY 1 (nodeA,nodeB,nodeC)`), shutting down one standby will cause another eligible node to become the synchronous replica automatically.
+
+### 0.d Official Documentation
+`pg_resetwal` reference:
 https://www.postgresql.org/docs/current/app-pgresetwal.html
 
-0.e Normally, resetting WAL is highly discouraged. This is what you see in pg_resetwal's manual:
-"
-This function is sometimes needed if these files have become
-corrupted. It should be used only as a last resort, when the server will not start due to such corruption
-bear in mind that the database might contain inconsistent data due to partially-committed transactions
-"
-In the official reference, this is what you can find, meaning this binary is perfectly safe for healty database clusters
-that have been cleanly shut down.
-"
-This can be done safely on an otherwise sound database cluster, if none of the dangerous modes mentioned below are used.
-"
-----------------------------------------------------------------------------------
+You should carefully review the official documentation before proceeding.
 
-1. In collaboration with the developers, make sure that the service is suspended so that the data does not change, then perform
-a full backup for safety measures. You can ensure data modification prevention in a variety of ways like:
-a. stop pg_bouncer or any other proxing intermediary if you want to cut developer access to the database service
-sudo systemctl stop pgbouncer.service
-b. Quiesce & kill sessions  
-ALTER DATABASE payam_db ALLOW_CONNECTIONS false;
-# or directly modify the system catalog table:
-# UPDATE pg_database SET datallowconn = false WHERE datname = 'payam_db';
-SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid();
+### 0.e Caution About `pg_resetwal`
+Normally, resetting WAL is **highly discouraged**. From the manual:
+> This function is sometimes needed if these files have become corrupted. It should be used only as a last resort, when the server will not start due to such corruption. Bear in mind that the database might contain inconsistent data due to partially-committed transactions.
 
+However, the official documentation also notes that:
+> This can be done safely on an otherwise sound database cluster, if none of the dangerous modes mentioned below are used.
 
-2. Full base backup. Sample command:
-export PGHOST=vip && export PGPORT=5432 && export PGUSER=replicator && export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && export PGPASSWORD='P@$4VV0rd' && \
-time /usr/bin/pg_basebackup -h $PGHOST -p $PGPORT -U $PGUSER -w -c fast -D $BACKUP_DIR -Ft -Xs -P
+This means the utility is safe for a healthy database cluster that has been **cleanly shut down**, provided you avoid the dangerous modes (such as forcing incorrect LSN values). In this procedure, the intent is controlled WAL segment size adjustment—not recovery from corruption.
 
-3. Adjust desirable config for all nodes (edit).  
-vi /etc/patroni/config.yml
-    min_wal_size: 1GB	# Mandatory for resetwal
-    max_wal_size: 16GB	# Mandatory for resetwal
+---
+
+## Step 1. Quiesce Workload and Perform a Safety Backup
+
+You must coordinate with application developers or operations teams to ensure **no data changes** occur during the maintenance. Options to ensure this:
+
+1. Stop external connection poolers or proxies (e.g., `pgbouncer`):
+   ```shell
+   sudo systemctl stop pgbouncer.service
+   ```
+
+2. Prevent new connections and terminate existing ones for a specific database (example shown for `payam_db`):
+   ```shell
+   # Disallow new connections
+   ALTER DATABASE payam_db ALLOW_CONNECTIONS false;
+
+   # Alternative (direct system catalog modification – less preferred):
+   -- UPDATE pg_database SET datallowconn = false WHERE datname = 'payam_db';
+
+   # Terminate existing sessions (excluding the current one)
+   SELECT pg_terminate_backend(pid)
+   FROM pg_stat_activity
+   WHERE pid <> pg_backend_pid();
+   ```
+
+A full physical base backup (Step 2) provides rollback protection in case the procedure must be abandoned.
+
+---
+
+## Step 2. Take a Full Base Backup (Physical)
+
+This ensures you have a safe fallback copy prior to modifying WAL structure.
+
+```shell
+export PGHOST=vip && \
+export PGPORT=5432 && \
+export PGUSER=replicator && \
+export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && \
+export PGPASSWORD='P@$4VV0rd' && \
+time /usr/bin/pg_basebackup -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -w -c fast \
+  -D "$BACKUP_DIR" -Ft -Xs -P
+```
+
+Notes:
+- `-Ft` creates a tar-format backup (may produce multiple `.tar` files).
+- `-Xs` streams required WAL for a consistent backup.
+- This backup is for safety and may be discarded if the procedure completes successfully.
+
+---
+
+## Step 3. Adjust Desired Configuration on All Nodes
+
+Edit Patroni configuration (`/etc/patroni/config.yml`) to ensure `min_wal_size` and `max_wal_size` are appropriate for the new `wal_segment_size` you plan to set via `pg_resetwal`.
+
+Example (per-node differences only in `synchronous_standby_names`):
+
+```yaml
+postgresql:
+  parameters:
+    min_wal_size: 1GB       # Mandatory for resetwal context
+    max_wal_size: 16GB      # Mandatory for resetwal context
     wal_compression: on
-    synchronous_standby_names: "FIRST 1 (fmktpayamdb02,fmktpayamdb03)"	# Node 1
-    synchronous_standby_names: "FIRST 1 (fmktpayamdb01,fmktpayamdb03)"	# Node 2
-    synchronous_standby_names: "FIRST 1 (fmktpayamdb01,fmktpayamdb02)"	# Node 3
+    synchronous_standby_names: "FIRST 1 (fmktpayamdb02,fmktpayamdb03)"  # Node 1
+    # Node 2: synchronous_standby_names: "FIRST 1 (fmktpayamdb01,fmktpayamdb03)"
+    # Node 3: synchronous_standby_names: "FIRST 1 (fmktpayamdb01,fmktpayamdb02)"
+```
 
-Considerations:
-Typically, min_wal_size should be at least 2–4 times the wal_segment_size to allow enough space for WAL recycling without frequent resizing.
-max_wal_size should be large enough to accommodate spikes in WAL generation (e.g., during large transactions, bulk loads, or checkpoints).
- A common recommendation is 8–64 times the wal_segment_size, depending on workload. For very high-throughput systems (e.g., large batch jobs),
- you may need even higher values
-Checkpoint tuning:
-Ensure checkpoint_timeout and checkpoint_completion_target are also optimized (e.g., checkpoint_timeout = 15min, checkpoint_completion_target = 0.9).
- Larger max_wal_size allows more time between checkpoints, reducing I/O overhead
-Disk Space:
-Ensure the disk has enough space for max_wal_size (PostgreSQL may temporarily exceed this under heavy load).
-For monitoring after the ultimate changes to check for efficiency of the chosen values:
-Monitor pg_stat_bgwriter and WAL directory size to adjust these values further if needed.
+### Considerations
 
-Example:
-The best practice size of min_wal_size and max_wal_size for wal_seg_size of 256MB is roughly:
-min_wal_size = 1GB  (4 segments)	# If the system is write-heavy, consider increasing it to 2GB (8 segments).
-max_wal_size = 8GB  (32 segments)  # For moderate workloads
-max_wal_size = 16GB (64 segments) # For heavy workloads
+- `min_wal_size` should typically be at least 2–4× the `wal_segment_size` to allow efficient WAL recycling.
+- `max_wal_size` must be large enough to absorb workload bursts (bulk loads, long-running transactions, checkpoints).
+  - Typical guideline: 8–64 × `wal_segment_size`.
+- For very high-throughput systems, even larger values may be required.
+- Checkpoint tuning:
+  - Example: `checkpoint_timeout = 15min`, `checkpoint_completion_target = 0.9`.
+  - Larger `max_wal_size` reduces checkpoint frequency (less I/O churn).
+- Disk space:
+  - Ensure sufficient space to accommodate up to `max_wal_size`; temporary WAL spikes may exceed it briefly.
 
+### Monitoring After Changes
 
-4. Stop standbys (checkpoint + stop)  
-# Standbys
+Monitor:
+- `pg_stat_bgwriter`
+- WAL directory size growth patterns
+
+### Example Sizing (For `wal_segment_size = 256MB`)
+| Workload Type        | Suggested `min_wal_size` | Suggested `max_wal_size` |
+|----------------------|---------------------------|---------------------------|
+| Moderate             | 1GB (4 segments)          | 8GB (32 segments)         |
+| Heavy                | 1GB–2GB (4–8 segments)    | 16GB (64 segments)        |
+
+---
+
+## Step 4. Stop Standby Nodes (Checkpoint First)
+
+Clean shutdown ensures consistent state.
+
+```shell
+# On each standby:
 sudo -iu postgres psql -c 'CHECKPOINT'
 sudo systemctl stop patroni.service
+```
 
-5. Wait until the shut down standby nodes become evicted from the cluster completely. You can verify this
-by running the following command to see that they are not listed in the nodes list.
+---
+
+## Step 5. Wait for Standbys to Evict from Cluster
+
+Verify that the stopped standbys are no longer listed:
+
+```shell
 sudo patronictl -c /etc/patroni/config.yml list
+```
 
-6. Then do a manual checkpoint on the primary node and stop its service for a clean shutdown.
-# primary:
+Proceed only after Patroni no longer shows those nodes as active/healthy.
+
+---
+
+## Step 6. Checkpoint and Stop the Primary
+
+Perform a manual checkpoint and then stop the primary cleanly.
+
+```shell
+# On primary:
 sudo -iu postgres psql -c 'CHECKPOINT'
 sudo systemctl stop patroni.service
+```
 
-7. Copy the remaining WAL segments in the primary's pg_wal directory to its archive manually. Their number depends on a variety of parameters.
-This is a sample command. Note that we exclude the archive_status directory for copy, and only WAL residuals and history files are intended.
-Later extra unneeded WAL remains will be removed by pg_resetwal automatically, and that is why we take a backup of them manually.
-# primary:
-sudo -iu postgres bash -c "cd /var/lib/postgresql/15/main/pg_wal && find . -maxdepth 1 -mindepth 1 -type f -name '[0-9A-F]*' -exec cp -- {} /archive/postgresql/pg-wal-archive/ \;"
+A clean shutdown is critical before running `pg_resetwal`.
 
+---
 
+## Step 7. Archive Remaining WAL Segment Files (Primary)
 
-8. On the primary node, execute the pg_resetwal command like below. --wal-segsize will be in Megabytes
+Manually copy any remaining WAL segment files for safekeeping before resetting. This is optional but recommended if you want maximum rollback capability.
+
+```shell
+# On primary (exclude archive_status; copy only WAL segment and history files)
+sudo -iu postgres bash -c "cd /var/lib/postgresql/15/main/pg_wal && \
+  find . -maxdepth 1 -mindepth 1 -type f -name '[0-9A-F]*' -exec cp -- {} /archive/postgresql/pg-wal-archive/ \;"
+```
+
+Later, `pg_resetwal` may remove unneeded segments; this manual copy preserves them temporarily.
+
+---
+
+## Step 8. Run `pg_resetwal` on the Primary
+
+Reset WAL with the desired new segment size (in megabytes). This alters internal control file metadata and resets WAL sequence.
+
+```shell
 sudo -iu postgres /usr/lib/postgresql/15/bin/pg_resetwal -D /var/lib/postgresql/15/main/ --wal-segsize=256
+```
 
-
-*. On the primary, if you run the reset wal command, a standard output like below appears
-root@feasypgdb01:~# sudo -iu postgres /usr/lib/postgresql/15/bin/pg_resetwal -D /var/lib/postgresql/15/main/ --wal-segsize=256
+### Expected Output (Primary)
+```
 Write-ahead log reset
+```
 
-If you try resetwal on a secondary node, you will get:
-root@feasypgdb03:~# sudo -iu postgres /usr/lib/postgresql/15/bin/pg_resetwal -D /var/lib/postgresql/15/main/ --wal-segsize=256
+### If Attempted on a Standby (Example Warning)
+```
 The database server was not shut down cleanly.
 Resetting the write-ahead log might cause data to be lost.
 If you want to proceed anyway, use -f to force reset.
+```
 
-In some cases for rescue plans we might be forced to bring the cluster up from a secondary node. It shall be safe
-if every transaction from the primary has been written to the secondary which is mostly the case especially
-synchronous replicas. In such case which you want to certainly do it, you must add a -f flag
+In rescue scenarios (e.g., promoting a standby due to primary failure), you may need `-f`, but that increases risk—only use it when consistent with recovery strategy and when you are certain of replication state.
 
+---
 
+## Step 9. Confirm `wal_segment_size` (Control File + Directory)
 
+Validate the new segment size in both the control file and filesystem layout.
 
-9. Confirm wal_segment_size (control + dir)  
+```shell
 sudo -iu postgres /usr/lib/postgresql/15/bin/pg_controldata /var/lib/postgresql/15/main/ | grep -e 'Bytes per WAL segment'
-ll -h /var/lib/postgresql/15/main/pg_wal/
+ls -lh /var/lib/postgresql/15/main/pg_wal/
+```
 
-10. Start primary using !!!pg_ctlcluster!!!
+The control file value should reflect the new size. Newly generated WAL files will follow the new segment size.
+
+---
+
+## Step 10. Start Primary Using `pg_ctlcluster`
+
+Start PostgreSQL directly—do **not** start Patroni yet, to verify base parameters first.
+
+```shell
 pg_ctlcluster 15 main start --skip-systemctl-redirect
+```
 
-11. Verify wal_level and wal_segment_size
+---
+
+## Step 11. Verify Runtime Settings
+
+Check that PostgreSQL reports the correct WAL-related settings:
+
+```shell
 sudo -iu postgres psql -c 'SHOW wal_segment_size;'
 sudo -iu postgres psql -c 'SHOW wal_level;'
+```
 
-*. Take a backup and throw it away (if needed, check wal_level, and if it was minimal, then take the backup. This might happen if have tried to start pg from patroni service by mistake)
-export PGHOST=vip && export PGPORT=5432 && export PGUSER=replicator && export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && export PGPASSWORD='P@$4VV0rd' && \
-time /usr/bin/pg_basebackup -h $PGHOST -p $PGPORT -U $PGUSER -w -c fast -D $BACKUP_DIR -Ft -Xs -P
+If `wal_level` unexpectedly appears as `minimal`, ensure you did not accidentally bypass Patroni configuration or start with an overridden `postgresql.conf`.
 
+---
 
-12. Stop primary using !!!pg_ctlcluster!!!
+## (Optional) Intermediate Safety Base Backup
+
+If needed, take another physical base backup before reintroducing Patroni:
+
+```shell
+export PGHOST=vip && \
+export PGPORT=5432 && \
+export PGUSER=replicator && \
+export BACKUP_DIR="/archive/postgresql/pg-local-full-backup/systemd/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S.%3N_ManualBak/)" && \
+export PGPASSWORD='P@$4VV0rd' && \
+time /usr/bin/pg_basebackup -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -w -c fast \
+  -D "$BACKUP_DIR" -Ft -Xs -P
+```
+
+This backup can be discarded once confidence is established.
+
+---
+
+## Step 12. Stop the Primary (Direct Instance)
+
+Shut down the manually started instance:
+
+```shell
 pg_ctlcluster 15 main stop --skip-systemctl-redirect
+```
 
-13. Start primary using patroni
+---
+
+## Step 13. Start Primary Under Patroni
+
+Delegate control back to Patroni now that validation is complete.
+
+```shell
 sudo systemctl start patroni.service
+```
 
-The primary must go to running state in the result of the following command:
+Check status:
+```shell
 sudo patronictl -c /etc/patroni/config.yml list
+```
 
+The primary should appear in `running` state.
 
-*. If everything is alright with the primary node, we do the rest of the steps in an ordinary way,
-but if due to an incredibly rare reason, for example, a misconfiguration or a human error the primary replica becomes
-corrupted, we still have the synchronous replica to treat it like the primary replica and start from pg_resetwal
-step above on it again and move forward, like how it was mentioned with -f flag before. 
-Or if the entire operation is to abort, we can promote a secondary to new primary
-and restart the cluster from its initial state before the maintenance operation. Only, if you want to abort, remember to
-revert the config parameters such as "min_wal_size" and "max_wal_size" to their original values
+---
 
+## Step 14. Rebuild Standbys (Serially)
 
+After confirming the primary is healthy, rebuild each standby. Remove its old data directory so Patroni triggers a fresh clone.
 
-14. Check functionality of the primary thoroughlly, and when !!!OK!!!, remove data dir on each standby and start patroni one by one (serial)
-This will internally trigger a backup/restore process from the primary to the subject secondary by Patroni.
+```shell
+# On each standby (one at a time):
 rm -rf ~postgres/15/main
 sudo systemctl start patroni.service
+```
 
-15. For the restore process to speed up on the secondaries, run a manual CHECKPOINT on the primary for every standby upon starting its
-patroni service (It will cause the underlying backup/restore to start immediately) 
-* optionally check backup/restore progress using the following on the primary:
-psql -h vip -Upostgres -d postgres -tA -c "CHECKPOINT; SELECT ROUND((backup_streamed::numeric/NULLIF(backup_total,0))*100,2) FROM pg_stat_progress_basebackup ORDER BY pid LIMIT 1;"
+Patroni will automatically perform the internal replication bootstrap.
 
+---
 
+## Step 15. Accelerate Replica Catch-Up (Optional)
 
-15. Get Patroni status on the standby node
+Trigger a manual checkpoint on the primary to make required WAL available promptly for each standby:
+
+```shell
+psql -h vip -U postgres -d postgres -tA -c "CHECKPOINT; SELECT ROUND((backup_streamed::numeric/NULLIF(backup_total,0))*100,2) FROM pg_stat_progress_basebackup ORDER BY pid LIMIT 1;"
+```
+
+The progress query (if any base backup is active) lets you monitor replication bootstrap.
+
+---
+
+## Step 15 (Second Occurrence). Check Patroni Service Status (Standby)
+
+Verify system-level service status on each standby:
+
+```shell
 sudo systemctl status patroni.service
+```
 
+---
 
-16. Check cluster status to see the standby is added to and is healthy and functional on it. First upon starting standby's patroni service, "Creating Replica" shall appear,
-then it must show "streaming"
+## Step 16. Verify Cluster-Wide Status
+
+Ensure each standby transitions through `Creating Replica` to `streaming`:
+
+```shell
 sudo patronictl -c /etc/patroni/config.yml list
+```
 
-17. Configuration checks (all nodes)
-Check whatever configurations you wanted to change: 
+---
+
+## Step 17. Configuration Validation (All Nodes)
+
+Re-check critical configuration values to confirm they match expectations:
+
+```shell
 clear && sudo -iu postgres /usr/lib/postgresql/15/bin/pg_controldata /var/lib/postgresql/15/main/ | grep -e 'Bytes per WAL segment'
 sudo -iu postgres psql --pset=footer=off -c 'SHOW wal_segment_size;'
 sudo -iu postgres psql --pset=footer=off -c 'SHOW synchronous_standby_names;'
 sudo -iu postgres psql --pset=footer=off -c 'SHOW min_wal_size;'
 sudo -iu postgres psql --pset=footer=off -c 'SHOW max_wal_size;'
 sudo -iu postgres psql --pset=footer=off -c 'SHOW wal_compression;'
+```
 
-18. Final recovery check for every node (false for primary and true for  standbys)
+---
+
+## Step 18. Recovery Mode Status (Primary vs Standbys)
+
+Check each node. The primary should return `false`; standbys should return `true`:
+
+```shell
 sudo -iu postgres psql --pset=footer=off -c 'SELECT pg_is_in_recovery()'
+```
 
-19. Nodes synchronous check on primary
-sudo -iu postgres psql --pset=footer=off -c "SELECT application_name, sync_state FROM pg_stat_replication where application_name like 'fmktpayamdb%';"
-#################################################################
+---
+
+## Step 19. Synchronous Replication State (Primary)
+
+Confirm synchronous replication status and which replicas are marked synchronous:
+
+```shell
+sudo -iu postgres psql --pset=footer=off -c \
+"SELECT application_name, sync_state FROM pg_stat_replication WHERE application_name LIKE 'fmktpayamdb%';"
+```
+
+---
+
+## Failure Contingency Notes
+
+- If the primary becomes corrupted due to a rare misconfiguration or operator error, a synchronous standby (if fully caught up) can be used to resume service.
+- In a worst-case scenario, promote a healthy standby and revert configuration changes (`min_wal_size`, `max_wal_size`) as needed.
+- **Do not** forget to reapply or revert any parameters changed temporarily for the maintenance window.
+
+---
+
+## Summary
+
+This controlled procedure:
+1. Quiesces workload.
+2. Takes a physical backup for rollback.
+3. Adjusts configuration limits.
+4. Cleanly shuts down all nodes in a controlled order.
+5. Resets WAL segment size safely on the primary.
+6. Validates runtime parameters.
+7. Rebuilds standbys serially under Patroni.
+8. Verifies synchronization and replication health.
+
+By following these steps carefully, you minimize operational risk while successfully resizing WAL segments across a Patroni-managed PostgreSQL replication cluster.
+
+---
+
+## References
+
+- `pg_resetwal` Manual: https://www.postgresql.org/docs/current/app-pgresetwal.html
+- Write-Ahead Logging Concepts: https://www.postgresql.org/docs/current/wal-intro.html
+- Physical Backup and Replication: https://www.postgresql.org/docs/current/continuous-archiving.html
+
+---
