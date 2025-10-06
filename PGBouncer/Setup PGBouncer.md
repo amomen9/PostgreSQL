@@ -124,9 +124,16 @@ Because `PGBouncer` is a proxy, it can offer some other minor functionalities. F
  use multiple aliases for the same database. An example for such directives can be below:
 
 ```ini
+; pgbouncer.ini
+[databases]
 ; The following 2 will actually point to the same database:
 payam_db = host=127.0.0.1 port=5432 user=payam password=<pass> client_encoding=UNICODE datestyle=ISO
 payam_dw = host=127.0.0.1 port=5432 user=dataplatform_ro dbname=payam_db password=<pass> application_name=readonly_client options='-c default_transaction_read_only=on' client_encoding=UNICODE datestyle=ISO
+
+.
+.
+.
+
 ```
  
 Another advantage of this, is that you can easily manage different services with less importance and less sensitive interruption
