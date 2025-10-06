@@ -1,6 +1,12 @@
 
 # Add pgbouncer connection pooler for PostgreSQL
 
+`PGBouncer` is a proxy between client connections and PostgreSQL service. It gets connection requests and
+ redirects them to it. The value that PGBouncer adds, is to pool connections and maintain the connection
+ with PostgreSQL so that PostgreSQL would not have to pay for creating connections time and again. The 
+ PostgreSQL service in question can be on the same host or somewhere else. If it is on the same host,
+ the port for PGBouncer shall obviously be different. It is conventionally chosen to be `6432`. 
+
 1. Install pgbouncer
 
 ```shell
@@ -106,3 +112,10 @@ You can do this by adding the following line to the pgbouncer configuration:
 [pgbouncer]
 unix_socket_dir = /var/run/postgresql
 ```
+
+
+---
+
+## Sample configuration of PGBouncer as a proxy
+
+e A sample usage of `PGBouncer` can be to use it as a 
