@@ -14,7 +14,7 @@
 
 ---
 
-### [•  Part IV: PGBouncer](../PGBouncer/Part%20IV%20PGBouncer.md)
+### [•  Part IV: PGBouncer](../PGBouncer/Setup%20PGBouncer.md)
 
 ---
 
