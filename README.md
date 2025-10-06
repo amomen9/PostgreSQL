@@ -16,12 +16,9 @@ This is the list of contained scripts:
 * active error log reader.sql
 * get objects added by an installed extension.sql
 * pg_class report.sql
-
-.
-
-.
-
-.
+*.
+*.
+*.
 
 These scripts are within the [useful scripts](useful%20scripts) directory. See the README file there for their details
 
