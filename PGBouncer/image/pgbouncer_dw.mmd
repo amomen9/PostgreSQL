@@ -1,0 +1,56 @@
+---
+config:
+  theme: mc
+  look: neo
+  layout: dagre
+---
+flowchart TD
+ subgraph subGraph0["Cluster Layer"]
+        VIP["Virtual IP<br>172.23.136.54"]
+  end
+ subgraph subGraph2["fmktpayamdb01"]
+        PGB1["PgBouncer<br>Port: 6432"]
+  end
+ subgraph subGraph3["fmktpayamdb02"]
+        PGB2["PgBouncer<br>Port: 6432"]
+  end
+ subgraph subGraph4["fmktpayamdb03"]
+        PGB3["PgBouncer<br>Port: 6432"]
+  end
+ subgraph subGraph5["Connection Pooling Layer"]
+        subGraph2
+        subGraph3
+ end 
+ subgraph subGraph6["Connection Pooling Layer"]
+        subGraph4
+ end
+ subgraph subGraph7["Primary Site"]
+        subGraph5
+        subGraph9
+
+  end
+ subgraph subGraph8["Disaster Site"]
+        subGraph6
+        subGraph10
+  end
+ subgraph subGraph9["Database & HA Layer + DCS e.g., etcd"]
+        DB1[("PostgreSQL<br>+Patroni<br>Port: 5432<br>Primary")]
+        DB2[("PostgreSQL<br>+Patroni<br>Port: 5432<br>Replica")]
+  end 
+  subgraph subGraph10["Database & HA Layer + DCS e.g., etcd"]
+        DB3[("PostgreSQL<br>+Patroni<br>Port: 5432<br>Replica")]
+  end
+    VIP --> PGB1 & PGB2 & PGB3
+    PGB1 --> DB1
+    PGB2 --> DB2
+    PGB3 -. To one arbitrary<br>secondary node<br>for DW connection .-> DB2 & DB3
+    PGB3 --> DB3
+    DB1 -. Streaming Replication .-> DB2 & DB3
+    ClientDW(["Data Warehouse Client"]) -. "Read-only queries for<br>payam_dw DB alias" .-> PGB3
+    ClientAPP(["Application"]) --> VIP
+    subGraph5@{ shape: rounded}
+    style VIP fill:#ADD8E6
+    style PGB3 fill:#FFE873
+    style DB1 fill:#90EE90
+    style ClientDW fill:#F95
+    style ClientAPP fill:#90EE90
