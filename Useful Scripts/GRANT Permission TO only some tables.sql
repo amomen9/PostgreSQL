@@ -4,10 +4,9 @@ BEGIN;
 REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM dataplatform_ro;
 
 GRANT SELECT ON
-    public.message_message,
-    public.api_application,
-    public.message_receivedmessage,
-    public.clerk_clerk
+	public.message_message_details_view,
+	public.message_receivedmessage_details_view,
+	public.message_email_details_view
 TO dataplatform_ro;
 
 -- Stop future implicit SELECT (run for each table owner that might create new tables)
