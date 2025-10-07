@@ -20,11 +20,24 @@ flowchart TD
  subgraph subGraph5["Connection Pooling Layer"]
         subGraph2
         subGraph3
+ end 
+ subgraph subGraph6["Connection Pooling Layer"]
         subGraph4
+ end
+ subgraph subGraph7["Primary Site"]
+        subGraph5
+        subGraph9
+
   end
- subgraph subGraph7["Database & HA Layer + DCS e.g., etcd"]
+ subgraph subGraph8["Disaster Site"]
+        subGraph6
+        subGraph10
+  end
+ subgraph subGraph9["Database & HA Layer + DCS e.g., etcd"]
         DB1[("PostgreSQL<br>+Patroni<br>Port: 5432<br>Primary")]
         DB2[("PostgreSQL<br>+Patroni<br>Port: 5432<br>Replica")]
+  end 
+  subgraph subGraph10["Database & HA Layer + DCS e.g., etcd"]
         DB3[("PostgreSQL<br>+Patroni<br>Port: 5432<br>Replica")]
   end
     VIP --> PGB1 & PGB2 & PGB3
