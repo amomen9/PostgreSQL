@@ -1,4 +1,4 @@
-Generally, if you can predict the workload and particulars of your Database service, it is a better practice to start it with the WAL segment size most suitable for your needs. On core PostgreSQL cluster installations that are initiated using `initdb`, something like below with the flag `--wal-segsize` can be used:
+Generally, if you can predict the workload and particulars of your Database service, it is a better practice to start it with the WAL segment size most suitable for your needs to avoid log chain breakage. On core PostgreSQL cluster installations that are initiated using `initdb`, something like below with the flag `--wal-segsize` can be used:
 
 ```shell
 initdb --wal-segsize=<size in MB>
