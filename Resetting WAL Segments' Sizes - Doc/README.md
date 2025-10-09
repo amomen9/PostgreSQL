@@ -1,3 +1,15 @@
+Generally, if you can predict the workload and particulars of your Database service, it is a better practice to start it with the WAL segment size most suitable for your needs. On core PostgreSQL cluster installations that are initiated using `initdb`, something like below with the flag `--wal-segsize` can be used:
+
+```shell
+initdb --wal-segsize=<size in MB>
+```
+For the Ubuntu-style cluster installations, this flag still has to be directly passed to `initdb` like below:
+
+```shell
+pg_createcluster 17 main -- --wal-segsize=<size in MB>
+```
+Now we discuss changing the WAL segment sizes in the middle of a running project:
+
 # Resetting WAL Segment Sizes Documentation
 
 This article assumes that only one operation which is the planned **reset wal** task shall be carried out, and not any other operation such as an OS or PostgreSQL (PG) update. In fact, these two groups of actions must be mutually exclusive. This also implies that an OS restart is **not** intended during this maintenance window.
