@@ -3612,8 +3612,8 @@
       },
       {
         "current": {
-          "text": "fmktpayamdb01",
-          "value": "fmktpayamdb01"
+          "text": "NodeName01",
+          "value": "NodeName01"
         },
         "datasource": {
           "type": "prometheus",
@@ -3636,10 +3636,10 @@
       {
         "current": {
           "text": [
-            "payam_db"
+            "service_db"
           ],
           "value": [
-            "payam_db"
+            "service_db"
           ]
         },
         "datasource": {
@@ -3743,8 +3743,8 @@
     ]
   },
   "timezone": "",
-  "title": "DBA PayamMKT PostgreSQL Exporter",
-  "uid": "dba_payammkt",
+  "title": "DBA PostgreSQL Exporter",
+  "uid": "dba_service",
   "version": 65,
   "weekStart": ""
 }
