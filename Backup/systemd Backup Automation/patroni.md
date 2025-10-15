@@ -1,4 +1,4 @@
-# simple systemd Backup Automation (A typical cluster like Patroni with a VIP)
+# systemd Backup Automation (A typical cluster like Patroni with a VIP)
 
 
 The systemd backup automation plan is a simple plan composed of a service template with two 
