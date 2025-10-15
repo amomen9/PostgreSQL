@@ -1,4 +1,4 @@
-# simple systemd Backup Automation (A typical cluster like Patroni with a VIP)
+# systemd Backup Automation (A typical cluster like Patroni with a VIP)
 
 
 The systemd backup automation plan is a simple plan composed of a service template with two 
@@ -176,7 +176,7 @@ exitscript() {
 
 # Multiple commands exit code check
 run_command() {
-    SINGLE_COMMAND_OUTPUT="$("$@" 2>&1)"  # Capture both stdout and stderr
+    SINGLE_COMMAND_OUTPUT="$("$@" 2>&1 | tr -d '\0')"  # Capture both stdout and stderr
     CUMULATIVE_COMMAND_OUTPUT="$CUMULATIVE_COMMAND_OUTPUT"$'\n'"$SINGLE_COMMAND_OUTPUT" # Run command, append stdout/stderr to SINGLE_COMMAND_OUTPUT
     local exit_code=$?             # Capture exit code (use `local` to avoid global var)
     
@@ -403,7 +403,10 @@ PG_FULL_BACKUP_ARCHIVE_DIR=/backup/TapeBackups/postgresql/pg-full-backup-tape/sy
 # Conventionally tape archive of the backups which has its own retention policies
 BACKUP_TIMEOUT_DURATION="infinity"  # Set your timeout duration (e.g., 1h, 30m, 3600s)
 BACKUP_TYPE=Full	# Full/Incremental
-BACKUP_COMPRESSION_LEVEL="1"
+BACKUP_COMPRESSION_LEVEL="1"  # Compression level for pg_basebackup (0-9)
+# 0 = no compression, 1 = fastest, 9 = best compression
+STAT_PERCENTAGE=10 # Percentage of the backup completion to log progress for
+
 # -----------------------------------------
 
 
@@ -488,17 +491,18 @@ export PGHOST=$(yq eval '.ip' "$VIP_MANAGER_YAML_PATH")
 
 export PGUSER=$(yq e '.postgresql.authentication.replication.username' "$PATRONI_YAML_PATH")
 # User with which we take the physical backup
-export PORT=5432
+export PGPORT=5432
 # Connection port to the server
 export PGPASSWORD=$(yq e '.postgresql.authentication.replication.password' "$PATRONI_YAML_PATH")
 # Env variable for pg password. The password is extracted from the password file which is automatically created and 
 # updated by Patroni
-
+export PGDATABASE=postgres
+# Env variable for initial catalog (Database)
 
 #----------------------------------------------------------------------------
 # Starting the body of the script:
 
-(! [ -z $PATRONI_YAML_PATH ] && ! [ -z $USER ] && ! [ -z $PORT ] && \
+(! [ -z $PATRONI_YAML_PATH ] && ! [ -z $USER ] && ! [ -z $PGPORT ] && \
 ! [ -z $PG_LOCAL_FULL_BACKUP_DIR ] && ! [ -z $PG_FULL_BACKUP_DIR ] && \
 ! [ -z $PG_FULL_BACKUP_ARCHIVE_DIR ]) || \
 { echo "At least one variable is not assigned a value to. Check your variables." >&2; exitscript 1; }
@@ -524,7 +528,7 @@ mkdir -p $PG_FULL_BACKUP_ARCHIVE_DIR
 
 
 #-------------------------- Backup process start: ------------------------------------
-#CMDOUT=$(time /usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z 1 -Xs 2>&1)
+#CMDOUT=$(time /usr/bin/pg_basebackup -w -c fast -D $BACKUP_DIR -Ft -z -Z 1 -Xs 2>&1)
 
 
 # Initialize duration with default value
@@ -541,9 +545,9 @@ set +e
 
 
 ###### ------------------ Backup command --------------------
-if psql -p $PORT -t -c "SELECT pg_is_in_backup()" | grep -q f; then
+if psql -t -c "SELECT COUNT(*) > 0 FROM pg_stat_progress_basebackup" | grep -q f; then
 	# Ajdust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
-    timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -p $PORT -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
+    timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
 	exit_code=$?
 else
     echo "Skipping backup and the rest of the operation as a backup is already in progress"
@@ -694,7 +698,6 @@ fi
 #---------------------------- Exit control ---------------------------------------
 exitscript 0
 #---------------------------------------------------------------------------------
-
 
 
 
