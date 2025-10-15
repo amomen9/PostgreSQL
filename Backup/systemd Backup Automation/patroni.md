@@ -176,7 +176,7 @@ exitscript() {
 
 # Multiple commands exit code check
 run_command() {
-    SINGLE_COMMAND_OUTPUT="$("$@" 2>&1)"  # Capture both stdout and stderr
+    SINGLE_COMMAND_OUTPUT="$("$@" 2>&1 | tr -d '\0')"  # Capture both stdout and stderr
     CUMULATIVE_COMMAND_OUTPUT="$CUMULATIVE_COMMAND_OUTPUT"$'\n'"$SINGLE_COMMAND_OUTPUT" # Run command, append stdout/stderr to SINGLE_COMMAND_OUTPUT
     local exit_code=$?             # Capture exit code (use `local` to avoid global var)
     
