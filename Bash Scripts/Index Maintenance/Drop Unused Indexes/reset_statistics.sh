@@ -1,11 +1,15 @@
-#set -x
+#!/usr/bin/env bash
+# Reset PostgreSQL cumulative statistics (cluster-wide) using pg_stat_reset().
+# Usage: reset_pg_stats.sh <database_name>
 
-dbname=$1
+set -e
 
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 <database_name>" >&2
+  exit 1
+fi
 
-psqlc="sudo -u postgres psql -d$dbname"
-#$psqlc
+DB_NAME="$1"
 
-$psqlc -c "SELECT pg_stat_reset();"
-
-
+# Invoke psql as postgres OS user and perform stats reset
+sudo -u postgres psql -d "$DB_NAME" -c "SELECT pg_stat_reset();"
