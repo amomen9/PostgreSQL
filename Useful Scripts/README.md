@@ -27,15 +27,15 @@
 
 ## 3. Script Catalog Table 📋
 
-| # | Script | Category | Summary |
-|---|--------|----------|---------|
-| 1 | `active error log reader.sql` | Monitoring | Reads active server log excerpts. |
-| 2 | `get objects added by an installed extension.sql` | Extension Audit | Lists objects created by a specific `extension`. |
-| 3 | `GRANT Permission TO only some tables.sql` | Security | Applies least‑privilege `GRANT` / `REVOKE` patterns. |
-| 4 | `list of user and system functions and procedures.sql` | Introspection | Inventories all routines with metadata. |
-| 5 | `pg_class (relations) report.sql` | Catalog | Reports relation (`pg_class`) structure and stats. |
-| 6 | `User-Role Permissions.sql` | Access Matrix | Unified privilege snapshot (high level). |
-| 7 | `User-Role Permissions_advanced.sql` | Access Deep Dive | Detailed ACL expansion across object types. |
+| # | Script | Document | Category | Summary |
+|---|--------|----------|----------|---------|
+| 1 | [`active error log reader.sql`](active%20error%20log%20reader.sql) | [Document](active%20error%20log%20reader.md) | Monitoring | Reads active server log excerpts. |
+| 2 | [`get objects added by an installed extension.sql`](get%20objects%20added%20by%20an%20installed%20extension.sql) | [Document](get%20objects%20added%20by%20an%20installed%20extension.md) | Extension Audit | Lists objects created by a specific `extension`. |
+| 3 | [`GRANT Permission TO only some tables.sql`](GRANT%20Permission%20TO%20only%20some%20tables.sql) | [Document](GRANT%20Permission%20TO%20only%20some%20tables.md) | Security | Applies least‑privilege `GRANT` / `REVOKE` patterns. |
+| 4 | [`list of user and system functions and procedures.sql`](list%20of%20user%20and%20system%20functions%20and%20procedures.sql) | [Document](list%20of%20user%20and%20system%20functions%20and%20procedures.md) | Introspection | Inventories all routines with metadata. |
+| 5 | [`pg_class (relations) report.sql`](pg_class%20(relations)%20report.sql) | [Document](pg_class%20(relations)%20report.md) | Catalog | Reports relation (`pg_class`) structure and stats. |
+| 6 | [`User-Role Permissions.sql`](User-Role%20Permissions.sql) | [Document](User-Role%20Permissions.md) | Access Matrix | Unified privilege snapshot (high level). |
+| 7 | [`User-Role Permissions_advanced.sql`](User-Role%20Permissions_advanced.sql) | [Document](User-Role%20Permissions_advanced.md) | Access Deep Dive | Detailed ACL expansion across object types. |
 
 ---
 
