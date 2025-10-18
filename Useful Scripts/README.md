@@ -13,15 +13,15 @@
 
 ## 2. Quick Access Index 🔗
 
-### 2.1 Script Links
+### 2.1 Script Documentation Links
 
-1. [`active error log reader.sql`](active%20error%20log%20reader.sql)  
-2. [`get objects added by an installed extension.sql`](get%20objects%20added%20by%20an%20installed%20extension.sql)  
-3. [`GRANT Permission TO only some tables.sql`](GRANT%20Permission%20TO%20only%20some%20tables.sql)  
-4. [`list of user and system functions and procedures.sql`](list%20of%20user%20and%20system%20functions%20and%20procedures.sql)  
-5. [`pg_class (relations) report.sql`](pg_class%20(relations)%20report.sql)  
-6. [`User-Role Permissions.sql`](User-Role%20Permissions.sql)  
-7. [`User-Role Permissions_advanced.sql`](User-Role%20Permissions_advanced.sql)  
+1. [`active error log reader`](active%20error%20log%20reader.md)  
+2. [`get objects added by an installed extension`](get%20objects%20added%20by%20an%20installed%20extension.md)  
+3. [`GRANT Permission TO only some tables`](GRANT%20Permission%20TO%20only%20some%20tables.md)  
+4. [`list of user and system functions and procedures`](list%20of%20user%20and%20system%20functions%20and%20procedures.md)  
+5. [`pg_class (relations) report`](pg_class%20(relations)%20report.md)  
+6. [`User-Role Permissions`](User-Role%20Permissions.md)  
+7. [`User-Role Permissions_advanced`](User-Role%20Permissions_advanced.md)  
 
 ---
 
