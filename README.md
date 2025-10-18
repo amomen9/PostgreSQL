@@ -20,7 +20,8 @@ This is the list of contained scripts:
 * .
 * .
 
-These scripts are within the [useful scripts](useful%20scripts) directory. See the README file there for their details
+These scripts are within the [Useful Scripts](Useful%20Scripts) directory. See the README file there for their details
+
 
 
 
