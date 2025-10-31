@@ -1,3 +1,13 @@
+-- =============================================
+-- Author:              "a-momen"
+-- Contact & Report:    "amomen@gmail.com"
+-- Update date:         "2025-10-07"
+-- Description:         "GRANT Permission TO only some tables"
+-- License:             "Please refer to the license file"
+-- =============================================
+
+
+
 -- Simple static version (pgAdmin friendly)
 BEGIN;
 
