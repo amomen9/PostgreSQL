@@ -1,3 +1,13 @@
+-- =============================================
+-- Author:              "a-momen"
+-- Contact & Report:    "amomen@gmail.com"
+-- Update date:         "2025-02-28"
+-- Description:         "get objects added by an installed extension"
+-- License:             "Please refer to the license file"
+-- =============================================
+
+
+
 --create extension if not exists pageinspect;
 --select * from pg_extension;
 
