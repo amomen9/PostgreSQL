@@ -1,3 +1,13 @@
+-- =============================================
+-- Author:              "a-momen"
+-- Contact & Report:    "amomen@gmail.com"
+-- Update date:         "2025-03-01"
+-- Description:         "pg_class (relations) report"
+-- License:             "Please refer to the license file"
+-- =============================================
+
+
+
 SELECT 
     c.oid,
     c.relname,
