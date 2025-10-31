@@ -1,3 +1,13 @@
+-- =============================================
+-- Author:              "a-momen"
+-- Contact & Report:    "amomen@gmail.com"
+-- Update date:         "2025-09-15"
+-- Description:         "User-Role Permissions"
+-- License:             "Please refer to the license file"
+-- =============================================
+
+
+
 --   AI Contributed Query
 
 /* Extended privileges inventory:
