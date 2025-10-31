@@ -1,3 +1,13 @@
+-- =============================================
+-- Author:              "a-momen"
+-- Contact & Report:    "amomen@gmail.com"
+-- Update date:         "2025-02-28"
+-- Description:         "active error log reader"
+-- License:             "Please refer to the license file"
+-- =============================================
+
+
+
 -- Use the following when needed:
 --SELECT pg_backend_pid();
 --SELECT pg_rotate_logfile();
