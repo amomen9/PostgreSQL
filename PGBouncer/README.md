@@ -6,5 +6,5 @@
 
 --- 
 
-### [•  Part II: Sample planned configuration of PGBouncer as a proxy ](./Sample%20PGBouncer%20proxy.md)
+### [•  Part II: Sample planned configuration of PGBouncer as a proxy ](./Sample%20PGBouncer%20Proxy.md)
 
