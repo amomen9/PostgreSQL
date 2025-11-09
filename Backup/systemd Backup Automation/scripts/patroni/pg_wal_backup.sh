@@ -204,8 +204,11 @@ for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null
   WAL_FILES_FOUND=$((WAL_FILES_FOUND + 1))
   WAL_NAME=$(basename "$WAL_FILE")
   log -n "Archiving $WAL_NAME ..."
-  #echo -n "Archiving $WAL_NAME ..."
-  run_command timeout 2m mv "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR"
+  # echo -n "Archiving $WAL_NAME ..."
+  # On Linux, use "mv" to preserve file stats
+  # run_command timeout 2m mv "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR"
+  # On samba shares use "rsync -a --no-times" to dismiss preservation of file stats and avoid errors
+  run_command timeout 2m rsync -a --no-times "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR" && rm -f "$WAL_FILE"
   MOVE_EXIT_CODE=$?
   
   if [ $MOVE_EXIT_CODE -eq 124 ]; then
