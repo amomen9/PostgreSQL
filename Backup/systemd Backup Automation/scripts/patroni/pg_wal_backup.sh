@@ -41,63 +41,56 @@ get_TIMESTAMP() {
 log() {
     local add_newline=false
     local interpret_escapes=false
-	local message_content="${*:-}"
+    local message_content=""   # will be set after flag parsing
     local message=""
     local timestamp
     timestamp=$(get_TIMESTAMP 2>/dev/null || date '+%Y-%m-%d %H:%M:%S')
 
-	if [ $# -eq 0 ]; then 
-		message_content=""; 
-	else
-		# Parse valid flags only if the argument is composed solely of 'n' and/or 'c'
-		while [[ -n "$1" ]]; do
-			if [[ "$1" == "--" ]]; then
-				shift
-				break
-			elif [[ "$1" =~ ^-[nc]+$ ]]; then
-				[[ "$1" =~ n ]] && add_newline=true
-				[[ "$1" =~ c ]] && interpret_escapes=true
-				shift
-			else
-				# Not a flag pattern, so break and treat the rest as message content.
-				break
-			fi
-		done;
-	fi
+    if [ $# -eq 0 ]; then
+        message_content=""
+    else
+        # Parse -n / -c flags (any order/combination), stop at first non-flag or '--'
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                --) shift; break ;;
+                -[nc]*)
+                    [[ "$1" == *n* ]] && add_newline=true
+                    [[ "$1" == *c* ]] && interpret_escapes=true
+                    shift
+                    ;;
+                *) break ;;
+            esac
+        done
+        # Remaining args form the message (flags removed)
+        if [[ $# -gt 0 ]]; then
+            message_content="$*"
+        fi
+    fi
 
     # Build the log message.
     if [[ -z "$message_content" ]]; then
-        # No message content provided: log only the timestamp on a new line.
         message=""
-        add_newline=true  # Force newline even if -n was given.
+        add_newline=true
     else
         message="$timestamp - ${INSTANCE:-UNKNOWN}: $message_content"
     fi
 
-    # Output the message using the appropriate escaping and newlines.
+    # Output
     if $interpret_escapes; then
         if $add_newline; then
             echo -e "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2
-                return 2
-            }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         else
             echo -ne "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2
-                return 2
-            }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         fi
     else
         if $add_newline; then
             echo "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2
-                return 2
-            }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         else
             printf "%s" "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2
-                return 2
-            }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         fi
     fi
 }
