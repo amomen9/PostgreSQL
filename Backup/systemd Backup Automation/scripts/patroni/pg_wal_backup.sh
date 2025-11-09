@@ -220,10 +220,13 @@ for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null
   WAL_NAME=$(basename "$WAL_FILE")
   log "Archiving $WAL_NAME ..."
   # echo "Archiving $WAL_NAME ..."
-  # On Linux, use "mv" to preserve file stats
+  # On Linux filesystems, use "mv" to preserve file stats
   # run_command timeout 2m mv "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR"
-  # On samba shares use "cp --no-preserve=mode,ownership,timestamps" to dismiss preservation of file stats and avoid errors
+  
+  # On samba shares use "cp --no-preserve=mode,ownership,timestamps" to dismiss preservation of file stats and avoid errors,
+  # but file stats will be lost!!!
   run_command timeout 2m rsync --no-perms --no-owner --no-group --no-times "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR" && rm -f "$WAL_FILE"
+  
   MOVE_EXIT_CODE=$?
   
   if [ $MOVE_EXIT_CODE -eq 124 ]; then
@@ -232,15 +235,14 @@ for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null
      #echo " : Failed! Reason: $SINGLE_COMMAND_OUTPUT"; 
   elif [ $MOVE_EXIT_CODE -ne 0 ]; then
      log -n --no-ts " : Failed! Reason: $SINGLE_COMMAND_OUTPUT";
-  else
-     log -n --no-ts " Passed.";
   fi
   
   
   TARGET_WAL_PATH="$PG_WAL_BACKUP_ARCHIVE_DIR""$WAL_NAME"
   if [ $MOVE_EXIT_CODE -eq 0 ]; then
-    CUMULATIVE_WAL_MOVED_SIZE_BYTES=$((CUMULATIVE_WAL_MOVED_SIZE_BYTES + $(du -bs "$TARGET_WAL_PATH" 2>/dev/null | awk '{print $1}')))
-	WAL_FILES_MOVED=$((WAL_FILES_MOVED + 1))
+     log -n --no-ts " Passed.";
+     CUMULATIVE_WAL_MOVED_SIZE_BYTES=$((CUMULATIVE_WAL_MOVED_SIZE_BYTES + $(du -bs "$TARGET_WAL_PATH" 2>/dev/null | awk '{print $1}')))
+	 WAL_FILES_MOVED=$((WAL_FILES_MOVED + 1))
   fi  
 done
 
@@ -315,10 +317,10 @@ fi
 #-------------------------- Purge process start: ---------------------------------
 
 
-run_command timeout 1h find $PG_WAL_BACKUP_ARCHIVE_DIR -type f -mtime +10 -print0 | xargs -0 -r rm -rf
+timeout 30m find $PG_WAL_BACKUP_ARCHIVE_ROOT_DIR -type f -mtime +10 -print0 | xargs -0 -r rm -rf
 
 if [ $? -ne 0 ]; then 
-	log -n "Purge failed. Output returned by the purge command: ${SINGLE_COMMAND_OUTPUT}"
+	log -n "Purge failed." #"Output returned by the purge command: ${SINGLE_COMMAND_OUTPUT}"
 	echo "Purge failed."
 	exitscript 5	
 fi
