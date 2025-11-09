@@ -38,18 +38,18 @@ get_TIMESTAMP() {
 }
 
 #---------- log function -----------
+
 log() {
     local add_newline=false
     local interpret_escapes=false
-    local message_content=""   # will be set after flag parsing
+    local include_timestamp=true          # --no-ts turns this off
+    local message_content=""
     local message=""
     local timestamp
     timestamp=$(get_TIMESTAMP 2>/dev/null || date '+%Y-%m-%d %H:%M:%S')
 
-    if [ $# -eq 0 ]; then
-        message_content=""
-    else
-        # Parse -n / -c flags (any order/combination), stop at first non-flag or '--'
+    if [ $# -gt 0 ]; then
+        # Parse flags until first non-flag or explicit '--'
         while [[ $# -gt 0 ]]; do
             case "$1" in
                 --) shift; break ;;
@@ -58,24 +58,33 @@ log() {
                     [[ "$1" == *c* ]] && interpret_escapes=true
                     shift
                     ;;
+                --no-ts)
+                    include_timestamp=false
+                    shift
+                    ;;
                 *) break ;;
             esac
         done
-        # Remaining args form the message (flags removed)
+        # Remaining args (if any) = message
         if [[ $# -gt 0 ]]; then
             message_content="$*"
         fi
+    else
+        add_newline=true
     fi
 
-    # Build the log message.
+    # Build message
     if [[ -z "$message_content" ]]; then
         message=""
-        add_newline=true
     else
-        message="$timestamp - ${INSTANCE:-UNKNOWN}: $message_content"
+        if $include_timestamp; then
+            message="$timestamp - ${INSTANCE:-UNKNOWN}: $message_content"
+        else
+            message="${INSTANCE:-UNKNOWN}: $message_content"
+        fi
     fi
 
-    # Output
+    # Output (with or without escapes / newline)
     if $interpret_escapes; then
         if $add_newline; then
             echo -e "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
@@ -94,6 +103,11 @@ log() {
         fi
     fi
 }
+# Usage examples:
+# log "Normal message"
+# log -n "Message with newline flag"
+# log --no-ts "Message without timestamp"
+# log --no-ts -n -c "Escapes allowed, newline, no timestamp: Line1\nLine2"
 
 
 #---------------------------------
@@ -103,7 +117,8 @@ exitscript() {
 	#echo "Distinct list of errors: \n---------"
 	#echo "$CUMULATIVE_COMMAND_OUTPUT\n---------"
 	echo "---"$'\n'"Total Duration: $duration (DD:HH:MM:SS)"
-	log -c "---\nDuration: $duration (DD:HH:MM:SS)"
+	log -n "---"
+	log -n "Duration: $duration (DD:HH:MM:SS)"
 
 
 	if [ $# -eq 0 ]; then
@@ -170,8 +185,8 @@ fi
 
 
 
-log "------------------------------------- Started ------------------------------------------"
-log "Starting WAL archiving ..."
+log -n "------------------------------------- Started ------------------------------------------"
+log -n "Starting WAL archiving ..."
 echo
 echo
 echo "------------------------------------- Started ------------------------------------------"
@@ -203,20 +218,22 @@ MOVE_EXIT_CODE=1
 for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null); do
   WAL_FILES_FOUND=$((WAL_FILES_FOUND + 1))
   WAL_NAME=$(basename "$WAL_FILE")
-  log -n "Archiving $WAL_NAME ..."
-  # echo -n "Archiving $WAL_NAME ..."
+  log "Archiving $WAL_NAME ..."
+  # echo "Archiving $WAL_NAME ..."
   # On Linux, use "mv" to preserve file stats
   # run_command timeout 2m mv "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR"
-  # On samba shares use "rsync -a --no-times" to dismiss preservation of file stats and avoid errors
-  run_command timeout 2m rsync -a --no-times "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR" && rm -f "$WAL_FILE"
+  # On samba shares use "cp --no-preserve=mode,ownership,timestamps" to dismiss preservation of file stats and avoid errors
+  run_command timeout 2m rsync --no-perms --no-owner --no-group --no-times "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR" && rm -f "$WAL_FILE"
   MOVE_EXIT_CODE=$?
   
   if [ $MOVE_EXIT_CODE -eq 124 ]; then
   
-     log " : Failed! Reason: The user defined timeout exceeded (Exit code 124)";
+     log -n " : Failed! Reason: The user defined timeout exceeded (Exit code 124)";
      #echo " : Failed! Reason: $SINGLE_COMMAND_OUTPUT"; 
+  elif [ $MOVE_EXIT_CODE -ne 0 ]; then
+     log -n " : Failed! Reason: $SINGLE_COMMAND_OUTPUT";
   else
-     log " : Failed! Reason: $SINGLE_COMMAND_OUTPUT";
+     log -n " Passed.";
   fi
   
   
@@ -228,7 +245,7 @@ for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null
 done
 
 if [ "$WAL_FILES_FOUND" -eq 0 ]; then
-  log "Warning! No WAL files were found to backup. Skipping purge."
+  log -n "Warning! No WAL files were found to backup. Skipping purge."
   echo "Warning! No WAL files were found to backup. Skipping purge."
   exitscript 0
 fi
@@ -272,13 +289,13 @@ fi
 
 # Format the output based on success/failure
 if [ $exit_code -eq 0 ]; then
-	log "Moving all WAL files completed successfully. # of WAL files: $WAL_FILES_FOUND, Cumulative Size: $HUMAN_READABLE_SIZE"
+	log -n "Moving all WAL files completed successfully. # of WAL files: $WAL_FILES_FOUND, Cumulative Size: $HUMAN_READABLE_SIZE"
 	echo "Moving all WAL files completed successfully. # of WAL files: $WAL_FILES_FOUND, Cumulative Size: $HUMAN_READABLE_SIZE"
 	#echo "move WAL files to remote storage finished successfully."
 else
 	log -n "Critical error! "	
 	echo -n "Critical error! "	
-	log "Moving #$NO_FAILED_ATTEMPTS/$WAL_FILES_FOUND WAL files failed. Purging skipped."
+	log -n "Moving #$NO_FAILED_ATTEMPTS/$WAL_FILES_FOUND WAL files failed. Purging skipped."
 	echo "Moving #$NO_FAILED_ATTEMPTS/$WAL_FILES_FOUND WAL files failed. Purging skipped."
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
@@ -301,13 +318,13 @@ fi
 run_command timeout 1h find $PG_WAL_BACKUP_ARCHIVE_DIR -type f -mtime +10 -print0 | xargs -0 -r rm -rf
 
 if [ $? -ne 0 ]; then 
-	log "Purge failed. Output returned by the purge command: ${SINGLE_COMMAND_OUTPUT}"
+	log -n "Purge failed. Output returned by the purge command: ${SINGLE_COMMAND_OUTPUT}"
 	echo "Purge failed."
 	exitscript 5	
 fi
 
 echo "WAL archiving & purging completed successfully."
-log "WAL archiving & purging completed successfully."
+log -n "WAL archiving & purging completed successfully."
 
 #-------------------------- Purge process end ------------------------------------
 
