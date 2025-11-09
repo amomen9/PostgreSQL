@@ -80,7 +80,7 @@ log() {
         if $include_timestamp; then
             message="$timestamp - ${INSTANCE:-UNKNOWN}: $message_content"
         else
-            message="${INSTANCE:-UNKNOWN}: $message_content"
+            message="$message_content"
         fi
     fi
 
@@ -215,7 +215,7 @@ CUMULATIVE_WAL_MOVED_SIZE_BYTES=0
 TARGET_WAL_PATH=""
 MOVE_EXIT_CODE=1
 
-for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null); do
+for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null | sort ); do
   WAL_FILES_FOUND=$((WAL_FILES_FOUND + 1))
   WAL_NAME=$(basename "$WAL_FILE")
   log "Archiving $WAL_NAME ..."
@@ -228,12 +228,12 @@ for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null
   
   if [ $MOVE_EXIT_CODE -eq 124 ]; then
   
-     log -n " : Failed! Reason: The user defined timeout exceeded (Exit code 124)";
+     log -n --no-ts " : Failed! Reason: The user defined timeout exceeded (Exit code 124)";
      #echo " : Failed! Reason: $SINGLE_COMMAND_OUTPUT"; 
   elif [ $MOVE_EXIT_CODE -ne 0 ]; then
-     log -n " : Failed! Reason: $SINGLE_COMMAND_OUTPUT";
+     log -n --no-ts " : Failed! Reason: $SINGLE_COMMAND_OUTPUT";
   else
-     log -n " Passed.";
+     log -n --no-ts " Passed.";
   fi
   
   
