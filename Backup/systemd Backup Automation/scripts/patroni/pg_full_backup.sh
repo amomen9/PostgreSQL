@@ -30,7 +30,7 @@ get_TIMESTAMP() {
 }
 
 # Log function
-log -n() {
+log() {
     local add_newline=false
     local interpret_escapes=false
     local include_timestamp=true          # --no-ts turns this off
@@ -79,26 +79,26 @@ log -n() {
     if $interpret_escapes; then
         if $add_newline; then
             echo -e "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         else
             echo -ne "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         fi
     else
         if $add_newline; then
             echo "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         else
             printf "%s" "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         fi
     fi
 }
 # Usage examples:
-# log -n "Normal message"
-# log -n -n "Message with newline flag"
-# log -n --no-ts "Message without timestamp"
-# log -n --no-ts -n -c "Escapes allowed, newline, no timestamp: Line1\nLine2"
+# log "Normal message"
+# log -n "Message with newline flag"
+# log --no-ts "Message without timestamp"
+# log --no-ts -n -c "Escapes allowed, newline, no timestamp: Line1\nLine2"
 
 
 
