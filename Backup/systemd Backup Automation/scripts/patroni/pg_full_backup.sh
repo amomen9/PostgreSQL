@@ -104,14 +104,33 @@ log() {
 
 # Exit script
 exitscript() {
-	if [ $1 -gt 0 ]; then log -n "Warning! Some operation(s) failed but the main backup succeeded. Take necessary actions manually"; fi
-	log -n "-------------------------------------- Ended -------------------------------------------"
-	log -n
-	log -n
-	log -n
-	echo -e "---\nFor more details go to the log -n file."
+	#echo "Distinct list of errors: \n---------"
+	#echo "$CUMULATIVE_COMMAND_OUTPUT\n---------"
+	echo "---"$'\n'"Total Duration: $duration (DD:HH:MM:SS)"
+	log -n "---"
+	log -n "Duration: $duration (DD:HH:MM:SS)"
+
+
+	if [ $# -eq 0 ]; then
+		log "-------------------------------------- Ended -------------------------------------------";
+		echo "-------------------------------------- Ended -------------------------------------------"
+		log;
+		log;
+		log;	
+		exit 0;
+	fi
+	
+	if [ $1 -gt 0 ]; then log "Warning! Some operation(s) failed but the main backup succeeded. Take necessary actions manually"; fi
+	
+	log "-------------------------------------- Ended -------------------------------------------"
+	log
+	log
+	log
+	echo -e "---\nFor more details go to the log file."
 	echo "-------------------------------------- Ended -------------------------------------------"
+	
 	exit $1
+	
 }
 
 
