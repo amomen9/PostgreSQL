@@ -5,7 +5,7 @@ set -euo pipefail
 
 # ----------- Custom Variables -------------
 # All directory path values must end with /
-LOG_FILE_DIRECTORY="/var/log/postgresql/"
+LOG_FILE_DIRECTORY="/var/log -n/postgresql/"
 PATRONI_YAML_PATH=/etc/patroni/config.yml
 VIP_MANAGER_YAML_PATH=/etc/default/vip-manager.yml
 PG_LOCAL_FULL_BACKUP_DIR=/archive/postgresql/pg-local-full-backup/systemd/
@@ -18,7 +18,7 @@ BACKUP_TIMEOUT_DURATION="infinity"  # Set your timeout duration (e.g., 1h, 30m, 
 BACKUP_TYPE=Full	# Full/Incremental
 BACKUP_COMPRESSION_LEVEL="1"  # Compression level for pg_basebackup (0-9)
 # 0 = no compression, 1 = fastest, 9 = best compression
-STAT_PERCENTAGE=10 # Percentage of the backup completion to log progress for
+STAT_PERCENTAGE=10 # Percentage of the backup completion to log -n progress for
 
 # -----------------------------------------
 
@@ -30,7 +30,7 @@ get_TIMESTAMP() {
 }
 
 # Log function
-log() {
+log -n() {
     local add_newline=false
     local interpret_escapes=false
     local include_timestamp=true          # --no-ts turns this off
@@ -79,37 +79,37 @@ log() {
     if $interpret_escapes; then
         if $add_newline; then
             echo -e "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         else
             echo -ne "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         fi
     else
         if $add_newline; then
             echo "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         else
             printf "%s" "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
-                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+                echo "log -n: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
         fi
     fi
 }
 # Usage examples:
-# log "Normal message"
-# log -n "Message with newline flag"
-# log --no-ts "Message without timestamp"
-# log --no-ts -n -c "Escapes allowed, newline, no timestamp: Line1\nLine2"
+# log -n "Normal message"
+# log -n -n "Message with newline flag"
+# log -n --no-ts "Message without timestamp"
+# log -n --no-ts -n -c "Escapes allowed, newline, no timestamp: Line1\nLine2"
 
 
 
 # Exit script
 exitscript() {
-	if [ $1 -gt 0 ]; then log "Warning! Some operation(s) failed but the main backup succeeded. Take necessary actions manually"; fi
-	log "-------------------------------------- Ended -------------------------------------------"
-	log
-	log
-	log
-	echo -e "---\nFor more details go to the log file."
+	if [ $1 -gt 0 ]; then log -n "Warning! Some operation(s) failed but the main backup succeeded. Take necessary actions manually"; fi
+	log -n "-------------------------------------- Ended -------------------------------------------"
+	log -n
+	log -n
+	log -n
+	echo -e "---\nFor more details go to the log -n file."
 	echo "-------------------------------------- Ended -------------------------------------------"
 	exit $1
 }
@@ -130,7 +130,7 @@ run_command() {
 
 # ---------- Calculated Variables ---------
 INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
-LOG_FILE="${LOG_FILE_DIRECTORY}""pg_full_backup_${INSTANCE}.log"
+LOG_FILE="${LOG_FILE_DIRECTORY}""pg_full_backup_${INSTANCE}.log -n"
 START_TIMESTAMP=$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
 OVERALL_RESULT=0
 CMDOUT=""
@@ -159,8 +159,8 @@ fi
 
 
 
-log "------------------------------------- Started ------------------------------------------"
-log "Starting Full Backup ..."
+log -n "------------------------------------- Started ------------------------------------------"
+log -n "Starting Full Backup ..."
 echo
 echo
 echo "------------------------------------- Started ------------------------------------------"
@@ -227,7 +227,7 @@ if psql -t -c "SELECT COUNT(*) > 0 FROM pg_stat_progress_basebackup" | grep -q f
 	exit_code=$?
 else
     echo "Skipping backup and the rest of the operation as a backup is already in progress"
-    log "Skipping backup and the rest of the operation as a backup is already in progress"
+    log -n "Skipping backup and the rest of the operation as a backup is already in progress"
 	exitscript -1
 fi
 ####################################################################################
@@ -274,23 +274,23 @@ if [ $exit_code -eq 0 ]; then
     echo "$BACKUP_TYPE backup completed successfully."
     echo "Duration: $duration (DD:HH:MM:SS)"
     echo "Backup size: $BACKUP_SIZE"
-    log "$BACKUP_TYPE backup completed successfully."
-    log "Duration: $duration (DD:HH:MM:SS)"
-    log "Backup size: $BACKUP_SIZE"
+    log -n "$BACKUP_TYPE backup completed successfully."
+    log -n "Duration: $duration (DD:HH:MM:SS)"
+    log -n "Backup size: $BACKUP_SIZE"
 else
 	echo -n "Critical error! "
 	echo "$BACKUP_TYPE backup was interrupted and failed for the following reason:"
-	log "Critical error! "
-	log "$BACKUP_TYPE backup was interrupted and failed for the following reason:"
+	log -n "Critical error! "
+	log -n "$BACKUP_TYPE backup was interrupted and failed for the following reason:"
 	if [ $exit_code -eq 124 ]; then
 		CMDOUT="The user defined timeout exceeded (Exit code 124)";
 	fi
 	echo "$CMDOUT"
 	echo "Duration: $duration (DD:HH:MM:SS)"
 	echo "Leftovers size on disk: $BACKUP_SIZE"
-	log "$CMDOUT"
-	log "Duration: $duration (DD:HH:MM:SS)"
-	log "Leftovers size on disk: $BACKUP_SIZE"
+	log -n "$CMDOUT"
+	log -n "Duration: $duration (DD:HH:MM:SS)"
+	log -n "Leftovers size on disk: $BACKUP_SIZE"
 	exitscript -1
 fi
 
@@ -304,10 +304,10 @@ CMDOUT=$(timeout 24h cp -rf "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
 # Copy from the local to the remote backup
 
 if [ $? -eq 0 ]; then
-	log "Copy $BACKUP_TYPE backup to remote storage finished successfully."
+	log -n "Copy $BACKUP_TYPE backup to remote storage finished successfully."
 	echo "Copy $BACKUP_TYPE backup to remote storage finished successfully."
 else
-	log "Copy $BACKUP_TYPE backup to remote storage failed. MSG: $CMDOUT"
+	log -n "Copy $BACKUP_TYPE backup to remote storage failed. MSG: $CMDOUT"
 	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
@@ -321,10 +321,10 @@ $PG_FULL_BACKUP_ARCHIVE_DIR) 2>&1
 # set +x
 
 if [ $? -eq 0 ]; then
-	log "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
+	log -n "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
 	echo "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
 else
-	log "Copy $BACKUP_TYPE backup to remote --tape-- storage failed. MSG: $CMDOUT"
+	log -n "Copy $BACKUP_TYPE backup to remote --tape-- storage failed. MSG: $CMDOUT"
 	echo "Copy $BACKUP_TYPE backup to remote --tape-- storage failed. MSG: $CMDOUT"	
 	exitscript 1
 fi	
@@ -341,28 +341,28 @@ OVERALL_RESULT=0
 
 # For local directory (fast filesystem)
 echo "Purging ..."
-log "Purging ..."
+log -n "Purging ..."
 run_command timeout 30m find "$PG_LOCAL_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +2 -exec rm -rf {} +
 #echo "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
-log "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
+log -n "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
 
 # For CIFS shares (slower network filesystems)
 run_command timeout 1h find "$PG_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
 # echo "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
-log "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
+log -n "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
 
 run_command timeout 1h find "$PG_FULL_BACKUP_ARCHIVE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
 #echo "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
-log "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
+log -n "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
 # purging operation
 
 if [ $OVERALL_RESULT -eq 0 ]; then
-	log "Purging $BACKUP_TYPE backups completed successfully."
+	log -n "Purging $BACKUP_TYPE backups completed successfully."
 	echo "Purging $BACKUP_TYPE backups completed successfully."
 	exitscript 0
 	#echo "Copy full backup to remote tape storage finished successfully."
 else
-	log "Some purge $BACKUP_TYPE backup steps failed. MSG: $CMDOUT"
+	log -n "Some purge $BACKUP_TYPE backup steps failed. MSG: $CMDOUT"
 	echo "Some purge $BACKUP_TYPE backup steps failed. MSG: $CMDOUT"
 	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
