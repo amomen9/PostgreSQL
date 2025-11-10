@@ -73,10 +73,16 @@ CMDOUT=""
 BACKUP_DIR=$PG_LOCAL_FULL_BACKUP_DIR$(get_TIMESTAMP)"/"
 # This backup's local specific directory with the current timestamp.
 # -----------------------------------------
+# ---------- Create directories -----------
+mkdir -p 	$BACKUP_DIR \
+			$LOG_FILE_DIRECTORY \
+			$PG_LOCAL_FULL_BACKUP_DIR \
+			$PG_FULL_BACKUP_DIR \
+			$PG_FULL_BACKUP_ARCHIVE_DIR \
+			"$(dirname "$LOG_FILE")"
+#------------------------------------------
 
 
-# Ensure directories exist
-mkdir -p "$(dirname "$LOG_FILE")"
 
 
 MAX_SIZE=$((100*1024*1024))  # 100MB in bytes
