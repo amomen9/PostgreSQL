@@ -31,12 +31,76 @@ get_TIMESTAMP() {
 
 # Log function
 log() {
-  if [ $# -eq 0 ]; then
-	echo >> "$LOG_FILE"; 
-  else  
-	echo "$(get_TIMESTAMP) - $INSTANCE: $@" >> "$LOG_FILE";
-  fi
+    local add_newline=false
+    local interpret_escapes=false
+    local include_timestamp=true          # --no-ts turns this off
+    local message_content=""
+    local message=""
+    local timestamp
+    timestamp=$(get_TIMESTAMP 2>/dev/null || date '+%Y-%m-%d %H:%M:%S')
+
+    if [ $# -gt 0 ]; then
+        # Parse flags until first non-flag or explicit '--'
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                --) shift; break ;;
+                -[nc]*)
+                    [[ "$1" == *n* ]] && add_newline=true
+                    [[ "$1" == *c* ]] && interpret_escapes=true
+                    shift
+                    ;;
+                --no-ts)
+                    include_timestamp=false
+                    shift
+                    ;;
+                *) break ;;
+            esac
+        done
+        # Remaining args (if any) = message
+        if [[ $# -gt 0 ]]; then
+            message_content="$*"
+        fi
+    else
+        add_newline=true
+    fi
+
+    # Build message
+    if [[ -z "$message_content" ]]; then
+        message=""
+    else
+        if $include_timestamp; then
+            message="$timestamp - ${INSTANCE:-UNKNOWN}: $message_content"
+        else
+            message="$message_content"
+        fi
+    fi
+
+    # Output (with or without escapes / newline)
+    if $interpret_escapes; then
+        if $add_newline; then
+            echo -e "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+        else
+            echo -ne "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+        fi
+    else
+        if $add_newline; then
+            echo "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+        else
+            printf "%s" "$message" >> "${LOG_FILE:-/dev/null}" 2>/dev/null || {
+                echo "log: Failed to write to '${LOG_FILE:-/dev/null}'" >&2; return 2; }
+        fi
+    fi
 }
+# Usage examples:
+# log "Normal message"
+# log -n "Message with newline flag"
+# log --no-ts "Message without timestamp"
+# log --no-ts -n -c "Escapes allowed, newline, no timestamp: Line1\nLine2"
+
+
 
 # Exit script
 exitscript() {
@@ -137,13 +201,6 @@ fi
 # Full backup will be only taken from the primary replica in a replication cluster according to the policies. A secondary replica however can
 # also be manually specified.
 
-mkdir -p $PG_LOCAL_FULL_BACKUP_DIR
-
-
-mkdir -p $PG_FULL_BACKUP_DIR
-
-
-mkdir -p $PG_FULL_BACKUP_ARCHIVE_DIR
 
 
 #-------------------------- Backup process start: ------------------------------------
@@ -163,7 +220,7 @@ set +e
 
 
 
-###### ------------------ Backup command --------------------
+################################ Backup command ####################################
 if psql -t -c "SELECT COUNT(*) > 0 FROM pg_stat_progress_basebackup" | grep -q f; then
 	# Ajdust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
     timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
@@ -173,7 +230,7 @@ else
     log "Skipping backup and the rest of the operation as a backup is already in progress"
 	exitscript -1
 fi
-###### ------------------------------------------------------
+####################################################################################
 
 
 
