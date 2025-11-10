@@ -5,7 +5,7 @@ set -euo pipefail
 
 # ----------- Custom Variables -------------
 # All directory path values must end with /
-LOG_FILE_DIRECTORY="/var/log -n/postgresql/"
+LOG_FILE_DIRECTORY="/var/log/postgresql/"
 PATRONI_YAML_PATH=/etc/patroni/config.yml
 VIP_MANAGER_YAML_PATH=/etc/default/vip-manager.yml
 PG_LOCAL_FULL_BACKUP_DIR=/archive/postgresql/pg-local-full-backup/systemd/
@@ -18,7 +18,7 @@ BACKUP_TIMEOUT_DURATION="infinity"  # Set your timeout duration (e.g., 1h, 30m, 
 BACKUP_TYPE=Full	# Full/Incremental
 BACKUP_COMPRESSION_LEVEL="1"  # Compression level for pg_basebackup (0-9)
 # 0 = no compression, 1 = fastest, 9 = best compression
-STAT_PERCENTAGE=10 # Percentage of the backup completion to log -n progress for
+STAT_PERCENTAGE=10 # Percentage of the backup completion to log progress for
 
 # -----------------------------------------
 
@@ -149,7 +149,7 @@ run_command() {
 
 # ---------- Calculated Variables ---------
 INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
-LOG_FILE="${LOG_FILE_DIRECTORY}""pg_full_backup_${INSTANCE}.log -n"
+LOG_FILE="${LOG_FILE_DIRECTORY}""pg_full_backup_${INSTANCE}.log"
 START_TIMESTAMP=$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S)
 OVERALL_RESULT=0
 CMDOUT=""
@@ -241,7 +241,7 @@ set +e
 
 ################################ Backup command ####################################
 if psql -t -c "SELECT COUNT(*) > 0 FROM pg_stat_progress_basebackup" | grep -q f; then
-	# Ajdust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
+	# Adjust the timeout value. Assuming the backup is being taken on a local storage, it can be set to infinity
     timeout $BACKUP_TIMEOUT_DURATION /usr/bin/pg_basebackup -w -c fast -D $BACKUP_DIR -Ft -z -Z $BACKUP_COMPRESSION_LEVEL -Xs > "$temp_out" 2>&1
 	exit_code=$?
 else
