@@ -23,20 +23,6 @@ OUTPUT_MODE=""		# STDOUT STDERR LOG ALL
 # ------------------------------------------
 
 
-# ---------- Calculated Variables ---------
-INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
-PG_WAL_BACKUP_ARCHIVE_DIR="$PG_WAL_BACKUP_ARCHIVE_ROOT_DIR""$(hostname)/"
-PG_WAL_TapeBACKUP_ARCHIVE_DIR="$PG_WAL_TapeBACKUP_ARCHIVE_ROOT_DIR""$(hostname)/"
-LOG_FILE="/var/log/postgresql/pg_wal_backup_${INSTANCE}.log"
-NO_FAILED_ATTEMPTS=0
-SINGLE_COMMAND_OUTPUT=""
-CURRENT_LOG_SIZE=$(stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
-# -----------------------------------------
-# ---------- Create directories -----------
-mkdir -p $PG_WAL_BACKUP_ARCHIVE_ROOT_DIR $PG_WAL_ARCHIVE_DIR $PG_WAL_BACKUP_ARCHIVE_DIR
-#------------------------------------------
-
-
 # Functions ---------------------------------------------------------------
 # TIMESTAMP function
 get_TIMESTAMP() {
@@ -173,13 +159,23 @@ bytes_to_human() {
 }
 
 # -------------------------------------------------------------------------
-
-
-
-
-# Ensure directories exist
-mkdir -p "$(dirname "$LOG_FILE")"
-mkdir -p $PG_WAL_BACKUP_ARCHIVE_DIR
+# ---------- Calculated Variables ---------
+INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
+PG_WAL_BACKUP_ARCHIVE_DIR="$PG_WAL_BACKUP_ARCHIVE_ROOT_DIR""$(hostname)/"
+PG_WAL_TapeBACKUP_ARCHIVE_DIR="$PG_WAL_TapeBACKUP_ARCHIVE_ROOT_DIR""$(hostname)/"
+LOG_FILE="/var/log/postgresql/pg_wal_backup_${INSTANCE}.log"
+NO_FAILED_ATTEMPTS=0
+SINGLE_COMMAND_OUTPUT=""
+CURRENT_LOG_SIZE=$(stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
+# -----------------------------------------
+# ---------- Create directories -----------
+mkdir -p 	$PG_WAL_BACKUP_ARCHIVE_ROOT_DIR \
+			$PG_WAL_ARCHIVE_DIR \
+			$PG_WAL_BACKUP_ARCHIVE_DIR \
+			$PG_WAL_TapeBACKUP_ARCHIVE_ROOT_DIR \
+			$PG_WAL_TapeBACKUP_ARCHIVE_DIR \
+			"$(dirname "$LOG_FILE")"
+#------------------------------------------
 
 
 
