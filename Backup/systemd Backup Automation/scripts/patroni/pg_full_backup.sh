@@ -299,8 +299,9 @@ fi
 
 
 #-------------------------- Copy to remote location ------------------------------	
-#cp -rf "$(find ${BACKUP_DIR} -maxdepth 1 -type d -exec ls -t {} + | head -1)" $PG_FULL_BACKUP_DIR	
-CMDOUT=$(timeout 24h cp -rf "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
+#CMDOUT=$(timeout 24h cp -rf "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
+CMDOUT=$(timeout 24h rsync -r --no-perms --no-owner --no-group --no-times "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
+
 # Copy from the local to the remote backup
 
 if [ $? -eq 0 ]; then
