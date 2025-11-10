@@ -8,7 +8,9 @@ set -euo pipefail
 # ----------- Custom Variables -------------
 # All directory path values must end with /
 PG_WAL_BACKUP_ARCHIVE_ROOT_DIR=/backup/Backups/postgresql/pg-wal-backup/systemd/
-# Directory where backups are to be moved
+# Directory where backups are to be copied to
+PG_WAL_TapeBACKUP_ARCHIVE_ROOT_DIR=/backup/TapeBackups/postgresql/pg-wal-backup/systemd/
+# Tape Directory where backups are to be copied to
 
 PG_WAL_ARCHIVE_DIR=/archive/postgresql/pg-wal-archive/
 # The directory where PostgreSQL DB Cluster copies the generated WAL files for archiving.
@@ -24,11 +26,15 @@ OUTPUT_MODE=""		# STDOUT STDERR LOG ALL
 # ---------- Calculated Variables ---------
 INSTANCE=$(yq eval '.scope' /etc/patroni/config.yml)
 PG_WAL_BACKUP_ARCHIVE_DIR="$PG_WAL_BACKUP_ARCHIVE_ROOT_DIR""$(hostname)/"
+PG_WAL_TapeBACKUP_ARCHIVE_DIR="$PG_WAL_TapeBACKUP_ARCHIVE_ROOT_DIR""$(hostname)/"
 LOG_FILE="/var/log/postgresql/pg_wal_backup_${INSTANCE}.log"
 NO_FAILED_ATTEMPTS=0
 SINGLE_COMMAND_OUTPUT=""
 CURRENT_LOG_SIZE=$(stat -c %s "$LOG_FILE" 2>/dev/null || echo 0)
 # -----------------------------------------
+# ---------- Create directories -----------
+mkdir -p $PG_WAL_BACKUP_ARCHIVE_ROOT_DIR $PG_WAL_ARCHIVE_DIR $PG_WAL_BACKUP_ARCHIVE_DIR
+#------------------------------------------
 
 
 # Functions ---------------------------------------------------------------
@@ -226,8 +232,11 @@ for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null
   # On samba shares use "cp --no-preserve=mode,ownership,timestamps" to dismiss preservation of file stats and avoid errors,
   # but file stats will be lost!!!
   run_command timeout 2m rsync --no-perms --no-owner --no-group --no-times "$WAL_FILE" "$PG_WAL_BACKUP_ARCHIVE_DIR" && rm -f "$WAL_FILE"
-  
+  # Success of the former command is enough
   MOVE_EXIT_CODE=$?
+  
+  # Tape backup
+  run_command timeout 2m rsync --no-perms --no-owner --no-group --no-times "$PG_WAL_BACKUP_ARCHIVE_DIR""/$WAL_NAME" "$PG_WAL_TapeBACKUP_ARCHIVE_DIR"
   
   if [ $MOVE_EXIT_CODE -eq 124 ]; then
   
