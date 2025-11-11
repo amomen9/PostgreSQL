@@ -102,10 +102,56 @@ log() {
 
 
 
+
+
+calculate_elapsed_formatted() {
+
+end_time=$(date +%s.%N) || end_time=$(date +%s) # Fallback to seconds precision
+# Calculate duration safely
+elapsed=$(echo "$end_time - $start_time" 2>/dev/null | bc) || elapsed=0
+
+# Calculate time components with error handling
+if [[ $(echo "$elapsed > 0" | bc) -eq 1 ]]; then
+    full_seconds=$(printf "%.0f" "$elapsed" 2>/dev/null) || full_seconds=0
+    milliseconds=$(printf "%.0f" "$(echo "($elapsed - $full_seconds)*1000" | bc)" 2>/dev/null) || milliseconds=0
+    milliseconds=$(( milliseconds < 0 ? 0 : milliseconds ))
+    # Ensure milliseconds is 3 digits
+    milliseconds=$(printf "%03d" "$milliseconds" 2>/dev/null) || milliseconds=000
+
+    seconds=$((full_seconds % 60))
+    minutes=$(( (full_seconds / 60) % 60 ))
+    hours=$(( (full_seconds / 3600) % 24 ))
+    days=$(( full_seconds / 86400 ))
+
+    duration=$(printf "%02d:%02d:%02d:%02d.%03d" "$days" "$hours" "$minutes" "$seconds" "$milliseconds" 2>/dev/null) || duration="00:00:00:00.000"
+fi
+
+}
+
+
+# Multiple commands exit code check
+run_command() {
+    # Accept full command string (including pipelines) as one argument
+    local cmd="$*"
+    local tmpfile status
+    tmpfile=$(mktemp) || { echo "mktemp failed" >&2; OVERALL_RESULT=1; return 1; }
+
+    # Use bash -c with pipefail so pipeline failures are caught
+    bash -o pipefail -c "$cmd" >"$tmpfile" 2>&1
+    status=$?
+
+    (( status != 0 )) && OVERALL_RESULT=1
+    CMDOUT=$(sed 's/\x0//g' "$tmpfile")
+    rm -f "$tmpfile"
+    return $status
+}
+
+
 # Exit script
 exitscript() {
 	#echo "Distinct list of errors: \n---------"
 	#echo "$CUMULATIVE_COMMAND_OUTPUT\n---------"
+	calculate_elapsed_formatted
 	echo "---"$'\n'"Total Duration: $duration (DD:HH:MM:SS)"
 	log -n "---"
 	log -n "Duration: $duration (DD:HH:MM:SS)"
@@ -133,23 +179,6 @@ exitscript() {
 	
 }
 
-
-# Multiple commands exit code check
-run_command() {
-    # Accept full command string (including pipelines) as one argument
-    local cmd="$*"
-    local tmpfile status
-    tmpfile=$(mktemp) || { echo "mktemp failed" >&2; OVERALL_RESULT=1; return 1; }
-
-    # Use bash -c with pipefail so pipeline failures are caught
-    bash -o pipefail -c "$cmd" >"$tmpfile" 2>&1
-    status=$?
-
-    (( status != 0 )) && OVERALL_RESULT=1
-    CMDOUT=$(sed 's/\x0//g' "$tmpfile")
-    rm -f "$tmpfile"
-    return $status
-}
 # -----------------------------------------
 
 
@@ -261,7 +290,6 @@ fi
 
 
 set -e
-end_time=$(date +%s.%N) || end_time=$(date +%s) # Fallback to seconds precision
 
 if [ -e "$BACKUP_DIR" ] || [ -L "$BACKUP_DIR" ]; then
     BACKUP_SIZE=$(du -sh "$BACKUP_DIR" 2>/dev/null | awk '{print $1}')
@@ -274,30 +302,11 @@ fi
 CMDOUT=$(cat "$temp_out" 2>/dev/null || echo "Failed to read command output")
 rm -f "$temp_out"
 
-# Calculate duration safely
-elapsed=$(echo "$end_time - $start_time" 2>/dev/null | bc) || elapsed=0
-
-# Calculate time components with error handling
-if [[ $(echo "$elapsed > 0" | bc) -eq 1 ]]; then
-    full_seconds=$(printf "%.0f" "$elapsed" 2>/dev/null) || full_seconds=0
-    milliseconds=$(printf "%.0f" "$(echo "($elapsed - $full_seconds)*1000" | bc)" 2>/dev/null) || milliseconds=0
-    milliseconds=$(( milliseconds < 0 ? 0 : milliseconds ))
-    # Ensure milliseconds is 3 digits
-    milliseconds=$(printf "%03d" "$milliseconds" 2>/dev/null) || milliseconds=000
-
-    seconds=$((full_seconds % 60))
-    minutes=$(( (full_seconds / 60) % 60 ))
-    hours=$(( (full_seconds / 3600) % 24 ))
-    days=$(( full_seconds / 86400 ))
-
-    duration=$(printf "%02d:%02d:%02d:%02d.%03d" "$days" "$hours" "$minutes" "$seconds" "$milliseconds" 2>/dev/null) || duration="00:00:00:00.000"
-fi
-
-
+calculate_elapsed_formatted
 # Format the output based on success/failure
 if [ $exit_code -eq 0 ]; then
     echo "$BACKUP_TYPE backup completed successfully."
-    echo "Duration: $duration (DD:HH:MM:SS)"
+    echo " Duration: $duration (DD:HH:MM:SS)"
     echo "Backup size: $BACKUP_SIZE"
     log -n "$BACKUP_TYPE backup completed successfully."
     log -n "Duration: $duration (DD:HH:MM:SS)"
@@ -335,6 +344,7 @@ if [ $? -eq 0 ]; then
 	echo "Copy $BACKUP_TYPE backup to remote storage finished successfully."
 else
 	log -n "Copy $BACKUP_TYPE backup to remote storage failed. MSG: $CMDOUT"
+	echo "Copy $BACKUP_TYPE backup to remote storage failed. MSG: $CMDOUT"
 	exitscript 1
 	# On the condition of the backup failure, the purging operation will be skipped and the
 	# service will also be marked as failed for this run.
@@ -349,7 +359,7 @@ $PG_FULL_BACKUP_ARCHIVE_DIR) 2>&1
 
 if [ $? -eq 0 ]; then
 	log -n "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
-	echo "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
+	#echo "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
 else
 	log -n "Copy $BACKUP_TYPE backup to remote --tape-- storage failed. MSG: $CMDOUT"
 	echo "Copy $BACKUP_TYPE backup to remote --tape-- storage failed. MSG: $CMDOUT"	
