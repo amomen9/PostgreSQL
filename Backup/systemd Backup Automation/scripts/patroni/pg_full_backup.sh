@@ -367,20 +367,22 @@ CMDOUT=""
 OVERALL_RESULT=0
 
 # For local directory (fast filesystem)
-echo "Purging ..."
-log -n "Purging ..."
+echo "Purging: "
+log -n "Purging: "
 run_command timeout 30m find "$PG_LOCAL_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +2 -exec rm -rf {} +
-#echo "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
-log -n "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
+#echo "Purge local $BACKUP_TYPE backups ... ${CMDOUT}"
+log -n "Purge local $BACKUP_TYPE backups ... ${CMDOUT}"
 
+CMDOUT=""
 # For CIFS shares (slower network filesystems)
 run_command timeout 1h find "$PG_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
-# echo "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
-log -n "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
+# echo "Purge remote $BACKUP_TYPE backups ... ${CMDOUT}"
+log -n "Purge remote $BACKUP_TYPE backups ... ${CMDOUT}"
 
+CMDOUT=""
 run_command timeout 1h find "$PG_FULL_BACKUP_ARCHIVE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
-#echo "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
-log -n "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
+#echo "Purge remote --tape-- $BACKUP_TYPE backups ... ${CMDOUT}"
+log -n "Purge remote --tape-- $BACKUP_TYPE backups ... ${CMDOUT}"
 # purging operation
 
 if [ $OVERALL_RESULT -eq 0 ]; then
