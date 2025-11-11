@@ -136,14 +136,20 @@ exitscript() {
 
 # Multiple commands exit code check
 run_command() {
-    local tmpfile=$(mktemp)
-    if ! "$@" > "$tmpfile" 2>&1; then
-        OVERALL_RESULT=1
-    fi
-    CMDOUT=$(<"$tmpfile" tr -d '\0')  # Read and clean output: remove null bytes
-    rm -f "$tmpfile"
-}
+    # Accept full command string (including pipelines) as one argument
+    local cmd="$*"
+    local tmpfile status
+    tmpfile=$(mktemp) || { echo "mktemp failed" >&2; OVERALL_RESULT=1; return 1; }
 
+    # Use bash -c with pipefail so pipeline failures are caught
+    bash -o pipefail -c "$cmd" >"$tmpfile" 2>&1
+    status=$?
+
+    (( status != 0 )) && OVERALL_RESULT=1
+    CMDOUT=$(sed 's/\x0//g' "$tmpfile")
+    rm -f "$tmpfile"
+    return $status
+}
 # -----------------------------------------
 
 
@@ -319,7 +325,8 @@ fi
 
 #-------------------------- Copy to remote location ------------------------------	
 #CMDOUT=$(timeout 24h cp -rf "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
-CMDOUT=$(timeout 24h rsync -r --no-perms --no-owner --no-group --no-times "${BACKUP_DIR}" $PG_FULL_BACKUP_DIR 2>&1)
+SRC="${BACKUP_DIR%/}"
+CMDOUT=$(timeout 24h rsync -r --no-perms --no-owner --no-group --no-times "${SRC}" $PG_FULL_BACKUP_DIR 2>&1)
 
 # Copy from the local to the remote backup
 
@@ -362,16 +369,16 @@ OVERALL_RESULT=0
 # For local directory (fast filesystem)
 echo "Purging ..."
 log -n "Purging ..."
-timeout 30m find "$PG_LOCAL_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +2 -exec rm -rf {} +
+run_command timeout 30m find "$PG_LOCAL_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +2 -exec rm -rf {} +
 #echo "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
 log -n "Purge local $BACKUP_TYPE backups: ${CMDOUT}"
 
 # For CIFS shares (slower network filesystems)
-timeout 1h find "$PG_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
+run_command timeout 1h find "$PG_FULL_BACKUP_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
 # echo "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
 log -n "Purge remote $BACKUP_TYPE backups: ${CMDOUT}"
 
-timeout 1h find "$PG_FULL_BACKUP_ARCHIVE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
+run_command timeout 1h find "$PG_FULL_BACKUP_ARCHIVE_DIR" -maxdepth 1 -type d -mtime +15 -print0 | xargs -0 -r rm -rf
 #echo "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
 log -n "Purge remote --tape-- $BACKUP_TYPE backups: ${CMDOUT}"
 # purging operation
