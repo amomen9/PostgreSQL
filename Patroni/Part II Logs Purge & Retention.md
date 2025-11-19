@@ -17,7 +17,7 @@ The PostgreSQL Log files Retention Policiy is set through Log settings in Postgr
  the following directives:
 
 ```conf
-log_filename = 'postgresql-15-main-%A.log'
+log_filename = 'postgresql-18-main-%A.log'
 log_rotation_age = 1d
 log_rotation_size = 1024MB
 log_truncate_on_rotation = on
