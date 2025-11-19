@@ -25,7 +25,7 @@ export PGCONF=/etc/postgresql/$PGVERSION/main
 
 **Note:**
 
-1. PostgreSQL major version specified here is 17. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, and most likely later versions, as well.
+1. PostgreSQL major version specified here is 18. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, 17, and most likely later versions, as well.
 2. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we set up the watchdog on all the backend (pg) nodes themselves.
 3. The scripts and configuration files are both embedded in this doc and included in the git repository.
 4. Most of the steps in this document are sequential, and the later steps depend on the earlier steps. So, follow the steps in order.
@@ -62,7 +62,7 @@ For the database clusters with a large amount of data, I used to move the data d
 - `/var/lib/postgresql/`
 - `/var/log/`
 - `/var/lib/etcd`
-- `/var/lib/postgresql/17/main/pg_tblspc/`
+- `/var/lib/postgresql/18/main/pg_tblspc/`
 
 Here is a sample figure of the disk layout:
 
@@ -124,27 +124,27 @@ Install PostgreSQL and mask its service
 
 ```shell
 sudo apt update
-sudo apt install -y postgresql-17 postgresql-17-repack postgresql-17-plpgsql-check \
-postgresql-17-cron postgresql-17-pgaudit postgresql-17-show-plans postgresql-doc-17 \
-postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepare iputils-arping
+sudo apt install -y postgresql-18 postgresql-18-repack postgresql-18-plpgsql-check \
+postgresql-18-cron postgresql-18-pgaudit postgresql-18-show-plans postgresql-doc-18 \
+postgresql-contrib-18 postgresql-18-plprofiler plprofiler postgresql-18-preprepare iputils-arping
 
 
-# postgresql-17: This is the main PostgreSQL 17 database server package, which includes the core database server software.
-# postgresql-17-repack: A utility to reorganize tables and indexes without significant downtime, helping to optimize the database by reducing bloat.
-# postgresql-17-plpgsql-check: A package that provides a plpgsql_lint function to check the syntax and structure of PL/pgSQL functions.
-# postgresql-17-cron: Adds cron-like scheduling capabilities to PostgreSQL, allowing jobs to be scheduled and run inside the database.
-# postgresql-17-pgaudit: An extension that provides detailed session and object audit logging via the standard logging facility provided by PostgreSQL.
-# postgresql-17-show-plans: Captures execution plans of SQL statements automatically for monitoring purposes.
-# postgresql-doc-17: Documentation for PostgreSQL 17, including guides and manuals.
-# postgresql-contrib-17: A collection of additional extensions and tools contributed by the PostgreSQL community, enhancing the database's functionality.
-# postgresql-17-plprofiler: Provides profiling tools to analyze the performance of PL/pgSQL functions within PostgreSQL.
-# plprofiler: A related tool to postgresql-17-plprofiler, used to visualize and analyze PL/pgSQL profiling data.
-# postgresql-17-preprepare: An extension for pre-parsing SQL statements to improve performance by reducing the parsing overhead.
+# postgresql-18: This is the main PostgreSQL 18 database server package, which includes the core database server software.
+# postgresql-18-repack: A utility to reorganize tables and indexes without significant downtime, helping to optimize the database by reducing bloat.
+# postgresql-18-plpgsql-check: A package that provides a plpgsql_lint function to check the syntax and structure of PL/pgSQL functions.
+# postgresql-18-cron: Adds cron-like scheduling capabilities to PostgreSQL, allowing jobs to be scheduled and run inside the database.
+# postgresql-18-pgaudit: An extension that provides detailed session and object audit logging via the standard logging facility provided by PostgreSQL.
+# postgresql-18-show-plans: Captures execution plans of SQL statements automatically for monitoring purposes.
+# postgresql-doc-18: Documentation for PostgreSQL 18, including guides and manuals.
+# postgresql-contrib-18: A collection of additional extensions and tools contributed by the PostgreSQL community, enhancing the database's functionality.
+# postgresql-18-plprofiler: Provides profiling tools to analyze the performance of PL/pgSQL functions within PostgreSQL.
+# plprofiler: A related tool to postgresql-18-plprofiler, used to visualize and analyze PL/pgSQL profiling data.
+# postgresql-18-preprepare: An extension for pre-parsing SQL statements to improve performance by reducing the parsing overhead.
 # iputils-arping: A network utility for sending ARP requests to discover or ping a host on the same network.
 
 
-sudo systemctl disable --now postgresql.service postgresql@17-main.service
-sudo systemctl mask postgresql.service postgresql@17-main.service
+sudo systemctl disable --now postgresql.service postgresql@18-main.service
+sudo systemctl mask postgresql.service postgresql@18-main.service
 ```
 
 Now, as said in the section `0`, we change the ownership of `/var/lib/postgresql`
@@ -211,7 +211,7 @@ Set the node name (`name:` directive) the same as its hostname that can be resol
 
 ```YAML
 ##### SHOULD BE CHANGED ##### PG Cluster Name&Version
-scope: "17-main"
+scope: "18-main"
 ##### SHOULD BE CHANGED ##### Cluster Name
 namespace: "maunleashdb"
 ##### SHOULD BE CHANGED ##### Node Name
@@ -356,11 +356,11 @@ postgresql:
   # pgpass: /var/lib/postgresql/@VERSION@-@CLUSTER@.pgpass
   # Modified directory layout:
 ##### SHOULD BE CHANGED ##### This Node data_dir 
-  data_dir: /var/lib/postgresql/17/main/
+  data_dir: /var/lib/postgresql/18/main/
 ##### SHOULD BE CHANGED ##### This Node bin_dir 
-  bin_dir: /usr/lib/postgresql/17/bin
+  bin_dir: /usr/lib/postgresql/18/bin
 ##### SHOULD BE CHANGED ##### This Node config_dir 
-  config_dir: /etc/postgresql/17/main
+  config_dir: /etc/postgresql/18/main
   pgpass: /var/lib/postgresql/.pgpass
   
   authentication:
@@ -391,7 +391,7 @@ postgresql:
   parameters:
     # data dir location
 ##### SHOULD BE CHANGED ##### This Node data_directory 
-    data_directory: '/var/lib/postgresql/17/main/'
+    data_directory: '/var/lib/postgresql/18/main/'
     # network params:
     listen_addresses: "*"
     unix_socket_directories: '/var/run/postgresql/'
@@ -399,7 +399,7 @@ postgresql:
     logging_collector: 'on'
     log_directory: '/var/log/postgresql/'
 ##### SHOULD BE CHANGED ##### This Node Log File Name 
-    log_filename: 'postgresql-17-main-%A.log'
+    log_filename: 'postgresql-18-main-%A.log'
     #log_file_mode: 0600
     log_rotation_age: 1d
     #log_rotation_size: 1024MB
@@ -612,7 +612,7 @@ Make sure the postgresql database cluster is functional on the first node, we di
  create necessary users and their permissions. Then check the changes:
 
 ```shell
-pg_ctlcluster 17 main --skip-systemctl-redirect start
+pg_ctlcluster 18 main --skip-systemctl-redirect start
 # Enter psql PostgreSQL CLI client
 sudo -iu postgres psql
 ```
@@ -626,8 +626,7 @@ select * from pg_user;
 #### *. Stop running pg executable (First Node Only)
 
 ```shell
-pg_ctlcluster 17 main --skip-systemctl-redirect stop -m immediate
-
+pg_ctlcluster 18 main --skip-systemctl-redirect stop -m immediate
 ```
 
 
@@ -636,7 +635,7 @@ pg_ctlcluster 17 main --skip-systemctl-redirect stop -m immediate
 Delete data directory contents on the 2nd and 3rd nodes only
 
 ```shell
-sudo rm -rf /var/lib/postgresql/17/main/*
+sudo rm -rf /var/lib/postgresql/18/main/*
 ```
 
 #### 13. Enable and start etcd service (Every Node)
@@ -657,7 +656,7 @@ We want to start patroni for the first time. Thus, we want to make sure that pos
 We do these by executing the following commands:
 
 ```shell
-pg_ctlcluster 17 main --skip-systemctl-redirect stop -m immediate
+pg_ctlcluster 18 main --skip-systemctl-redirect stop -m immediate
 sudo systemctl enable --now patroni
 ```
 
@@ -753,7 +752,7 @@ sudo vi /etc/default/vip-manager.yml
 
 * This is typically different between different clusters (Ex: your new cluster and the sample configuration here)
 ```YAML
-trigger-key: "/maunleashdb/17-main/leader"
+trigger-key: "/maunleashdb/18-main/leader"
 trigger-value: "maunleash01"
 ip: 172.23.124.74
 interface: ens160
@@ -785,7 +784,7 @@ trigger-value: "maunleash01"
 interval: 1000
 
 # the etcd or consul key which vip-manager will regularly poll.
-trigger-key: "/maunleashdb/17-main/leader"
+trigger-key: "/maunleashdb/18-main/leader"
 # if the value of the above key matches the trigger-value (often the hostname of this host), vip-manager will try to add the virtual ip address to the interface specified in Iface
 trigger-value: "maunleash01"
 
