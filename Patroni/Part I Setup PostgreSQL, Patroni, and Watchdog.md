@@ -22,9 +22,9 @@ alias sysrld='sudo systemctl reload'
 alias etcdget='etcdctl get --prefix'
 export PATCONF=/etc/patroni/config.yml
 export PGBCONF=/etc/pgbouncer/pgbouncer.ini
-export PGVERSION=$(bash -c '([ -d /lib/postgresql ] && ls -1 /lib/postgresql | grep -E "^(9\.[0-6]|[1-9][0-9]*)$" | sort -V) || echo "PostgreSQL not found"')
-export PGDATA=/var/lib/postgresql/$PGVERSION/main
-export PGCONF=/etc/postgresql/$PGVERSION/main
+export PGVERSION=\$([ -d /lib/postgresql ] && ls -1 /lib/postgresql | grep -E "^(9\.[0-6]|[1-9][0-9]*)\$" | sort -V | tail -1 || echo "")
+export PGDATA=/var/lib/postgresql/\$PGVERSION/main
+export PGCONF=/etc/postgresql/\$PGVERSION/main
 EOF
 
 source /etc/profile
