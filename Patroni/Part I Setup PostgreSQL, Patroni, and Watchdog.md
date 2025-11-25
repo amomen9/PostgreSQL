@@ -491,7 +491,7 @@ Example:
 ![example](image/PartISetupPostgreSQL,Patroni,andWatchdog/Picture1.png)
 
 List of such configuration parameters:
-```
+```YAML
 max_connections: 100
 max_locks_per_transaction: 64
 max_worker_processes: 8
