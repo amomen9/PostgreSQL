@@ -6,7 +6,7 @@
 
 # Part I: Setup PostgreSQL, Patroni, and Watchdog
 
-To begin with, I propose using some aliases and variables that will be pretty handy later. You can see how much they shorten the commands
+To begin with, I propose using some aliases and variables that will be pretty handy later. You can see how much they shorten the commands. Run the following to append them to the global profile:
 ```
 cat <<EOF >> /etc/profile
 alias patctl='sudo patronictl -c /etc/patroni/config.yml'
