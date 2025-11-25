@@ -6,7 +6,7 @@
 
 # Part I: Setup PostgreSQL, Patroni, and Watchdog
 
-To begin with, I propose using some aliases and variables that will be pretty handy later. You can see how much they shorten the commands. Run the following to append them to the global profile:
+To begin with, I propose using some aliases and variables that will be pretty handy later. You can see how much they shorten the commands. Run the following to append them to the global profile. When executing `source /etc/profile` at the end, watch for any parameters that have been possibly overridden in your current shell config:
 
 ```shell
 cat <<EOF >> /etc/profile
@@ -24,6 +24,8 @@ export PGVERSION=$(bash -c '([ -d /lib/postgresql ] && ls -1 /lib/postgresql | g
 export PGDATA=/var/lib/postgresql/$PGVERSION/main
 export PGCONF=/etc/postgresql/$PGVERSION/main
 EOF
+
+source /etc/profile
 ```
 
 **Install and Configure PostgreSQL**
