@@ -164,6 +164,19 @@ Now, as said in the section `0`, we change the ownership of `/var/lib/postgresql
 sudo chown -R postgres:postgres /var/lib/postgresql
 ```
 
+* Optional:
+
+Install system stats from `EnterpriseDB`, as well. It can be compiled from source from
+
+[https://github.com/EnterpriseDB/system_stats](https://github.com/EnterpriseDB/system_stats)
+
+or be installed from `EnterpriseDB` repositories.
+
+```shell
+sudo apt update
+sudo apt install ./edb-pg18-system-stats-3_3.0-3.jammy_amd64.deb
+```
+
 #### 4. Create required directories (Every Node):
 
 Directories to create:
