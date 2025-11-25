@@ -72,6 +72,12 @@ vi /etc/pgbouncer/userlist.txt
 "user2" "pass"
 ```
 
+**Sample**
+
+```text
+"postgres" "SCRAM-SHA-256$4096:u+YXDz7meRxmuprDPgBo8g==$kdw3n+kyQFpFfaJhA+55/IvhVbA9YoXxMl28oV6+dcI=:k0pnkCRaKn88RnX5n19xisDM28LZE08mZlEEvbN5dXg="
+```
+
 The pass can be in any format. It does not need to be database cluster user/password, it is
  for pgbouncer authentication, but the hashing algorithm is the same. If you need it to be
  the same as the database cluster, for the hashed password, you can query `pg_authid` catalog
