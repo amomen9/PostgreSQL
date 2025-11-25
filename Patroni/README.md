@@ -18,4 +18,6 @@
 
 ---
 
-### [•  Part V: PG major version upgrade](../PostgreSQL%20Upgrade/Part%20V%20pg%20major%20version%20upgrade.md)
+## Additional tasks:
+
+### [ PG major version upgrade](../PostgreSQL%20Upgrade/pg%20major%20version%20upgrade.md)
