@@ -30,7 +30,7 @@ EOF
 
 **Note:**
 
-1. PostgreSQL major version specified here is 18. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, 17, and most likely later versions, as well.
+1. PostgreSQL major version specified here is 18. However, this manual also complies with most of the pg versions in use, including 12, 13, 14, 15, 16, 17, 18, and most likely later versions, as well.
 2. Like many of the watchdog solutions for DBMS HA solutions, the watchdog can be installed on a highly available set of servers, even a separate one. Here we set up the watchdog on all the backend (pg) nodes themselves.
 3. The scripts and configuration files are both embedded in this doc and included in the git repository.
 4. Most of the steps in this document are sequential, and the later steps depend on the earlier steps. So, follow the steps in order.
