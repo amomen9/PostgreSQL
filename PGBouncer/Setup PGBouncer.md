@@ -1,6 +1,6 @@
 &nbsp; Doc parts:
 
-* [Prerequisite: Setup PostgreSQL (plus Optionally: Patroni, and Watchdog) ](./Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md)
+* [Prerequisite: Setup PostgreSQL (plus Optionally: Patroni, and Watchdog) ](../Patroni/Part%20I%20Setup%20PostgreSQL%2C%20Patroni%2C%20and%20Watchdog.md)
 
 
 # Add pgbouncer connection pooler for PostgreSQL
