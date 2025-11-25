@@ -226,7 +226,7 @@ The patroni's `.yml` configuration file should be something like the following o
 A `##### SHOULD BE CHANGED #####` line has been added before every line that should conventionally be changed for every cluster,
  more or less for your case.
 
-** Best practice: **
+**Best practice:**
 Set the node name (`name:` directive) the same as its hostname that can be resolved by all the nodes.
 
 <details>
