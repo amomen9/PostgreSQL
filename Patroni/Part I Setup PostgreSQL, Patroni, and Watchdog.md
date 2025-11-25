@@ -8,6 +8,7 @@
 
 To begin with, I propose using some aliases and variables that will be pretty handy later. You can see how much they shorten the commands
 ```
+cat <<EOF >> /etc/profile
 alias patctl='sudo patronictl -c /etc/patroni/config.yml'
 alias sysstt='sudo systemctl start'
 alias sysstp='sudo systemctl stop'
@@ -19,6 +20,7 @@ export PGBCONF=/etc/pgbouncer/pgbouncer.ini
 export PGVERSION=$(bash -c '([ -d /lib/postgresql ] && ls -1 /lib/postgresql | grep -E "^(9\.[0-6]|[1-9][0-9]*)$" | sort -V) || echo "PostgreSQL not found"')
 export PGDATA=/var/lib/postgresql/$PGVERSION/main
 export PGCONF=/etc/postgresql/$PGVERSION/main
+EOF
 ```
 
 **Install and Configure PostgreSQL**
