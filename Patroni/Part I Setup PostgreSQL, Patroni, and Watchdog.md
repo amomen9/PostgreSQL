@@ -7,8 +7,11 @@
 # Part I: Setup PostgreSQL, Patroni, and Watchdog
 
 To begin with, I propose using some aliases and variables that will be pretty handy later. You can see how much they shorten the commands. Run the following to append them to the global profile:
-```
+
+```shell
 cat <<EOF >> /etc/profile
+
+# Manually added aliases and variables for PostgreSQL, Patroni, etcd, pgbouncer, etc.
 alias patctl='sudo patronictl -c /etc/patroni/config.yml'
 alias sysstt='sudo systemctl start'
 alias sysstp='sudo systemctl stop'
