@@ -1,0 +1,468 @@
+# PostgreSQL Cheat Sheet
+
+A consolidated, cleaned reference of commands and short examples.
+
+If you need full runbooks (step-by-step setup), see the **Instruction Sets** folder:
+- [Install PostgreSQL 13 on CentOS 8](../Instruction%20Sets/install_postgresql_13_centos_8_instructions.md)
+- [Install PostgreSQL on Ubuntu (15/16/17)](../Instruction%20Sets/install_postgresql_ubuntu_instructions.md)
+- [Install & Configure Pgpool-II on Ubuntu](../Instruction%20Sets/install_configure_pgpool2_ubuntu_instructions.md)
+
+---
+
+## psql basics
+
+### Connect and basic discovery
+
+```shell
+# Connect
+psql -h <host> -p <port> -U <user> -d <db>
+
+# List databases
+\l
+
+# Connect to database
+\c <dbname>
+
+# List relations / tables
+\dt
+
+# Describe a table
+\d+ <table_name>
+
+# List indexes
+\di+
+
+# Show connection info
+\conninfo
+```
+
+### Quality-of-life
+
+```psql
+-- Show statements `psql` runs behind meta-commands
+\set ECHO_HIDDEN on
+
+-- Show query runtime
+\timing on
+```
+
+`psql` history file (typical Linux location):
+- `/home/<user>/.psql_history`
+
+---
+
+## Server info & configuration
+
+```sql
+SELECT version();
+SHOW server_version;
+SHOW server_version_num;
+
+SELECT * FROM pg_settings;
+
+-- Show where the main config file lives
+SHOW config_file;
+
+-- Show the actual data directory (cluster PGDATA)
+SHOW data_directory;
+```
+
+### Reload configuration
+
+`pg_hba.conf` and `postgresql.conf` changes require a reload (or restart):
+
+```sql
+SELECT pg_reload_conf();
+```
+
+Or from shell:
+
+```shell
+pg_ctl reload -D "$PGDATA"
+```
+
+---
+
+## Roles and privileges
+
+```psql
+-- List roles
+\du+
+```
+
+```sql
+-- Create/alter users
+CREATE ROLE myuser WITH LOGIN;
+ALTER ROLE myuser WITH PASSWORD '...' ;
+ALTER ROLE myuser RENAME TO new_name;
+
+-- Example: make a role a superuser (or remove it)
+ALTER ROLE streaming_barman WITH SUPERUSER;
+ALTER ROLE streaming_barman WITH NOSUPERUSER;
+
+-- Common attributes template
+ALTER ROLE barman WITH
+  BYPASSRLS
+  CREATEDB
+  CREATEROLE
+  SUPERUSER
+  INHERIT
+  LOGIN
+  REPLICATION
+  CONNECTION LIMIT 10
+  PASSWORD '...';
+```
+
+---
+
+## Extensions
+
+```sql
+-- See available / installed extensions
+SELECT * FROM pg_available_extensions;
+SELECT * FROM pg_extension;
+```
+
+### `pageinspect`
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pageinspect;
+
+-- Example (inspect heap page items)
+SELECT lp AS tuple,
+       t_xmin,
+       t_xmax,
+       t_field3 AS t_cid,
+       t_ctid
+FROM heap_page_items(get_raw_page('tbl', 0));
+```
+
+### `pg_freespacemap`
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_freespacemap;
+
+SELECT *,
+       round(100 * avail / 8192, 2) AS "freespace_ratio_percent"
+FROM pg_freespace('accounts');
+```
+
+---
+
+## Backup & restore (quick reference)
+
+See full runbook: [Logical backup & restore](../Instruction%20Sets/logical_backup_restore_instructions.md).
+
+### `pg_dump` / `pg_dumpall` / `pg_restore`
+
+```shell
+# Dump a database to plain SQL
+pg_dump mydb > db.sql
+
+# Restore plain SQL into a target database
+psql -d newdb -f db.sql
+
+# Custom format dump + restore
+pg_dump -Fc mydb > db.dump
+pg_restore -d newdb db.dump
+
+# Directory format dump, parallel
+pg_dump -Fd mydb -j 5 -f dumpdir
+```
+
+Notable flags:
+- `-a`: data-only (no schema)
+- `-c`: emit `DROP` statements
+- `-C`: emit `CREATE DATABASE` and reconnect
+- `-n` / `-N`: include/exclude schemas
+- `-t` / `-T`: include/exclude tables (supports patterns)
+
+### Online backup SQL helpers (when applicable)
+
+```sql
+SELECT pg_backup_start(label => 'label', fast => false);
+SELECT * FROM pg_backup_stop(wait_for_archive => true);
+```
+
+---
+
+## Streaming replication & WAL
+
+### Replication slots
+
+```sql
+-- Create a physical replication slot
+SELECT * FROM pg_create_physical_replication_slot('pgrepslot');
+
+-- List slots
+SELECT * FROM pg_replication_slots;
+
+-- Drop slot
+SELECT pg_drop_replication_slot('pgrepslot');
+```
+
+Notes:
+- Replication slot names may only contain lowercase letters, numbers, and `_`.
+
+### Check primary/standby state
+
+```sql
+-- Primary: show replicas
+SELECT * FROM pg_stat_replication;
+
+-- Standby: is this instance in recovery?
+SELECT pg_is_in_recovery();
+
+-- Standby: WAL receiver status
+SELECT status, conninfo FROM pg_catalog.pg_stat_wal_receiver;
+```
+
+### Force WAL switch / checkpoint
+
+```sql
+CHECKPOINT;
+SELECT pg_switch_wal();
+```
+
+### Receive WAL from a primary (`pg_receivewal`)
+
+```shell
+pg_receivewal -v -h <primary_host> -p 5432 -U barman -W --directory=.
+```
+
+---
+
+## Tablespaces
+
+```sql
+-- Create tablespace
+CREATE TABLESPACE tbs_database_name
+  OWNER database_user
+  LOCATION '/data/postgres13/tbs_databases/tbs_database_name';
+
+-- Move a database to tablespace
+ALTER DATABASE database_name SET TABLESPACE tbs_database_name;
+
+-- Inspect
+\db+
+SELECT * FROM pg_tablespace;
+```
+
+---
+
+## Table design helpers
+
+### Identity columns
+
+```sql
+-- Add an identity column
+ALTER TABLE inpatientcharges
+  ADD COLUMN id bigint GENERATED BY DEFAULT AS IDENTITY;
+
+-- Convert an existing column to identity (example)
+ALTER TABLE patient
+  ALTER COLUMN patientid SET NOT NULL,
+  ALTER COLUMN patientid ADD GENERATED ALWAYS AS IDENTITY (START WITH 2);
+```
+
+### Temporary tables
+
+```sql
+CREATE TEMP TABLE tmp_tbl AS
+SELECT *
+FROM tbl
+WHERE ...;
+```
+
+---
+
+## Indexes & sizing
+
+### Index definition and sizes
+
+```sql
+-- Get CREATE INDEX statement
+SELECT pg_get_indexdef(indexrelid) AS index_query
+FROM pg_index
+WHERE indrelid = 'pgbench_accounts'::regclass;
+
+-- Size of a specific index
+SELECT pg_size_pretty(pg_relation_size('pgbench_accounts_index'));
+
+-- Index definition from pg_indexes
+SELECT indexdef FROM pg_indexes WHERE indexname = '...';
+```
+
+### Leaf fragmentation (btree)
+
+Requires `pageinspect`.
+
+```sql
+SELECT i.indexrelid::regclass,
+       s.leaf_fragmentation
+FROM pg_index AS i
+JOIN pg_class AS t ON i.indexrelid = t.oid
+JOIN pg_opclass AS opc ON i.indclass[0] = opc.oid
+JOIN pg_am ON opc.opcmethod = pg_am.oid
+CROSS JOIN LATERAL pgstatindex(i.indexrelid) AS s
+WHERE t.relkind = 'i'
+  AND pg_am.amname = 'btree';
+```
+
+### Unused / duplicate index discovery
+
+```sql
+-- Unused indexes (review carefully; uniqueness matters)
+SELECT s.relname AS table_name,
+       indexrelname AS index_name,
+       i.indisunique,
+       idx_scan AS index_scans
+FROM pg_catalog.pg_stat_user_indexes s,
+     pg_index i
+WHERE i.indexrelid = s.indexrelid;
+
+-- Find duplicate indexes (same columns/opclass)
+SELECT indrelid::regclass AS table_name,
+       att.attname AS column_name,
+       amname AS index_method
+FROM pg_index i,
+     pg_class c,
+     pg_opclass o,
+     pg_am a,
+     pg_attribute att
+WHERE o.oid = ALL (indclass)
+  AND att.attnum = ANY(i.indkey)
+  AND a.oid = o.opcmethod
+  AND att.attrelid = c.oid
+  AND c.oid = i.indrelid
+GROUP BY table_name, att.attname, indclass, amname, indkey
+HAVING count(*) > 1;
+```
+
+### Reindex concurrently for all tables (generator)
+
+```sql
+SELECT 'REINDEX TABLE CONCURRENTLY ' || quote_ident(relname) ||
+       ' /*' || pg_size_pretty(pg_total_relation_size(C.oid)) || '*/;'
+FROM pg_class C
+LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
+WHERE nspname = 'public'
+  AND C.relkind = 'r'
+  AND nspname !~ '^pg_toast'
+ORDER BY pg_total_relation_size(C.oid) ASC;
+```
+
+---
+
+## Files, host info, and OS integration
+
+### Get server IP / hostname from SQL
+
+```sql
+SELECT inet_server_addr();
+
+SELECT boot_val, reset_val
+FROM pg_settings
+WHERE name = 'listen_addresses';
+```
+
+Read server hostname file (Linux):
+
+```sql
+COPY (SELECT * FROM pg_read_file('/etc/hostname')) TO STDOUT;
+```
+
+Run OS command via `COPY FROM PROGRAM` (requires superuser and must be enabled):
+
+```sql
+CREATE TEMP TABLE tt_cmd (hostname text);
+COPY tt_cmd FROM PROGRAM 'hostname';
+SELECT * FROM tt_cmd;
+DROP TABLE tt_cmd;
+```
+
+---
+
+## `.pgpass` and non-interactive auth
+
+Format (one per line):
+
+```text
+hostname:port:database:username:password
+```
+
+Wildcards are allowed:
+
+```text
+*:*:*:postgres:<password>
+```
+
+Then connect:
+
+```shell
+psql -h <host> -p <port> -d <db> -U <user>
+```
+
+---
+
+## Pgpool-II / PCP quick notes
+
+See full runbook: [Install & Configure Pgpool-II on Ubuntu](../Instruction%20Sets/install_configure_pgpool2_ubuntu_instructions.md).
+
+### Common checks
+
+```shell
+# Show pgpool backend nodes status (via VIP, example port 9999)
+psql -h <vip_or_host> -p 9999 -U pgpool -d postgres -c "SHOW pool_nodes"
+
+# Watchdog status
+pcp_watchdog_info -h <vip_or_host> -p 9898 -U pgpool
+```
+
+### PCP examples
+
+```shell
+# Recover/attach node N
+pcp_recovery_node -h <vip_or_host> -p 9898 -U pgpool -n <node_id>
+```
+
+### Troubleshooting note (common)
+
+If you see:
+- `ERROR: executing recovery, execution of command failed at "1st stage"`
+
+Common causes:
+- `pgpool_recovery` / `pgpool_adm` extensions not created in required DBs
+- Recovery scripts not found or not executable
+
+---
+
+## Useful one-liners
+
+### Change table owners in a schema (example)
+
+```shell
+# Example: change owner for tables matching a pattern
+for tbl in $(psql -qAt -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE 'test_%';" pg_test); do
+  psql -c "ALTER TABLE \"$tbl\" OWNER TO new_owner" pg_test
+done
+```
+
+### Compute “parallelism” from a setting (example)
+
+```shell
+# Example: derive a value from max_parallel_workers
+parallelism=$(echo "a=$(psql -h ${HOST} -U ${USER} -p ${PORT} -d postgres -tA -c \"SELECT current_setting('max_parallel_workers');\"); scale=0; (a + 2) / 3" | bc)
+```
+
+---
+
+## Monitoring exporters (names only)
+
+- `prometheus-node-exporter`
+- `prometheus-postgres-exporter`
+- `prometheus-pgbouncer-exporter`
+- `prometheus-haproxy-exporter`
+- `prometheus-process-exporter`
+- `prometheus-sql-exporter`
+- `prometheus-hacluster-exporter`
