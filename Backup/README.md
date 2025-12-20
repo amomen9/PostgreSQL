@@ -12,7 +12,7 @@
 
 #### systemd Backup Automation
 
-1. [For pgPool](./simple%20systemd%20Backup%20Automation/pgpool.md)
-2. [For Patroni](./simple%20systemd%20Backup%20Automation/patroni.md)
+1. [For pgPool](./systemd%20Backup%20Automation/pgpool.md)
+2. [For Patroni](./systemd%20Backup%20Automation/patroni.md)
 
 ---
