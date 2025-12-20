@@ -1,0 +1,1396 @@
+
+### install and setup PostgreSQL 13 on CentOS 8
+```
+1)
+sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+sudo dnf -qy module disable postgresql
+sudo dnf install -y postgresql13-server
+
+2) create subdirectory /data/postgres13 if it does not exist and subdirectory for postgres log file and /archive
+mkdir -p /var/log/pgsql /archive /data/postgres13
+chown -R postgres:postgres /var/log/pgsql /archive /data/postgres13
+
+# This step is required if the command 'sudo /usr/pgsql-13/bin/postgresql-13-setup initdb' is entered in the first step.
+# 3) copy default contents to the target directory preserving permissions:
+# cp -a /var/lib/pgsql /data/
+# cp -a flag means: -dR --preserve=all (-d:`--no-dereference --preserve=links` -R )
+
+4) now you can configure PostgreSQL to point to the new data directory in two ways:
+	1) Modifying postgres' service file directly or use drop-in feature to override PGDATA and PGLOG variables using 'systemctl edit postgresql-13'
+	using drop-in feature:		#Recommended Choice
+		a) 
+		systemctl edit postgresql-13
+		
+		b) add the following lines, save and exit editor:
+[Service]
+Environment=PGDATA=/data/postgres13/data/
+Environment=PGLOG=/var/log/pgsql/
+		
+		c)
+		systemctl daemon-reload
+		
+	modifying pg's service file:
+		here modifying the postgres' service file directly is described which is not recommended:	 
+		a) get the service file path using this command:
+		systemctl show -p FragmentPath postgresql-13
+		
+		b) edit the service f:ile:
+		vi /usr/lib/systemd/system/postgresql-13.service
+		
+		c) add the following lines to the text editor in the appropriate place, save and quit
+		Environment=PGDATA=/data/postgres13/data/
+		PGLOG=/var/log/pgsql/
+		
+		d) because the service file is modified, run the following command:
+		systemctl daemon-reload
+
+	2) Modifying postgres' conf file in the default directory: in this approach, the postgresql.conf file remains in the default
+	directory but the data directory is changed
+		a) open postgresql.conf file via text editor:
+		vi /var/lib/pgsql/13/data/postgresql.conf
+		
+		b) uncomment the line "#data_directory = 'ConfigDir'" and replace ConfigDir with the new data directory
+
+5) initialize postgresql database cluster
+sudo /usr/pgsql-13/bin/postgresql-13-setup initdb
+
+*) if you have not copied the data directory preserving the permissions, you have to impose a change on SELinux and run the following
+commands:
+semanage fcontext --add --equal /var/lib/pgsql /DATA/
+restorecon -rv /data/postgres13/data
+chmod -R 700 /data/postgres13/data
+chown -R postgres:postgres /data/postgres13
+
+) disable firewalld or add exceptions
+
+) modifying selinux is not necessary at this stage, but if you want to handle it, its conf file
+	location is: /etc/selinux/config
+
+5) enable & start postgresql service:
+sudo systemctl enable postgresql-13
+sudo systemctl start postgresql-13
+
+6) finally verify the data directory using the following command:
+sudo -u postgres psql -c 'show data_directory'
+
+7) Open firewall ports if needed:
+firewall-cmd --add-port=5432/tcp 
+firewall-cmd --permanent --add-port=5432/tcp
+
+8) Go to postgresql.conf, uncomment listen_addresses and change it to:
+listen_addresses = '*'
+
+9) Go to pg_hba.conf and add the following lines for ipv4 and ipv6 respectively: (you can put scram-sha-256 instead of md5)
+host	all		all		0.0.0.0/0		md5
+host	all		all		::0/0			md5
+
+10) restart postgresql service
+
+11) create a superuser user by issuing the following command inside postgresql console, and create a database for the created user:
+create user barman with superuser encrypted password '1'; -- quote a.momen with "
+create database barman;
+grant all privileges on database barman to barman; -- This does not make the user the owner of the database
+	alternatively in linux shell:
+createuser -s -P barman
+
+12) optionaly add pg binaries to user's path. The universal path file is /etc/profile. Add the following line to this file:
+echo "export PATH=\$PATH:/usr/pgsql-13/bin" >> /etc/profile
+``` install and setup PostgreSQL 13 on CentOS 8
+
+
+
+
+
+### install and setup PostgreSQL 16 on Ubuntu
+```
+1. install pg
+sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+#sudo apt-get -y install postgresql
+# to search for packages you can use the following command:
+# apt search --names-only postgresql | grep ^post
+# 15: 
+sudo apt install -y postgresql-15 postgresql-15-repack postgresql-15-plpgsql-check \
+postgresql-15-cron postgresql-15-pgaudit postgresql-15-show-plans postgresql-doc-15 \
+postgresql-contrib-15 postgresql-15-plprofiler plprofiler postgresql-15-preprepare iputils-arping
+# 16:
+sudo apt install -y postgresql-16 postgresql-16-repack postgresql-16-plpgsql-check \
+postgresql-16-cron postgresql-16-pgaudit postgresql-16-show-plans postgresql-doc-16 \
+postgresql-contrib-16 postgresql-16-plprofiler plprofiler postgresql-16-preprepare iputils-arping
+# 17:
+sudo apt install -y postgresql-17 postgresql-17-repack postgresql-17-plpgsql-check \
+postgresql-17-cron postgresql-17-pgaudit postgresql-17-show-plans postgresql-doc-17 \
+postgresql-contrib-17 postgresql-17-plprofiler plprofiler postgresql-17-preprepare iputils-arping
+
+
+# Note: postgresql-contrib package is inclusive later than pg 9.6 (excluding pg 9.6)
+
+2. stop service template for the initial cluster
+systemctl stop postgresql@16-main.service
+
+3. create directories for the new location of data dir and tablespaces
+mkdir -p /data/postgresql/16/main/{tablespaces,log,extensions}
+
+4. take necessary permission measures on the created. (suppose that we have a group named dbadmins with database administration members)
+usermod -aG dbadmins postgres
+chown -R postgres:dbadmins /data
+chmod -R u=rws,g=r,o= /data
+chmod -R u+x /data
+chmod -R g-x /data
+
+5. move data dir contents to the new location
+cp -ar /var/lib/postgresql/16/main/* /data/postgresql/16/main/ && rm -rf /var/lib/postgresql/*
+
+6. modify postgresql.conf file to change the directory location parameters 
+(data_directory and log_directory.)
+
+7. start the service again. If you have done everything right, it should start promptly.
+systemctl start postgresql@16-main.service
+
+8. we also do these additional (and optional according to your needs) steps:
+apt install pgagent -y
+sudo -iu postgres psql -c "create extension pgagent"
+	-. create necessary initial users
+	
+``` install and setup PostgreSQL 16 on Ubuntu
+
+
+
+### pgpool ubuntu
+```
+##--- start pgpool2 installation, setup, and configuration on Ubuntu
+prerequisite:
+add pg repo if you already have not (pgpool is included within the postgres official repository)
+
+1. install required packages
+# version 16
+sudo apt-get -y install pgpool2 libpgpool2 postgresql-16-pgpool2
+sudo apt-get -y install postgresql-server-dev-16 postgresql-server-dev-all
+sudo apt-get -y install postgresql-16-pgpool2-dbgsym libpgpool2-dbgsym pgpool2-dbgsym
+# version 15
+sudo apt-get -y install pgpool2 libpgpool2 postgresql-15-pgpool2
+sudo apt-get -y install postgresql-server-dev-15 postgresql-server-dev-all
+sudo apt-get -y install postgresql-15-pgpool2-dbgsym libpgpool2-dbgsym pgpool2-dbgsym
+
+2. copy template script files from  the following directory to a specific directory
+	rename and remove .sample from the end of the files.
+cp /usr/share/doc/pgpool2/examples/scripts/* /data/postgresql/16/scripts/
+
+3. create the pgpool_node_id file with the node id (ex 0) below on Every Node:
+pgpool_node_id
+
+4. 
+touch /var/log/pgpool/pgpool_status		# Backend status file
+chown -R postgres /var/log/pgpool
+
+5. create Replication, Health Check, and Recovery users with required privileges on Every Node.
+ 
+# inside pg engine, create pg super user, and linux user and set up hba to accept peer connections for this user
+create user repl superuser password '1';
+create user pgpool superuser password '1';		# If you want to show "replication_state" and "replication_sync_state" column in SHOW POOL NODES command result,
+# role pgpool needs to be PostgreSQL super user or in pg_monitor group. This also applies to detach_false_primary feature
+# you can run the following to grant pg_monitor
+# GRANT pg_monitor TO pgpool;
+# inside psql:
+SET password_encryption = 'scram-sha-256';
+CREATE ROLE pgpool WITH LOGIN;
+CREATE ROLE repl WITH REPLICATION LOGIN;
+\password pgpool
+\password repl
+\password postgres
+
+
+# user os settings
+
+usermod -aG sudo postgres
+passwd postgres
+
+
+# in linux shell, set PGDATABASE env var for postgresmgr to be postgres
+echo export PGDATABASE=postgres >> /home/postgresmgr/.profile 
+
+10. Customize the following bash script files accordingly:
+# Script Files. A template of such files can be found at /usr/share/doc/pgpool2/examples
+follow_primary.sh
+replication_mode_recovery_1st_stage
+recovery_1st_stage
+failover.sh
+replication_mode_recovery_2nd_stage
+pgpool_remote_start
+escalation.sh
+
+11. Customize conf files
+# Conf files
+pg_hba.conf
+pgpool.conf
+pcp.conf
+pool_hba.conf
+
+
+-. setup .pgpass file like the following
+*:*:*:postgres:J2TCnLn$aAcP*W
+
+*:*:*:pgpool:J2TCnLn$aAcP*W
+
+*:*:*:repl:J2TCnLn$aAcP*W
+
+-. setup .pcppass file like the following
+*:9898:pgpool:1
+
+-. create extension on the primary server's template1 database
+# You must install and create the extensions in each database where you plan to use EDB Pgpool-II.
+# To ensure all extensions are available for future databases, you can add the extension to the
+# template1 database.
+CREATE EXTENSION pgpool_recovery;
+CREATE EXTENSION pgpool_adm;
+
+-. ensure that the following directive is activated in pgpool.conf
+enable_pool_hba = on
+
+
+-. fill pcp.conf file
+pg_md5 -u pgpool -p
+pg_md5 -u postgres -p
+pg_md5 -u repl -p
+# inside pcp.conf:
+pgpool:<password md5 hash>
+
+chmod 755 /etc/pgpool2/pcp.conf
+
+-. uncomment pool_passwd entry in pgpool.conf file. let it point relatively or absolutely to the desired pool_passwd path
+	the file will be created if not exists. if the default path (home directory) works for you, leave it commented out.
+
+-. Do either of the following md5 for scram-sha-256 encryption methods for authentication in pool_passwd file
+	# these will create pool_passwd file if not exists and fill it with the encrypted user/password pair
+	pg_md5 -m -f /etc/pgpool2/pgpool.conf -u postgres -p
+	# create .pgpoolkey file and place encryption key inside of it and change its mode to 600. Then: 
+	pg_enc -m -f /etc/pgpool2/pgpool.conf -u postgres -p
+
+cp ~postgres/{.pcppass,.pgpoolkey,.pgpass,.Xauthority} ~a.momen@mofid.dc/ && chown -R a.momen@mofid.dc:a.momen@mofid.dc ~a.momen@mofid.dc
+
+
+
+-. We will not apply the following service modification to pgpool. Yet, some may choose to do so.
+# The pgpool_status file plays a crucial role in Pgpool-II's operation as it records the status of backend PostgreSQL servers.
+# Problems that might occur in the absence of the pgpool_status file
+# 1. data inconsistency and discrepancy especially in scenarios where a backend might stop unexpectedly and Pgpool executes a failover procedure
+# 2. It says whether the node is up or down, and is retained across Pgpool-II restarts
+# 3. issues like a split-brain condition, where multiple primary servers exist.
+
+
+# The OPTS="-D -n" configuration is used to configure environment variables and startup options for Pgpool-II. Placing a line in this file sets
+# a specific behavior for the Pgpool-II service when it starts. The -D option is for testing purpose only for developers and you should not use it
+# for other purposes. If pgpool_status is accidentally removed, Pgpool-II may go into split-brain (there are multiple primary servers exist).
+# The line OPTS="-D" to /etc/sysconfig/pgpool (RHEL) or pgpool.conf or service file on Ubuntu, tells Pgpool-II to ignore the pgpool_status file at startup,
+# which normally contains the backend status (up/down). This option can be useful when you don't want Pgpool-II to resume the previous state
+# of the backend nodes. The -n option instructs Pgpool-II to not run as a daemon
+# system file on Ubuntu. Either user Environment directive or ExecStart:
+sudo systemctl edit pgpool2
+1. Alternative 2:
+[Service]
+ExecStart=
+ExecStart=/usr/sbin/pgpool -D -n
+2. Alternative 1:
+[Service]
+Environment="PGPOOL_OPTS=-D -n"
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart pgpool2
+
+
+-. stop postgres service on the secondary nodes.	
+pg_ctlcluster 15 main  -m immediate stop	# Data directory must not be provided here like pg_ctl as
+#an argument for pg_ctlcluster itself.
+pg_ctlcluster $PGMAJVER $PGCLU -m fast -f stop -- -D ${NODE_PGDATA}
+
+-. run the following commands to create symbolic links:
+ln -s /tmp/.s.PGSQL.9999 /var/run/postgresql/.s.PGSQL.9999
+ln -s /tmp/.s.PGSQL.9898 /var/run/postgresql/.s.PGSQL.9898
+
+
+-. correct the environment variables for the user postgres
+
+-. manual/hand test pgpool scripts
+$PGDATA/recovery_1st_stage $PGDATA funleashpgdb02 $PGDATA 5432 1 5432 $HOSTNAME
+$PGDATA/pgpool_remote_start funleashpgdb02 $PGDATA
+# failover to the second node
+/etc/pgpool2/scripts/failover.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA funleashpgdb01 5432
+/etc/pgpool2/scripts/follow_primary.sh 0 funleashpgdb01 5432 $PGDATA 1 funleashpgdb02 0 0 5432 $PGDATA
+# fail back to the first node
+/etc/pgpool2/scripts/failover.sh 1 funleashpgdb02 5432 $PGDATA 0 funleashpgdb01 1 1 5432 $PGDATA funleashpgdb02 5432
+/etc/pgpool2/scripts/follow_primary.sh 1 funleashpgdb02 5432 $PGDATA 0 funleashpgdb01 1 1 5432 $PGDATA
+
+
+-. run the following command "pcp_recovery_node"
+pcp_recovery_node -h vip -p 9898 -U pgpool -n 1
+pcp_recovery_node -h vip -p 9898 -U pgpool -n 2
+# Common errors:
+# 1. If you got the following error,
+pcp_recovery_node -h vip -p 9898 -U pgpool -n 1
+ERROR:  executing recovery, execution of command failed at "1st stage"
+DETAIL:  command:"recovery_1st_stage"
+	a.  the extensions are probably not created in the postgres and template1 databases.
+	b. scripts do not exist in the right location, or are not executable
+# 2. If you get the following error, the socket file is probably placed somewhere else because of the pgpool bug, or it is not
+# yet been created by pgpool and you should wait a while.
+psql -p 9999
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.9999" failed: No such file or directory
+        Is the server running locally and accepting connections on that socket?
+
+
+-. if up command (if_up_cmd)
+/usr/bin/sudo /usr/sbin/ip addr add $_IP_$/24 dev ens160 label ens160:0
+/usr/bin/sudo /usr/sbin/ip addr add 172.23.124.74/24 dev ens160 label ens160:0
+
+
+
+
+-. check servers' status:
+psql -h vip -p 9999 -U pgpool postgres -c "show pool_nodes"
+
+
+-. switch active/standby watchdog
+pcp_watchdog_info -h vip -p 9898 -U pgpool
+
+
+-. simulate primary server failure
+[server1]# systemctl stop pgpool2.service
+# pcp_watchdog_info -p 9898 -h vip -U pgpool
+[server1]# systemctl start pgpool.service
+[server1]# pcp_watchdog_info -p 9898 -h vip -U pgpool
+
+
+-. check status
+psql -h vip  -p 9999 -U pgpool postgres -c "show pool_nodes"
+
+-.
+[server1]$ pg_ctlcluster <pg version> <clu name> -D <pg data directory> -m immediate stop
+
+-. psql -h vip -p 9999 -U pgpool postgres -c "show pool_nodes"
+
+-. commands on servers:
+psql -h server3 -p 5432 -U pgpool postgres -c "select pg_is_in_recovery()"
+psql -h server3 -p 5432 -U pgpool postgres -c "select * from pg_stat_replication"
+
+
+-. online recovery
+pcp_recovery_node -h   vip  -p 9898 -U pgpool -n 0
+
+
+-. use the following to examine the log files.
+# pgpool last log file.  Note! tail -f is not a solution here as the log file might rotate:
+watch -n 0.5 'tail -30 $(find /tmp/pgpool_logs/ -type f -printf "%T+ %p\n" | sort -r | head -n 1 | cut -d " " -f2-) | grep script_log'
+# pgpool all log files contained withing log directories recursively
+watch -n 0.5 'find /tmp/pgpool_logs/ -type f -name "pgpool-*" -exec cat {} + | grep script_log | tail -30'
+
+# postgres last log file.
+watch -n 0.5 'tail -30 $(find /var/log/postgresql/ -type f -printf "%T+ %p\n" | sort -r | head -n 1 | cut -d " " -f2-)'
+# postgres all log files
+watch -n 0.5 'find /var/log/postgresql/ -type f -name "postgresql-*" -exec cat {} + | tail -30'
+
+
+
+-. important! If any configuration change for postgres is deemed necessary, here is the following approach:
+1. change the configuration on the primary server
+2. stop the service on the secondary nodes
+3. recovery process will be carried out on the standby nodes.
+4. the primary node will be stopped
+5. one of the standby nodes will become the new primary.
+6. recovery process will be carried out for the old primary node.
+
+
+-. SQL commands added by pgpool_recovery extension
+function pgpool_recovery(text,text,text,text,integer,text,text)
+function pgpool_recovery(text,text,text,text,integer,text)
+function pgpool_recovery(text,text,text,text,integer)
+function pgpool_recovery(text,text,text,text)
+function pgpool_recovery(text,text,text)
+function pgpool_remote_start(text,text)
+function pgpool_pgctl(text,text)
+function pgpool_switch_xlog(text)
+
+-. SQL commands added by pgpool_adm extension
+function pcp_attach_node(integer,text)
+function pcp_attach_node(integer,text,integer,text,text)
+function pcp_detach_node(integer,boolean,text)
+function pcp_detach_node(integer,boolean,text,integer,text,text)
+function pcp_health_check_stats(integer,text)
+function pcp_health_check_stats(integer,text,integer,text,text)
+function pcp_node_count(text)
+function pcp_node_count(text,integer,text,text)
+function pcp_node_info(integer,text)
+function pcp_node_info(integer,text,integer,text,text)
+function pcp_pool_status(text)
+function pcp_pool_status(text,integer,text,text)
+
+
+gong
+
+
+6. create replication slot 
+# select pg_drop_replication_slot('testpg');
+select * from pg_create_physical_replication_slot('pgrepslot'); 
+select * from pg_replication_slots;
+
+7. 
+
+
+
+6. create archive directory for WALs, set postgres' archive command to point to that directory
+mkdir -p /backup/wal && chown -R postgres:postgres /backup
+
+7. create archive directory for full backups
+mkdir -p /backup/full && chown -R postgres:postgres /backup
+
+8. set up passwordless ssh between all the nodes for postgres
+# To use the 'automated failover' and 'online recovery' of Pgpool-II, it is requried to allow SSH public key authentication (passwordless SSH login) to all backend servers as Pgpool-II startup user (default is postgres)
+
+
+
+
+9. create a symbolic link for pg_rewind
+ln -s /usr/lib/postgresql/<pg major version>/bin/pg_rewind /usr/bin/pg_rewind
+
+
+12. check the configuration for pcp.conf using the following command:
+
+
+12. Copy and replace the configuration files to all other nodes
+
+13. Rectify the file pgpool_node_id on the other nodes to have the correct node id
+
+14. 
+-. alter ownership to postgres for 
+chown -R postgres:postgres /etc/pgpool2
+
+15. 
+
+##--- finished pgpool2 installation, setup, and configuration on Ubuntu
+
+
+## pgpool cli
+http://192.168.171.71/docs/pgpool2/pgpool.html
+pgpool [option...] /stop/reload
+
+## pcp
+pcp cli tools can either be used by installing pgpool2 package or by installing it python module
+and running its commands using python 
+(
+install in python:
+pip install pypcp
+)
+pcp (Pgpool-II Control Program) commands:
+http://192.168.171.71/docs/pgpool2/pcp-commands.html
+•  pcp_attach_node: Attaches a given node to Pgpool-II.
+•  pcp_detach_node: Detaches the given node from Pgpool-II.
+•  pcp_node_count: Displays the total number of database nodes.
+•  pcp_node_info: Displays information on the given node ID.
+•  pcp_health_check_stats: Displays health check statistics data on the given node ID.
+•  pcp_watchdog_info: Displays the watchdog status of Pgpool-II.
+•  pcp_proc_count: Displays the list of Pgpool-II children process IDs.
+•  pcp_proc_info: Displays information on the given Pgpool-II child process ID.
+•  pcp_pool_status: Displays the parameter values as defined in pgpool.conf.
+•  pcp_promote_node: Promotes the given node as new main to Pgpool-II.
+•  pcp_stop_pgpool: Terminates the Pgpool-II process.
+•  pcp_reload_config: Reloads the Pgpool-II config file.
+•  pcp_recovery_node: Attaches the given backend node with recovery.
+
+
+## Notes
+# There is no need to create the target directory for pg_basebackup. If not exsits, it will be created automatically,
+# but it needs to be empty for stream methods
+# backup command given by ms co-pilot
+${PGHOME}/bin/pg_basebackup -h primary_server -D /var/lib/postgresql/14/data/ -U replicator -v -P --wal-method=stream
+# backup command inside the script files given by pgpool
+${PGHOME}/bin/pg_basebackup -h ${NEW_PRIMARY_NODE_HOST} -U $REPLUSER -p ${NEW_PRIMARY_NODE_PORT} -D ${NODE_PGDATA} -X stream
+# sample
+pg_basebackup -h atestpgdbc01 -U repl -p 5432 -D /backup/full/$(TZ='Asia/Tehran' date +%Y-%m-%d-%H%M%S) -P -X stream
+# set up secondary from primary
+rm -rf $PGDATA/*
+rm -rf $PGDATA/../tablespaces/*
+pg_basebackup -h funleashpgdb01 -U repl -p 5432 -D $PGDATA/ -T $PGDATA/../tablespaces/=$PGDATA/../tablespaces/ -R -P -X stream
+
+
+# SQL commands for pg base backup:
+SELECT pg_backup_start(label => 'label', fast => false);
+SELECT * FROM pg_backup_stop(wait_for_archive => true);
+
+SELECT pg_dump('your_database_name')
+SELECT pg_dumpall()
+COPY (SELECT pg_dump('your_database_name')) TO '/path/to/your/backup/file.sql';
+
+#sample postgresql.auto.conf file created by pg_basebackup in standby mode:
+##------------------------------------------
+# Do not edit this file manually!
+# It will be overwritten by the ALTER SYSTEM command.
+primary_conninfo = 'user=repl passfile=''/var/lib/postgresql/.pgpass'' channel_binding=prefer host=funleashpgdb01 port=5432 sslmode=prefer sslcompression=0 sslcertmode=allow sslsni=1 ssl_min_protocol_version=TLSv1.2 gssencmode=prefer krbsrvname=postgres gssdelegation=0 target_session_attrs=any load_balance_hosts=disable'
+##------------------------------------------
+# command to check replication status on primary:
+SELECT * FROM pg_stat_replication;
+# command to check replication status on secondary:
+SELECT pg_is_in_recovery();
+
+# What is called at the time of pcp_recovery_node
+#SELECT pgpool_recovery('recovery_command', 'node_id', 'backend_hostname', 'backend_port', 'backend_data_directory');
+SELECT pgpool_recovery('recovery_1st_stage', 'funleashpgdb02', '/data/postgresql/15/main/data/', '5432', 1, '5432', 'funleashpgdb01')
+
+SELECT pgpool_remote_start('hostname', 'data_directory');
+SELECT pgpool_switch_xlog('command');
+
+
+## postgresql prominent environment variables
+declare -x PGDATA=/data/postgresql/15/main/data
+declare -x HOSTNAME=$(hostname | cut -d '.' -f1)
+declare -x HOME=~
+declare -x LOGNAME=$(whoami)
+declare -x PWD=~
+declare -x USER=$(whoami)
+``` pgpool ubuntu
+
+
+### install pgpoolAdmin
+```
+official installation guide:
+https://www.pgpool.net/docs/pgpoolAdmin/en/install.html
+
+# prerequisites:
+-. Apache2 web server
+sudo apt install -y apache2
+-. PHP 5.6.0 and higher and lower than 8 (8 and later won't work for pgpoolAdmin)
+-. pgpool
+
+1. Download pgpoolAdmin archive from the official website
+https://pgpool.net/mediawiki/index.php/Downloads
+ 
+1. install apache2 httpd web server:
+sudo apt install -y apache2
+
+1. install PHP (5.6.0 <= PHP version <= 7.*)
+# if you have php8.* or later installed, remove them first. a sample removal command set can be like the following
+sudo apt remove -y --purge php8.* php-pgsql php-mbstring
+sudo apt autoremove -y
+
+1. Install Ondrej PPA repository which contains earlier php versions
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+sudo apt update
+
+1. install php
+sudo apt install -y php7.4
+
+2. I change the user and group under which apache runs to postgres. This is arbitrary and 
+I do it for convenience. The user/group that pgpool runs under is also postgres
+sudo vi /etc/apache2/envvars
+# change the following
+export APACHE_RUN_USER=postgres
+export APACHE_RUN_GROUP=postgres
+
+
+3.
+sudo chmod 755 /usr/sbin/pgpool
+sudo chmod 755 /usr/sbin/pcp_*
+
+4. obtain the hash for your admin user's password
+pg_md5 password_string
+Ex: for user: pgpoolAdmin pass: pgpoolAdmin
+echo pgpoolAdmin:$(pg_md5 pgpoolAdmin) >> /etc/pgpool2/pcp.conf && cat /etc/pgpool2/pcp.conf
+
+5. Unpack files and move them to web server document root directory
+mv pgpoolAdmin-4.2.0.tar.gz /tmp
+cd /tmp
+tar xzvf pgpoolAdmin-4.2.0.tar.gz
+sudo mv pgpoolAdmin-4.2.0 /var/www/html/pgpoolAdmin
+#rm pgpoolAdmin-4.2.0.tar.gz
+sudo chown -R postgres:postgres /var/www
+
+6. verify if the files have been moved correcty
+sudo find /var/www/html/pgpoolAdmin -print
+
+7.
+open your web browser and type the following address to check if "Multibyte Support" and "PostgreSQL Support"
+are enabled. We assume they are not, so in the next steps we will instruct how to enable them
+http://hostaddress/pgpoolAdmin/install/phpinfo.php
+
+8. Install "Multibyte Support" and "PostgreSQL Support" (Note: do not install php-pgsql or php-mbstring)
+sudo apt-get install -y php7.4-mbstring
+sudo apt-get install -y php7.4-pgsql
+
+9. restart apache service
+systemctl restart apache2
+
+10. reload http://hostaddress/pgpoolAdmin/install/phpinfo.php, the options in question must be
+enabled now. if not, the configuration must be ";zend.multibyte = Off" in a single line. If so,
+run the following to enable multibyte support
+cd /etc/php/7.4/apache2 && find /etc/php/7.4/apache2 -type f -exec sed -i 's/;zend.multibyte = Off/zend.multibyte = On/g' {} +
+systemctl restart apache2
+
+
+11. create template_c directory and set permissions
+cd /var/www/html/pgpoolAdmin
+mkdir -p templates_c
+chmod 777 templates_c
+
+12. apache user must have read/write access to the following
+cd /var/www/html/pgpoolAdmin/conf
+# chown www-data pgmgt.conf.php
+chmod 644 pgmgt.conf.php
+
+13. apache user must have the following permissions
+
+cd /etc/pgpool2/
+chown postgres:postgres pgpool.conf
+chmod 664 pgpool.conf
+chown postgres:postgres pcp.conf
+chmod 664 pcp.conf
+
+14. access the installer at the following URL:
+http://hostaddress/pgpoolAdmin/install/index.php
+
+15. correct the parameters in the upcomming page such as pgpool.conf, pcp.conf, etc. files path. A sample
+of parameters which can be wrong for Ubuntu are below.
+pgpool.conf File: 
+/etc/pgpool2/pgpool.conf
+pcp.conf File: 
+/etc/pgpool2/pcp.conf
+pgpool Command: 
+/usr/sbin/pgpool
+PCP directory: 
+/usr/sbin
+
+16. After that the configurations were completed successfully, remove the installation directory
+rm -rf /var/www/html/pgpoolAdmin/install
+
+
+sudo tail -f /var/log/apache2/error.log
+sudo tail -f /var/log/php_errors.log
+``` install pgpoolAdmin
+
+
+
+
+
+
+create database <dbname>;
+
+\l(ist)
+show databases
+
+\dt
+show the list of database tables
+select * from pg_tables
+
+
+\c(onnect)
+connect to database
+
+sudo -u postgres psql -c 'show config_file'
+sudo -u postgres psql -c 'show data_directory'
+
+/var/lib/pgsql/13/data ->	/DATA/Postgre13/data 	700
+							/DATA/Postgre13 		755
+							
+/usr/lib/systemd/system/postgresql-13.service :
+#default: Environment=PGDATA=/var/lib/pgsql/13/data/
+# our intention: Environment=PGDATA=/data/postgres13/data/
+
+The default log path is the following:
+pgsql/13/data/log/
+
+
+# pg_hba.conf file is read on server startup and when the server receives a
+# SIGHUP signal.  If you edit the file on a running system, you have to
+# SIGHUP the server for the changes to take effect, run "pg_ctl reload",
+# or execute "SELECT pg_reload_conf()".
+
+
+
+
+pg_ctl path in pg13:
+/usr/pgsql-13/bin/pg_ctl
+
+/pg_ctl -D /var/lib/pgsql/13/data -m immediate stop
+
+CREATE EXTENSION pageinspect;
+CREATE TABLE tbl (data text);
+INSERT INTO tbl VALUES('A');
+SELECT lp as tuple, t_xmin, t_xmax, t_field3 as t_cid, t_ctid FROM heap_page_items(get_raw_page('tbl', 0));
+SELECT * FROM heap_page_items(get_raw_page('tbl', 0));
+
+## PostgreSQL's extensions and respective functions:
+```
+*)	CREATE EXTENSION pageinspect;
+	SELECT * FROM heap_page_items(get_raw_page('tbl', 0));
+	
+*)	CREATE EXTENSION pg_freespacemap;
+	SELECT *, round(100 * avail/8192 ,2) as "freespace ratio" FROM pg_freespace('accounts');
+```
+
+for tbl in `psql -qAt -c "select tablename from pg_tables where schemaname = 'public' and tablename like '%';" YOUR_DB` ; do  psql -c "alter table \"$tbl\" owner to NEW_OWNER" YOUR_DB ; done
+for tbl in `psql -qAt -c "select tablename from pg_tables where schemaname = 'public' and tablename like 'test_%';" pg_test` ; do  psql -c "alter table \"$tbl\" owner to root" pg_test ; done
+
+
+## recover dead primary from standby streaming replication
+```
+1) on new primary, make sure to install the same postgreSQL version as the standby but
+do not initialize the database cluster
+
+2) on new primary, create drop-in and set the following environment variables for postgresql
+if you want to change the data directory:
+[Service]
+Environment=PGDATA=/data/postgres13/data/
+PGLOG=/var/log/pgsql/
+
+3) on standby, allow the connection from the new primary by adding authorization method entry
+to the pg_hba.conf file
+host    replication     replicator      192.168.241.129/32      md5
+
+4) on standby, reload configuration:
+psql -c "select pg_reload_conf()"
+
+5) on new primary, run the following command and provide replicator user password:
+pg_basebackup -h 192.168.241.130 -p 5432 -U replicator -D /data/postgres13/data -Fp -Xf -P
+
+6) on new primary, change the ownership to pg data directory
+chown -R postgres:postgres /data/postgres13
+
+7) on new primary, delete the following files:
+rm -f postgresql.auto.conf
+rm -f standby.signal
+
+8) on new primary, enable and start postgreSQL service, make sure you the standby is running
+
+9) on primary, run the following command to check replication status:
+psql -x -c "select * from pg_stat_replication"
+	The output should be something like this:
+	
+-[ RECORD 1 ]----+---------------------------------
+pid              | 265824
+usesysid         | 16386
+usename          | replicator
+application_name | walreceiver
+client_addr      | 192.168.241.130
+client_hostname  |
+client_port      | 56158
+backend_start    | 2021-08-08 07:31:44.691788+04:30
+backend_xmin     |
+state            | streaming
+sent_lsn         | 0/400E4D8
+write_lsn        | 0/400E4D8
+flush_lsn        | 0/400E4D8
+replay_lsn       | 0/400E4D8
+write_lag        |
+flush_lag        |
+replay_lag       |
+sync_priority    | 0
+sync_state       | async
+reply_time       | 2021-08-08 07:40:08.972764+04:30
+
+```
+
+
+select inet_server_addr();
+ip address of the server
+
+\conninfo
+
+select * from pg_settings;
+
+select pg_create_physical_replication_slot('<slotname>');
+
+select * from pg_replication_slots;
+query replication slots
+
+show database cluster roles (users):
+\du+
++: show also description column
+select * from pg_catalog.pg_user;
+
+pg_receivewal -v -h192.168.241.129 -p5432 -Ubarman -W --directory=.
+
+ALTER USER streaming_barman WITH SUPERUSER|NOSUPERUSER;
+promote/demote a user to/from superuser
+
+alter user barman with BYPASSRLS createdb createrole superuser INHERIT LOGIN REPLICATION CONNECTION LIMIT 10 VALID UNTIL 'timestamp' [ ENCRYPTED ] PASSWORD 'password';
+ALTER USER name RENAME TO new_name
+
+ALTER SYSTEM SET configuration_parameter { TO | = } { value | 'value' | DEFAULT }
+ALTER SYSTEM RESET configuration_parameter
+ALTER SYSTEM RESET ALL
+
+### Points
+1) Replication slot names may only contain lower case letters, numbers, and the underscore character.
+
+### tablespace:
+CREATE TABLESPACE tbs_database_name OWNER database_user LOCATION '/data/postgres13/tbs_databases/tbs_database_name';
+ALTER DATABASE database_name  SET TABLESPACE tbs_database_name;
+\db+
+select * from pg_tablespace;
+
+## inpatient charges:
+```
+create database test;
+\c test
+CREATE TABLE inpatientCharges (
+  drg_definition VARCHAR(200),
+  provider_id INT,
+  provider_name VARCHAR(200),
+  provider_street_address VARCHAR(200),
+  provider_city VARCHAR(50),
+  provider_state VARCHAR(10),
+  provider_zip_code INT,
+  hospital_referral_region_description VARCHAR(50),
+  total_discharges INT,
+  average_covered_charges VARCHAR(20),
+  average_total_payments VARCHAR(20),
+  average_medicare_payments VARCHAR(20)
+  id integer generated by default as identity
+);
+
+--oltp workload:
+\c test;
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+insert into inpatientCharges values ('a',1,'a','a','a','a',1,'a',1,'a','a','a');
+
+select count(*) from inpatientCharges;
+
+```
+## add identity column to table
+ALTER TABLE inpatientCharges 
+    ADD COLUMN id int                -- int or bigint or smallint
+        GENERATED BY DEFAULT AS IDENTITY;
+
+## alter existing column to identity:
+ALTER TABLE patient 
+    ALTER patientid SET NOT NULL,  -- optional
+    ALTER patientid ADD GENERATED ALWAYS AS IDENTITY 
+        (START WITH 2);  -- optional
+		
+## top records:
+select * from inpatientcharges order by id desc limit 10;
+select * from inpatientcharges order by id desc fetch first 10 rows only;
+
+
+## extract fragmentation of leaves of b-tree index:
+SELECT i.indexrelid::regclass,
+       s.leaf_fragmentation
+FROM pg_index AS i
+   JOIN pg_class AS t ON i.indexrelid = t.oid
+   JOIN pg_opclass AS opc ON i.indclass[0] = opc.oid
+   JOIN pg_am ON opc.opcmethod = pg_am.oid
+   CROSS JOIN LATERAL pgstatindex(i.indexrelid) AS s
+WHERE t.relkind = 'i'
+  AND pg_am.amname = 'btree';
+
+
+describe table
+\d+ tablename
+
+list indexes
+\di+
+
+show index definition:
+SELECT indexdef FROM pg_indexes WHERE indexname = '...'
+
+####### Teymouri #####################################
+1 – Sometimes you need to see how many indexes your table has. This query will show the schema-qualified table name and its index names.
+db=# SELECT CONCAT(n.nspname,'.', c.relname) AS table,
+    i.relname AS index_name FROM pg_class c
+     JOIN pg_index x ON c.oid = x.indrelid
+     JOIN pg_class i ON i.oid = x.indexrelid LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE c.relkind = ANY (ARRAY['r', 't']) AND c.relname like 'pgbench_accounts';
+          table          | index_name       
+-------------------------+------------------------
+ public.pgbench_accounts | pgbench_accounts_pkey
+ public.pgbench_accounts | pgbench_accounts_index
+
+2 – As we all know, an index is a performance feature, but along with that, it is also used to ensure uniqueness. But to ensure the uniqueness we need a separate type of index called a unique index. To check whether an index is unique or not, pg_index has a column named “indisunique” to identify the uniqueness of the index.
+SELECT    i.relname AS index_name,
+          indisunique is_unique
+FROM      pg_class c
+JOIN      pg_index x ON c.oid = x.indrelid
+JOIN      pg_class i ON i.oid = x.indexrelid
+LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE     c.relkind = ANY (ARRAY['r', 't'])
+AND       c.relname LIKE 'pgbench_accounts';
+       index_name       | is_unique 
+------------------------+-----------
+ pgbench_accounts_pkey  | t
+ pgbench_accounts_index | f
+
+3- There is a pretty simple way to get the size of the index of PostgreSQL. Here is a query to list the PostgreSQL with size.
+
+SELECT pg_size_pretty(pg_relation_size('pgbench_accounts_index'));
+ pg_size_pretty 
+----------------
+ 132 MB
+
+Here is a list of the indexes with total table size and size of the index, which is very useful to compare your table size with its corresponding indexes.  It’s very good to know the size of your table, index, and the total size of the table.
+SELECT    CONCAT(n.nspname,'.', c.relname) AS table,
+          i.relname AS index_name, pg_size_pretty(pg_relation_size(x.indrelid)) AS table_size,
+          pg_size_pretty(pg_relation_size(x.indexrelid)) AS index_size,
+          pg_size_pretty(pg_total_relation_size(x.indrelid)) AS total_size FROM pg_class c 
+JOIN      pg_index x ON c.oid = x.indrelid
+JOIN      pg_class i ON i.oid = x.indexrelid
+LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE     c.relkind = ANY (ARRAY['r', 't'])
+AND       n.oid NOT IN (99, 11, 12375);
+          table          | index_name       | table_size | index_size | total_size 
+-------------------------+------------------------+------------+------------+------------
+ public.pgbench_tellers  | pgbench_tellers_pkey   | 88 kB      | 64 kB  | 152 kB
+ public.pgbench_accounts | pgbench_accounts_pkey  | 2561 MB    | 428 MB | 3122 MB
+ public.pgbench_accounts | pgbench_accounts_index | 2561 MB    | 132 MB | 3122 MB
+ public.pgbench_branches | pgbench_branches_pkey  | 8192 bytes | 16 kB  | 24 kB
+
+pg_relation_size: Function gives the size of relation. It is used to get the size of the table/index.
+pg_total_relation_size:  This is a special function that gives the total size of the table along with its all indexes.
+
+5 – Get the query of the index. This query will show the index creation query.
+
+SELECT pg_get_indexdef(indexrelid) AS index_query
+FROM   pg_index WHERE  indrelid = 'pgbench_accounts'::regclass;
+                                     index_query
+----------------------------------------------------------------------------------------
+CREATE UNIQUE INDEX pgbench_accounts_pkey ON public.pgbench_accounts USING btree (aid)
+CREATE INDEX pgbench_accounts_index ON public.pgbench_accounts USING btree (bid)
+CREATE INDEX pgbench_accounts_index_dup ON public.pgbench_accounts USING btree (bid)
+(3 rows)
+
+6 – In case your index becomes corrupted or bloated, you need to build that index again. At the same time, you don’t want to block the operation on your table, so this REINDEX CONCURRENTLY command is your choice for that.
+
+REINDEX INDEX CONCURRENTLY idx;
+
+7– This query will find the unused indexes. If index_scans is 0 or close to 0 then you can drop those indexes. But be careful, as maybe those indexes are for unique purposes.
+
+SELECT s.relname AS table_name,
+       indexrelname AS index_name,
+       i.indisunique,
+       idx_scan AS index_scans
+FROM   pg_catalog.pg_stat_user_indexes s,
+       pg_index i
+WHERE  i.indexrelid = s.indexrelid;
+table_name       | index_name            | indisunique | index_scans
+------------------+-----------------------+-------------+-------------
+pgbench_branches | pgbench_branches_pkey | t           | 0
+pgbench_tellers  | pgbench_tellers_pkey  | t           | 0
+pgbench_accounts | pgbench_accounts_pkey | t           | 0
+(3 rows)
+
+9 – Query used to find a duplicate index. In this example, pgbench_accounts has two of the same indexes. There is no need to have multiple same indexes with a different name on a table. As we already discussed, in case of update/insert, all the indexes get updated along with the actual table, which hurts the performance.
+
+Duplicate indexesShell
+SELECT   indrelid::regclass table_name,
+         att.attname column_name,
+         amname index_method
+FROM     pg_index i,
+         pg_class c,
+         pg_opclass o,
+         pg_am a,
+         pg_attribute att
+WHERE    o.oid = ALL (indclass) 
+AND      att.attnum = ANY(i.indkey)
+AND      a.oid = o.opcmethod
+AND      att.attrelid = c.oid
+AND      c.oid = i.indrelid
+GROUP BY table_name, 
+         att.attname,
+         indclass,
+         amname, indkey
+HAVING count(*) > 1;
+table_name | column_name | index_method
+------------+-------------+--------------
+foo        | a           | btree
+
+
+Reindexing all tables
+After upgrading the production database to PostgreSQL 13, I wanted to reindex all tables to convert them to the new deduplicated format. PostgreSQL allows you to reindex without locking by using its REINDEX ... CONCURRENTLY syntax. After a little playing around I created this SQL statement to generate REINDEX TABLE CONCURRENTLY statements for all tables, in ascending order of size:
+SELECT 'REINDEX TABLE CONCURRENTLY ' || quote_ident(relname) || ' /*' || pg_size_pretty(pg_total_relation_size(C.oid)) || '*/;'
+FROM pg_class C
+LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
+WHERE nspname = 'public'
+  AND C.relkind = 'r'
+  AND nspname !~ '^pg_toast'
+ORDER BY pg_total_relation_size(C.oid) ASC;
+
+############################################################################
+
+create a new temporary table from existing selection:
+CREATE TEMP TABLE tbl AS SELECT * FROM tbl WHERE ... ;
+
+
+select relname,relkind from pg_class where relname like '%user%';
+get relations containing something in their name.
+
+select relname from pg_index i join pg_class c on i.indexrelid = c.oid where relname not like 'pg_%';
+get user indexes of current database
+
+
+
+
+################# PSQL ################################
+### psql meta commands and equivalents:
+```
+run shell command
+\!
+
+psql command history
+/home/user/.psql_history
+
+\l
+select * from pg_stat_database;
+select * from pg_database;
+
+\d
+
+show actual query run by psql
+\set ECHO_HIDDEN on
+
+like set statistics time on
+\timing [on|off]
+
+```
+
+
+
+
+### pgAdmin
+```
+## install
+## RHEL Rocky, Redhat or CentOS
+1. remove the old repos if any
+#Ex:
+sudo rpm -e pgadmin4-redhat-repo
+2.
+sudo rpm -i https://ftp.postgresql.org/pub/pgadmin/pgadmin4/yum/pgadmin4-redhat-repo-2-1.noarch.rpm
+3.
+# Install for both desktop and web modes.
+sudo yum install pgadmin4
+# Install for desktop mode only.
+sudo yum install pgadmin4-desktop
+# Install for web mode only.
+sudo yum install pgadmin4-web
+
+## Ubuntu 24.04
+curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+#sudo apt install pgadmin4
+#sudo apt install pgadmin4-desktop
+sudo apt install pgadmin4-web 
+sudo /usr/pgadmin4/bin/setup-web.sh
+``` pgAdmin
+
+
+### phppgadmin
+```
+apt install -y phppgadmin
+
+sudo chown -R www-data:www-data /usr/share/phppgadmin
+sudo chmod -R 755 /usr/share/phppgadmin
+
+vi /etc/apache2/sites-available/000-default.conf
+Alias /phpPgAdmin /usr/share/phpPgAdmin
+
+<Directory /usr/share/phppgadmin>
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+
+sudo systemctl restart apache2
+
+# If further problems occurred:
+sudo setenforce 0  # For SELinux
+sudo systemctl stop apparmor.service  # For AppArmor
+sudo ufw allow 80/tcp
+sudo ufw reload
+
+
+```
+###
+
+
+extensions views
+select * from pg_available_extensions;
+select * from pg_extension;
+
+
+### pg_dump, pg_dumpall
+```
+To dump a database called mydb into an SQL-script file:
+$ pg_dump mydb > db.sql
+To reload such a script into a (freshly created) database named newdb:
+$ psql -d newdb -f db.sql
+To dump a database into a custom-format archive file:
+$ pg_dump -Fc mydb > db.dump
+To dump a database into a directory-format archive:
+$ pg_dump -Fd mydb -f dumpdir
+To dump a database into a directory-format archive in parallel with 5 worker jobs:
+$ pg_dump -Fd mydb -j 5 -f dumpdir
+To reload an archive file into a (freshly created) database named newdb:
+$ pg_restore -d newdb db.dump
+To reload an archive file into the same database it was dumped from, discarding the current contents of that database:
+$ pg_restore -d postgres --clean --create db.dump
+To dump a single table named mytab:
+$ pg_dump -t mytab mydb > db.sql
+To dump all tables whose names start with emp in the detroit schema, except for the table named employee_log:
+$ pg_dump -t 'detroit.emp*' -T detroit.employee_log mydb > db.sql
+To dump all schemas whose names start with east or west and end in gsm, excluding any schemas whose names contain the word test:
+$ pg_dump -n 'east*gsm' -n 'west*gsm' -N '*test*' mydb > db.sql
+The same, using regular expression notation to consolidate the switches:
+$ pg_dump -n '(east|west)*gsm' -N '*test*' mydb > db.sql
+To dump all database objects except for tables whose names begin with ts_:
+$ pg_dump -T 'ts_*' mydb > db.sql
+To specify an upper-case or mixed-case name in -t and related switches, you need to double-quote the name; else it will be folded to lower case (see Patterns). But double quotes are special to the shell, so in turn they must be quoted. Thus, to dump a single table with a mixed-case name, you need something like
+$ pg_dump -t "\"MixedCaseName\"" mydb > mytab.sql
+
+notable parameters:
+dbname
+-a
+Dump only the data, not the schema
+-b
+Include large objects in the dump
+-B
+Exclude large objects in the dump.
+-c
+Output commands to DROP all the dumped database objects prior to outputting the commands for creating them. This option is ignored when emitting an archive (non-text) output file.
+-C
+Begin the output with a command to create the database itself and reconnect to the created database. If --clean is also specified, the script drops and recreates the target database before reconnecting to it. This option is ignored when emitting an archive (non-text) output file. For the archive formats, you can specify the option when you call pg_restore.
+-e pattern
+Dump only extensions matching pattern.
+-E
+Create the dump in the specified character set encoding.
+-f file/directly
+Send output to the specified file.
+-F format
+the format of the output
+```
+
+
+
+## Read from a flat file text csv
+COPY myTable FROM '/path/to/file/on/server' (FORMAT CSV, DELIMITER('|'), HEADER)
+
+
+
+### enable ENABLE_PSQL option for pgAdmin web
+```
+# the location is typically below. If it is not, just run one of the
+# find / -name "config*.py" -type f 2>/dev/null | grep pgadmin
+# or grep -rnw / -e 'ENABLE_PSQL' 2>/dev/null
+vi /usr/pgadmin4/web/config.py
+find the ENABLE_PSQL entry and set it to True
+# reconfig pgadmin web to take the change into effect. The .sh file is located
+# within pgadmin binary directory
+/usr/pgadmin4/bin/setup-web.sh
+```
+
+
+### get the definition of an object
+```
+SELECT pg_get_functiondef('function_name'::regproc);
+\d+ table_name
+SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'table_name';
+``` 
+
+
+SELECT version();		# verbose
+SHOW server_version_num;
+# get major version in shell using the previous
+$((`sudo -iu postgres psql -tc "show server_version_num"` / 10000))
+SHOW server_version;
+
+
+
+# manually rotate wal
+checkpoint;
+SELECT pg_switch_wal();
+
+
+
+### utilizing .pgpass file
+```
+# place the file in a well-accessible location
+# the template for the contents:
+hostname:port:database:username:password
+# using wildcard
+*:port:database:username:password
+
+
+# now connect to the db cluster using the following command:
+psql -h hostname -p port -d database -U username
+
+``` utilizing .pgpass file
+
+
+### Sample service stop on Ubuntu with pg_ctl and pg_ctlcluster commands
+postgres@funleashpgdb01:/data/postgresql/15/main/data$ systemctl status postgresql@15-main.service
+● postgresql@15-main.service - PostgreSQL Cluster 15-main
+     Loaded: loaded (/lib/systemd/system/postgresql@.service; enabled-runtime; vendor preset: enabled)
+     Active: deactivating (stop) since Sat 2024-06-08 09:58:42 UTC; 49s ago
+    Process: 180073 ExecStart=/usr/bin/pg_ctlcluster --skip-systemctl-redirect 15-main start (code=exited, status=0/SUCCESS)
+   Main PID: 180078 (postgres); Control PID: 211365 (pg_ctlcluster)
+      Tasks: 5 (limit: 969)
+     Memory: 36.0M
+        CPU: 3.758s
+     CGroup: /system.slice/system-postgresql.slice/postgresql@15-main.service
+             ├─180078 /usr/lib/postgresql/15/bin/postgres -D /data/postgresql/15/main/data -c config_file=/etc/postgresql/15/main/postgresql.conf
+             ├─180084 "postgres: 15/main: archiver archiving 000000010000000000000019" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ">
+             ├─180086 sh -c "test ! -f /backup/wal/000000010000000000000019 && sudo cp pg_wal/000000010000000000000019 /backup/wal/000000010000000000000019"
+             ├─211365 /usr/bin/perl -wT /usr/bin/pg_ctlcluster --skip-systemctl-redirect -m fast 15-main stop
+             └─211367 /usr/lib/postgresql/15/bin/pg_ctl stop -s -w -D /data/postgresql/15/main/data -m fast
+
+
+
+### Query to get objects within an installed extension:
+```
+SELECT e.extname AS "Ext Name", pg_catalog.pg_describe_object(d.classid, d.objid, 0) AS "Object description"
+FROM pg_catalog.pg_depend d JOIN pg_catalog.pg_extension e
+ON d.refobjid = e.oid
+WHERE d.refclassid = 'pg_catalog.pg_extension'::pg_catalog.regclass AND refobjid = '16390' AND deptype = 'e' AND
+	e.extname OPERATOR(pg_catalog.~) '^(pgpool_recovery)$' COLLATE pg_catalog.default
+ORDER BY 1;
+```
+
+
+
+
+
+
+
+P1="'[unknown]@[unknown] LOCATION:  BackendInitialize, postmaster.c'"
+P2="'[unknown]@[unknown] LOG:  00000: connection received: host=funleashpgdb01.l.mofid.dc port='"
+P3="'repl@postgres LOG:  00000: connection authenticated: identity="repl" method=scram-sha-256 (/etc/postgresql/'"
+P4="'repl@postgres LOCATION:  set_authn_id, auth'"
+P5="'repl@postgres LOG:  00000: connection authorized: user='"
+P6="'repl@postgres LOCATION:  PerformAuthentication, postinit'"
+P7="'repl@postgres LOG:  00000: statement: SELECT pg_catalog.pg_current_wal_lsn'"
+P8="'repl@postgres LOCATION:  exec_simple_query, postgres'"
+P9="'repl@postgres LOG:  00000: statement: SELECT application_name, state, sync_state'"
+P10="'repl@postgres LOCATION:  exec_simple_query, postgres'"
+P11="'repl@postgres LOG:  00000: statement: SELECT pg_is_in_recovery()'"
+P12="'repl@postgres LOCATION:  exec_simple_query, postgres.c'"
+
+tail -f -n 20 /var/log/postgresql/postgresql-15-main.log | grep -v "$P1" | grep -v "$P2" | grep -v "$P3" | grep -v "$P4" | grep -v "$P5" | grep -v "$P6" | grep -v "$P7" | grep -v "$P8" | grep -v "$P9" | grep -v "$P10" | grep -v "$P11" | grep -v "$P12"
+
+
+
+
+### get hostname/IP through pg db cluster:
+```
+1.
+SELECT inet_server_addr() AS hostname;
+2.
+SELECT boot_val, reset_val FROM pg_settings WHERE name='listen_addresses';
+3.
+COPY (SELECT * FROM pg_read_file('/etc/hostname')) TO STDOUT;
+4.
+CREATE TEMP TABLE tt_cmd (hostname text);
+COPY tt_cmd FROM PROGRAM 'hostname';
+SELECT * FROM tt_cmd;
+DROP TABLE tt_cmd;
+``` get hostname/IP through pg db cluster
+
+
+
+
+### Some queries
+```
+COPY (SELECT * FROM pg_read_file('/etc/hostname')) TO STDOUT;
+SELECT current_setting('transaction_isolation')
+SELECT pg_catalog.version();
+CREATE TEMP TABLE tt_cmd (hostname text);
+COPY tt_cmd FROM PROGRAM 'hostname'; SELECT * FROM tt_cmd; DROP TABLE tt_cmd;
+SELECT status, conninfo FROM pg_catalog.pg_stat_wal_receiver
+```
+
+
+
+### find object id/object identifier/oid of an object
+```
+# ubu:
+/usr/lib/postgresql/15/bin/oid2name
+# rhel:
+/usr/pgsql-16/bin/oid2name
+# table
+SELECT oid FROM pg_class WHERE relname = 'your_table_name';
+SELECT 'your_table_name'::regclass::oid;
+SELECT c.oid
+FROM pg_catalog.pg_class c
+JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+WHERE c.relname = 'your_table_name' AND n.nspname = 'your_schema_name';
+
+SELECT oid, spcname FROM pg_tablespace WHERE spcname = 'your_tablespace_name';
+SELECT oid, rolname FROM pg_authid WHERE rolname = 'your_role_name';
+SELECT oid FROM pg_class WHERE relname = 'your_index_name' AND relkind = 'i';
+SELECT 'your_function_name'::regproc::oid;
+```
+
+
+# This shall not be added to the escalation.sh shell script file
+if [ $(ip a | grep $VIP | wc -l) -eq 0 ]; then /usr/bin/sudo /usr/sbin/ip addr add $VIP/24 dev $DEVICE label $DEVICE:0 && continue; else continue; fi
+
+
+
+### Logical backup and restore
+```
+pg_dumpall -U postgres -h localhost -p 5432 > all_databases.sql
+pg_dumpall -U postgres -h 172.23.174.123 -p 30361 > all_databases.sql
+
+psql -U postgres -h localhost -p 5432 -f all_databases.sql
+``` Logical backup and restore
+
+
+
+
+
+
+### Install and setup pg Barman
+```
+install Barman and associated packages
+apt install -y barman barman-cli python3-barman
+```
+
+
+
+
+### Add postgres instance to red gate monitor
+```
+ssh-keygen -t ed25519 -C "<YOUR USERNAME>"
+ssh-keygen -t ed25519 -C "postgres"
+# or
+
+
+``` Add postgres instance to red gate monitor
+
+
+acquiring degree of parallelism for some maintenance jobs
+parallelism=$(echo "a=$(psql -h ${HOST} -U ${USER} -p ${PORT} -dpostgres -c "select current_setting('max_parallel_workers');" -tA); scale=0; (a + 2) / 3" | bc)
+
+
+
+scp -i .ssh/id_rsa_ser -r edb-pg15-system-stats-3_3.0-3.jammy_amd64.deb root@172.23.136.51:~root/
+
+
+
+prometheus-haproxy-exporter
+prometheus-node-exporter
+prometheus-pgbouncer-exporter
+prometheus-postgres-exporter
+prometheus-sql-exporter
+prometheus-hacluster-exporter
+prometheus-node-exporter-collectors
+prometheus-process-exporter
+
+
+
+Finish ■
