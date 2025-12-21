@@ -189,11 +189,17 @@ fi
 
 log -n "------------------------------------- Started ------------------------------------------"
 log -n "Starting WAL archiving ..."
+log -n "WAL source (archive_command target): $PG_WAL_ARCHIVE_DIR"
+log -n "Backup destination: $PG_WAL_BACKUP_ARCHIVE_DIR"
+log -n "Tape destination: $PG_WAL_TapeBACKUP_ARCHIVE_DIR"
 echo
 echo
 echo "------------------------------------- Started ------------------------------------------"
 echo "Starting WAL archiving ..."
 echo "log file path: $LOG_FILE"
+echo "WAL source (archive_command target): $PG_WAL_ARCHIVE_DIR"
+echo "Backup destination: $PG_WAL_BACKUP_ARCHIVE_DIR"
+echo "Tape destination: $PG_WAL_TapeBACKUP_ARCHIVE_DIR"
 
 
 #-------------------------- Backup process start: ------------------------------------
@@ -245,7 +251,7 @@ for WAL_FILE in $(find "$PG_WAL_ARCHIVE_DIR" -type f -name "000000*" 2>/dev/null
   
   TARGET_WAL_PATH="$PG_WAL_BACKUP_ARCHIVE_DIR""$WAL_NAME"
   if [ $MOVE_EXIT_CODE -eq 0 ]; then
-     log -n --no-ts " Passed.";
+     log -n --no-ts " Passed. Dest: ${PG_WAL_BACKUP_ARCHIVE_DIR}${WAL_NAME} ; Tape: ${PG_WAL_TapeBACKUP_ARCHIVE_DIR}${WAL_NAME}"
      CUMULATIVE_WAL_MOVED_SIZE_BYTES=$((CUMULATIVE_WAL_MOVED_SIZE_BYTES + $(du -bs "$TARGET_WAL_PATH" 2>/dev/null | awk '{print $1}')))
 	 WAL_FILES_MOVED=$((WAL_FILES_MOVED + 1))
   fi  
@@ -297,8 +303,11 @@ fi
 # Format the output based on success/failure
 if [ $exit_code -eq 0 ]; then
 	log -n "Moving all WAL files completed successfully. # of WAL files: $WAL_FILES_FOUND, Cumulative Size: $HUMAN_READABLE_SIZE"
+	log -n "Backup destination: $PG_WAL_BACKUP_ARCHIVE_DIR"
+	log -n "Tape destination: $PG_WAL_TapeBACKUP_ARCHIVE_DIR"
 	echo "Moving all WAL files completed successfully. # of WAL files: $WAL_FILES_FOUND, Cumulative Size: $HUMAN_READABLE_SIZE"
-	#echo "move WAL files to remote storage finished successfully."
+	echo "Backup destination: $PG_WAL_BACKUP_ARCHIVE_DIR"
+	echo "Tape destination: $PG_WAL_TapeBACKUP_ARCHIVE_DIR"
 else
 	log -n "Critical error! "	
 	echo -n "Critical error! "	
@@ -331,7 +340,14 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "WAL archiving & purging completed successfully."
+echo "Backup destination: $PG_WAL_BACKUP_ARCHIVE_DIR"
+echo "Tape destination: $PG_WAL_TapeBACKUP_ARCHIVE_DIR"
+echo "Purged from: $PG_WAL_BACKUP_ARCHIVE_ROOT_DIR (files older than 10 days)"
 log -n "WAL archiving & purging completed successfully."
+log -n "Backup destination: $PG_WAL_BACKUP_ARCHIVE_DIR"
+log -n "Tape destination: $PG_WAL_TapeBACKUP_ARCHIVE_DIR"
+log -n "Purged from: $PG_WAL_BACKUP_ARCHIVE_ROOT_DIR (files older than 10 days)"
+
 
 #-------------------------- Purge process end ------------------------------------
 
