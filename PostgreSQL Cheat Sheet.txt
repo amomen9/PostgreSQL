@@ -1029,10 +1029,10 @@ CREATE TEMP TABLE tbl AS SELECT * FROM tbl WHERE ... ;
 
 
 select relname,relkind from pg_class where relname like '%user%';
-get relations containing something in their name.
+Get relations containing something in their name.
 
 select relname from pg_index i join pg_class c on i.indexrelid = c.oid where relname not like 'pg_%';
-get user indexes of current database
+Get user indexes of the current database
 
 
 
@@ -1042,6 +1042,9 @@ get user indexes of current database
 ```
 run shell command
 \!
+Ex:
+\! clear
+\! cp <source> <destination>
 
 psql command history
 /home/user/.psql_history
