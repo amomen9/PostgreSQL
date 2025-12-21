@@ -226,11 +226,13 @@ fi
 
 log -n "------------------------------------- Started ------------------------------------------"
 log -n "Starting Full Backup ..."
+log -n "Local backup destination: $BACKUP_DIR"
 echo
 echo
 echo "------------------------------------- Started ------------------------------------------"
 echo "Starting Full Backup ..."
 echo "LOG file path: $LOG_FILE"
+echo "Local backup destination: $BACKUP_DIR"
 
 
 #-------------PG Variables -------------------------------------------------
@@ -319,9 +321,11 @@ if [ $exit_code -eq 0 ]; then
     echo "$BACKUP_TYPE backup completed successfully."
     echo " Duration: $duration (DD:HH:MM:SS)"
     echo "Backup size: $BACKUP_SIZE"
+    echo "Backup destination: $BACKUP_DIR"
     log -n "$BACKUP_TYPE backup completed successfully."
     log -n "Duration: $duration (DD:HH:MM:SS)"
     log -n "Backup size: $BACKUP_SIZE"
+    log -n "Backup destination: $BACKUP_DIR"
 else
 	echo -n "Critical error! "
 	echo "$BACKUP_TYPE backup was interrupted and failed for the following reason:"
@@ -333,9 +337,11 @@ else
 	echo "$CMDOUT"
 	echo "Duration: $duration (DD:HH:MM:SS)"
 	echo "Leftovers size on disk: $BACKUP_SIZE"
+	echo "Backup destination (leftovers may exist here): $BACKUP_DIR"
 	log -n "$CMDOUT"
 	log -n "Duration: $duration (DD:HH:MM:SS)"
 	log -n "Leftovers size on disk: $BACKUP_SIZE"
+	log -n "Backup destination (leftovers may exist here): $BACKUP_DIR"
 	exitscript -1
 fi
 
@@ -352,7 +358,11 @@ CMDOUT=$(timeout 24h rsync -r --no-perms --no-owner --no-group --no-times "${SRC
 
 if [ $? -eq 0 ]; then
 	log -n "Copy $BACKUP_TYPE backup to remote storage finished successfully."
+	log -n "Remote destination root: $PG_FULL_BACKUP_DIR"
+	log -n "Remote destination path: ${PG_FULL_BACKUP_DIR}$(basename "$SRC")"
 	echo "Copy $BACKUP_TYPE backup to remote storage finished successfully."
+	echo "Remote destination root: $PG_FULL_BACKUP_DIR"
+	echo "Remote destination path: ${PG_FULL_BACKUP_DIR}$(basename "$SRC")"
 else
 	log -n "Copy $BACKUP_TYPE backup to remote storage failed. MSG: $CMDOUT"
 	echo "Copy $BACKUP_TYPE backup to remote storage failed. MSG: $CMDOUT"
@@ -365,12 +375,15 @@ fi
 #-------------------------- Copy to tape remote location -------------------------
 #set -x
 CMDOUT=$(timeout 24h cp -rf "${PG_FULL_BACKUP_DIR}""$(basename ${BACKUP_DIR})" \
-$PG_FULL_BACKUP_ARCHIVE_DIR) 2>&1	
-# set +x
+$PG_FULL_BACKUP_ARCHIVE_DIR) 2>&1
 
 if [ $? -eq 0 ]; then
 	log -n "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
-	#echo "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
+	log -n "Tape destination root: $PG_FULL_BACKUP_ARCHIVE_DIR"
+	log -n "Tape destination path: ${PG_FULL_BACKUP_ARCHIVE_DIR}$(basename "$BACKUP_DIR")"
+	echo "Copy $BACKUP_TYPE backup to remote --tape-- storage finished successfully."
+	echo "Tape destination root: $PG_FULL_BACKUP_ARCHIVE_DIR"
+	echo "Tape destination path: ${PG_FULL_BACKUP_ARCHIVE_DIR}$(basename "$BACKUP_DIR")"
 else
 	log -n "Copy $BACKUP_TYPE backup to remote --tape-- storage failed. MSG: $CMDOUT"
 	echo "Copy $BACKUP_TYPE backup to remote --tape-- storage failed. MSG: $CMDOUT"	
@@ -408,9 +421,10 @@ log -n "Purge remote --tape-- $BACKUP_TYPE backups ... ${CMDOUT}"
 
 if [ $OVERALL_RESULT -eq 0 ]; then
 	log -n "Purging $BACKUP_TYPE backups completed successfully."
+	log -n "Purged locations: local=$PG_LOCAL_FULL_BACKUP_DIR remote=$PG_FULL_BACKUP_DIR tape=$PG_FULL_BACKUP_ARCHIVE_DIR"
 	echo "Purging $BACKUP_TYPE backups completed successfully."
+	echo "Purged locations: local=$PG_LOCAL_FULL_BACKUP_DIR remote=$PG_FULL_BACKUP_DIR tape=$PG_FULL_BACKUP_ARCHIVE_DIR"
 	exitscript 0
-	#echo "Copy full backup to remote tape storage finished successfully."
 else
 	log -n "Some purge $BACKUP_TYPE backup steps failed. MSG: $CMDOUT"
 	echo "Some purge $BACKUP_TYPE backup steps failed. MSG: $CMDOUT"
