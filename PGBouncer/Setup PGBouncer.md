@@ -88,7 +88,7 @@ The pass can be in any format. It does not need to be database cluster user/pass
  table.
 
 ```sql
-SELECT rolpassword FROM pg_authid WHERE rolname='Your User'
+SELECT rolpassword FROM pg_authid WHERE rolname='your user'    # rolname in small letters
 ```
  
 4. restart pgbouncer service
