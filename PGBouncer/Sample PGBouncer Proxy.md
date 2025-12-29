@@ -11,8 +11,9 @@ Because `PGBouncer` is a proxy, it can offer some other minor functionalities. F
 [databases]
 ; The following 2 will actually point to the same database:
 ; The connection string will point to the same database as alias if the database is not mentioned in the connection string
-payam_db = host=127.0.0.1 port=5432 user=payam password=<pass> client_encoding=UNICODE datestyle=ISO
-payam_dw = host=127.0.0.1 port=5432 user=dataplatform_ro dbname=payam_db password=<pass> application_name=readonly_client options='-c default_transaction_read_only=on' client_encoding=UNICODE datestyle=ISO
+payam_db = host=127.0.0.1 port=5432 dbname=payam_db
+payam_dw = host=127.0.0.1 port=5432 dbname=payam_db user=dataplatform_ro
+
 
 .
 .
