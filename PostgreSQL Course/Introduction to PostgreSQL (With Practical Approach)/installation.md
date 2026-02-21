@@ -70,11 +70,11 @@ As said before, the approaches 1 and 2 need extra work like moving the files, cr
 
 ## Start with PostgreSQL native installation on Linux:
 
-The installation instructions are for RHEL And Ubuntu. RHEL explanations come first, the Ubuntu.
+The installation instructions are for RHEL and Ubuntu. RHEL explanations come first, then Ubuntu.
  The primary steps to install PostgreSQL on Alpine Linux are also noted very briefly. However, if you
  learn them and complete reading this document, you should have no problem installing pg on other distributions.
 
-Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s default repositories (OS repositories are nearly always outdated) etc.
+Obtain PostgreSQL repository from the official website, Enterprise DB, OS’s default repositories (OS repositories are nearly always outdated), etc.
  The best place to obtain the repositories is `postgresql.org` itself:
 
 [PostgreSQL Downloads](https://www.postgresql.org/download/) 
