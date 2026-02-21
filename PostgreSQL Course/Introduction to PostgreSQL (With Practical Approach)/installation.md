@@ -6,7 +6,7 @@
 
 ## Notes:
 
-* Here we do not discuss moving pg’s main installation directory.
+* Here we do not discuss moving pg’s binary installation directory.
 
 * a postgresql instance is called postgresql database cluster or postgresql cluster in short.
 
